@@ -15,15 +15,23 @@ We run the evaluation set, not training. And the curve is the answer: the
 same model, same puzzles, solving more at 17:00 than at 14:30. Memorization
 does not climb.
 
-**Why not a frontier model?**
-The rules of this harness: cheap open-weight models only, so the harness is
-what improves, not the model. A frontier model would also hide the effect
-we are showing.
+**Why not a frontier model? Why reasoning off?**
+Cheap open-weight models only, so the harness is what improves, not the
+model. Reasoning is off for the same reason: with thinking on, DeepSeek V4
+already scores about 90% on ARC-AGI-1 and there is nothing left to show.
+With thinking off it starts around 13% single shot, and every point above
+that comes from the tool loop, the gate and the library.
 
 **How does your score compare to published results?**
 We are not claiming a benchmark result. The claim is the delta over the
 day with the same model, which is what long-horizon learning looks like.
-The single-shot rate of the same model at 14:30 is our baseline.
+Reference points: the same model single shot is our own baseline script
+(`npm run baseline`); ARC Prize's no-thinking DeepSeek V4 runs are 12 to
+13% (semi-private, pass@2); the best published program-synthesis pipeline
+on a non-thinking DeepSeek is 67% pass@2 at $0.62 per task (Moghe and
+Chin, 2026); Greenblatt's GPT-4o pipeline was 42% with thousands of
+samples per task (2024). The public eval set is likely in training data,
+so any public-eval number is best case; ARC Prize scores semi-private.
 
 **Two workers, same puzzle?**
 Cannot happen: the claim is one atomic update, the planner never emits a

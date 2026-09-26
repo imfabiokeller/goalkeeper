@@ -103,6 +103,20 @@ Tools: `read_input`, `read_state`, `search_library`, `try_submit(proposal)`
 (runs the gate, returns the reasons, records nothing), `submit`, `block`.
 Step budget 20.
 
+## Model and reasoning
+
+Worker model: `deepseek/deepseek-v4-flash` with reasoning off
+(`WORKER_REASONING=none`). Decided at 15:00 after the first live merge:
+with reasoning on, DeepSeek V4 Pro and Flash already score about 90% on
+ARC-AGI-1 (ARC Prize verified, semi-private, pass@2), so a curve would
+have no headroom and the harness would be invisible. With reasoning off
+the same models score 12 to 13% single shot, direct grid (ARC Prize) and
+a published program-synthesis pipeline on a non-thinking DeepSeek reached
+55 to 67% pass@2 at under $1 per task (Moghe and Chin, arXiv 2607.06764).
+That is the band we are playing in: the model thinks only through the
+tool loop, and the library, not hidden chain-of-thought, is what raises
+the rate.
+
 ## Baseline
 
 `npm run baseline` (`usecase/tools/baseline.ts`) measures the same model
