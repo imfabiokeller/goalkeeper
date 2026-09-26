@@ -41,7 +41,8 @@ export const MAX_ERROR_ATTEMPTS = 5;
 
 export type IterationOutcome = "idle" | "merged" | "reopened" | "blocked" | "raced" | "error";
 
-export const DEADLINE_MS = 4 * 60_000;
+// Flash without thinking takes long steps on hard puzzles; 6 minutes, DEADLINE_MS overrides.
+export const DEADLINE_MS = Number(process.env.DEADLINE_MS ?? 6 * 60_000);
 export const HEARTBEAT_MS = 15_000;
 
 const PLANNER_MODULE = "../planner/plan.ts";

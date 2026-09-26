@@ -122,7 +122,7 @@ export async function refreshMetrics(c: Collections, now = new Date()): Promise<
                     0,
                   ],
                 },
-                ctx: { $cond: [{ $eq: ["$kind", "worker-run"] }, "$tokens.in", null] },
+                ctx: { $cond: [{ $eq: ["$kind", "worker-run"] }, "$raw.contextTokens", null] },
               },
             },
           ],
@@ -180,8 +180,9 @@ export async function refreshMetrics(c: Collections, now = new Date()): Promise<
       ])
       .next(),
     c.sources
-      .find({ kind: "worker-run" }, { projection: { "tokens.in": 1 }, sort: { createdAt: -1 }, limit: ROLLING_MERGES })
-      .map((s) => s.tokens?.in ?? 0)
+      // The assembled context per task (goal, input, state, failures, briefing), the flat number on stage.
+      .find({ kind: "worker-run", "raw.contextTokens": { $gt: 0 } }, { projection: { "raw.contextTokens": 1 }, sort: { createdAt: -1 }, limit: ROLLING_MERGES })
+      .map((s) => Number((s.raw as { contextTokens?: number }).contextTokens ?? 0))
       .toArray(),
     c.goal.findOne({ _id: "goal" }),
     c.inputs.countDocuments({ scheduled: true }),

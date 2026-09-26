@@ -75,8 +75,8 @@ describe("metrics", () => {
       taskFixture("old", { status: "merged", attempt: 1, updatedAt: new Date("2026-09-26T09:00:00Z") }),
     ]);
     await c.sources.insertMany([
-      sourceFixture("run", { kind: "worker-run", tokens: { in: 1000, out: 100, cost: 0.01 }, createdAt: m1 }),
-      sourceFixture("run", { kind: "worker-run", tokens: { in: 3000, out: 100, cost: 0.01 }, createdAt: m2 }),
+      sourceFixture("run", { kind: "worker-run", tokens: { in: 1000, out: 100, cost: 0.01 }, raw: { contextTokens: 1000 }, createdAt: m1 }),
+      sourceFixture("run", { kind: "worker-run", tokens: { in: 3000, out: 100, cost: 0.01 }, raw: { contextTokens: 3000 }, createdAt: m2 }),
       sourceFixture("gate", { kind: "gate", raw: { pass: false, reasons: ["x"] }, createdAt: m2 }),
       sourceFixture("gate", { kind: "gate", raw: { pass: true, reasons: [] }, createdAt: m2 }),
     ]);
