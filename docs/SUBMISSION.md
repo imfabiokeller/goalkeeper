@@ -24,11 +24,16 @@ the worker never sees scores it. Kill five workers mid-puzzle and their
 puzzles are picked up by others with the same lessons; nothing is lost.
 
 Today it ran ARC-AGI-1 (400 evaluation puzzles) with DeepSeek V4 Flash
-with thinking off. Same model, one shot per puzzle, no library: about 12%
-solved. With the harness: 80% of finished puzzles solved and climbing
-through the afternoon while the library grew from 0 to 15M tokens and
-every agent still read 4k. The claim on screen: the library grows, the
-context does not, and the solve rate goes up.
+with thinking off, six workers, for under a dollar. Our own control, the
+same model one shot per puzzle with no tools and no library, gated and
+scored the same way: 10% solved, 12.5% with two attempts (40 puzzles,
+`usecase/tools/baseline.json`; ARC Prize reports 12 to 13% for this
+model without thinking). With the harness, by 16:20: 74 puzzles solved
+on the hidden test, 82% of the puzzles it finished, while the library
+grew from 0 to 14.8M tokens and every agent still read about 4k. A third
+of the solves came on a second or later attempt, after a refuted rule,
+a hidden-score hint or a library that had grown. The claim on screen:
+the library grows, the context does not, and the solve rate goes up.
 
 ## Links
 
