@@ -88,7 +88,8 @@ function Stage() {
   const openCard = openKey ? (cards.find((c) => c?.key === openKey) ?? null) : null;
   const openUnit = openKey ? (units[openKey] ?? null) : null;
   const openTaskId = openUnit?.tasks.at(-1)?.id ?? null;
-  const task = usePoll<TaskPayload>(openTaskId ? taskUrl(openTaskId) : "/api/task/none", 10_000);
+  // Without an open card the poll idles on the cheap baseline route, so it never 404s.
+  const task = usePoll<TaskPayload>(openTaskId ? taskUrl(openTaskId) : "/api/baseline", 10_000);
   const close = useCallback(() => router.replace("/"), [router]);
   const open = useCallback((key: string) => router.replace(`/?open=${key}`), [router]);
 

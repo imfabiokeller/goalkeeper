@@ -78,10 +78,10 @@ export function Expanded({ card, unit, control, task, onClose, contextAvg }: { c
   const ctrlTries = tryDots(ctrlN, control?.score === 1 || control?.solvedAt2 ? "#4a8f67" : "#c29a3a");
   const cmpNote =
     control === undefined || control === null
-      ? "Same puzzle, same model, same budget: the only difference is the library. The control has not reached this puzzle yet."
+      ? "Same puzzle, same model: the difference is the library and the tools. The control has not reached this puzzle yet."
       : status === "solved" && !(control.score === 1 || control.solvedAt2)
         ? `goalkeeper solved it on attempt ${attempt}; the control starts every try from a blank page.`
-        : "Same puzzle, same budget: the only difference is the library.";
+        : "Same puzzle, same model: the difference is the library and the tools.";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24, height: "100%", minHeight: 0 }}>
@@ -175,7 +175,7 @@ export function Expanded({ card, unit, control, task, onClose, contextAvg }: { c
           <div style={{ display: "flex", flexDirection: "column", gap: 14, border: "1px solid #1f1f1f", borderRadius: 14, background: "#050505", padding: "18px 20px" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
               <span style={{ fontSize: 17, fontWeight: 500 }}>Compared with the control</span>
-              <span style={SUB}>same puzzle, same model, same token budget · the control agent has no library</span>
+              <span style={SUB}>same puzzle, same model, same two attempts on the hidden test · the control agent has no library and never runs its program</span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: 14, border: "1px solid #1f2a23", borderRadius: 10, background: "#08100b" }}>
