@@ -38,6 +38,7 @@ export async function enrich(text: string, opts: EnrichOptions = {}): Promise<En
     const { output } = await generateText({
       model: opts.model ?? enrichModel(),
       output: Output.object({ schema: EnrichmentShape, name: "enrichment" }),
+      maxOutputTokens: 800,
       system:
         "You index records of an extraction pipeline for retrieval. Summarize the record for a future worker on a different unit: what was tried, what the gate said, what generalizes.",
       prompt: text.slice(0, ENRICH_CHARS),

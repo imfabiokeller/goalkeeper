@@ -20,6 +20,7 @@ export async function spentUsd(c: Collections): Promise<number> {
   return row?.cost ?? 0;
 }
 
+const ERROR_BACKOFF_MS = 10_000;
 const IDLE_MS = 2000;
 const BUDGET_EVERY = 20;
 
@@ -52,6 +53,10 @@ async function main(): Promise<void> {
     const outcome = await iteration(c, workerId);
     if (outcome === "idle") {
       await sleep(IDLE_MS);
+    } else if (outcome === "error") {
+      // Back off so a dead provider does not burn attempts in a hot loop.
+      console.log(`[${workerId}] error in ${((Date.now() - started) / 1000).toFixed(1)} s, backing off`);
+      await sleep(ERROR_BACKOFF_MS);
     } else {
       console.log(`[${workerId}] ${outcome} in ${((Date.now() - started) / 1000).toFixed(1)} s`);
     }

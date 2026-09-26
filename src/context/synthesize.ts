@@ -90,7 +90,7 @@ export async function synthesize(args: SynthesizeArgs): Promise<Briefing | null>
   if (args.hits.length === 0) return null;
   try {
     const { system, prompt } = briefingPrompt(args);
-    const result = await generateText({ model: args.model ?? enrichModel(), system, prompt });
+    const result = await generateText({ model: args.model ?? enrichModel(), system, prompt, maxOutputTokens: 1200 });
     const grounded = ground(result.text, args.hits.map((h) => h.id));
     if (!grounded.text) return null;
     const citedIds = new Set(grounded.citedIds);

@@ -18,6 +18,7 @@ export async function structured<S extends z.ZodType>(
     output: Output.object({ schema }),
     prompt,
     temperature: 0,
+    maxOutputTokens: 1000,
   });
   const usage = result.totalUsage;
   const tin = usage.inputTokens ?? 0;

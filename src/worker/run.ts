@@ -110,6 +110,7 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
     messages: ctx.messages,
     tools,
     stopWhen: [stepCountIs(ctx.maxSteps ?? MAX_STEPS), hasToolCall("submit"), hasToolCall("block")],
+    maxOutputTokens: 4000, // a proposal plus reasoning, never the model's default ceiling
     abortSignal: ctx.abortSignal,
   });
 

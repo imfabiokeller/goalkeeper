@@ -32,6 +32,9 @@ export type IterationOptions = {
   maxSteps?: number;
 };
 
+// Errors (provider down, credits out) reopen a task this many times, then block it.
+export const MAX_ERROR_ATTEMPTS = 5;
+
 export type IterationOutcome = "idle" | "merged" | "reopened" | "blocked" | "raced" | "error";
 
 export const DEADLINE_MS = 4 * 60_000;
@@ -95,9 +98,15 @@ export async function iteration(c: Collections, workerId: string, opts: Iteratio
   } catch (err) {
     // Never leave a task claimed: back to open, attempt + 1, and an error
     // source. If the reaper already took it, the precondition skips it.
+    // After MAX_ERROR_ATTEMPTS the task blocks with the error so a broken
+    // provider cannot spin one task forever; the reason shows on screen.
+    const message = err instanceof Error ? err.message : String(err);
+    const exhausted = task.attempt >= MAX_ERROR_ATTEMPTS;
     await c.tasks
       .findOneAndUpdate(claimed(task, workerId), {
-        $set: { status: "open", worker: null, heartbeat: null, updatedAt: new Date() },
+        $set: exhausted
+          ? { status: "blocked", worker: null, heartbeat: null, blockReason: `error: ${message.slice(0, 200)}`, updatedAt: new Date() }
+          : { status: "open", worker: null, heartbeat: null, updatedAt: new Date() },
         $inc: { attempt: 1 },
       })
       .catch(() => undefined);
