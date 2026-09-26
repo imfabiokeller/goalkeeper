@@ -1,132 +1,199 @@
 "use client";
 
-// The stage view: header (goal, KPIs), the curve, the puzzle grid, the
-// worker rows and the live feed, in the brief's order. Layout only: the
-// regions fill 1920x1080 without scrolling; the mockup pass restyles.
+// The stage: header (goal, the hero chart, the counters, the Library
+// link), a grid of puzzle cards, the kill button and its toast, and the
+// expanded card as an overlay at ?open=key. 1920x1080, no scrolling.
 
-import { KpiStrip } from "../components/Counter.tsx";
-import { FeedLine } from "../components/FeedLine.tsx";
-import { SolveCurve } from "../components/SolveCurve.tsx";
-import { UnitGrid } from "../components/UnitGrid.tsx";
-import { WorkerRow } from "../components/WorkerRow.tsx";
-import { compact, duration, hhmm, pct, secondsSince } from "../lib/format.ts";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Card } from "../components/Card.tsx";
+import { Expanded } from "../components/Expanded.tsx";
+import { Hero } from "../components/Hero.tsx";
+import type { ControlResult } from "../lib/cards.ts";
+import { compact, hhmm } from "../lib/format.ts";
 import { usePoll } from "../lib/poll.ts";
-import type { StagePayload } from "../lib/types.ts";
-import { useSize } from "../lib/useSize.ts";
+import type { StageCard, StagePayload, TaskPayload, UnitPayload } from "../lib/types.ts";
+import { useMany } from "../lib/useMany.ts";
 
-type BaselinePayload = { solveRate: number; solveRateAt2: number | null; n: number; model: string } | null;
+type BaselineTotals = { solveRate?: number; solveRateAt2?: number | null; n?: number; model?: string } | null;
 
 const STAGE_POLL_MS = 2000;
+const UNIT_POLL_MS = 3000;
+const CONTROL_POLL_MS = 30_000;
 const BASELINE_POLL_MS = 60_000;
-const FEED_SHOWN = 15;
+const TOAST_MS = 30_000;
+const KILL_N = 5;
 
-function lastDefined<T>(list: T[], pick: (t: T) => number | null): number | null {
-  for (let i = list.length - 1; i >= 0; i--) {
-    const v = pick(list[i]!);
-    if (v !== null && v !== undefined) return v;
-  }
-  return null;
+const unitUrl = (key: string) => `/api/unit/${key}`;
+const controlUrl = (key: string) => `/api/baseline?key=${key}`;
+const taskUrl = (id: string) => `/api/task/${id}`;
+
+function Kpi({ value, note, color }: { value: React.ReactNode; note: string; color?: string }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 2, whiteSpace: "nowrap", flexShrink: 0 }}>
+      <span style={{ fontFamily: "var(--mono)", fontSize: 26, lineHeight: 1, color }}>{value}</span>
+      <span style={{ fontSize: 13, color: "var(--fg-dimmer)" }}>{note}</span>
+    </div>
+  );
+}
+
+function Stage() {
+  const router = useRouter();
+  const params = useSearchParams();
+  const openKey = params.get("open");
+  const stage = usePoll<StagePayload>("/api/stage", STAGE_POLL_MS);
+  const baseline = usePoll<BaselineTotals>("/api/baseline", BASELINE_POLL_MS);
+  const s = stage.data;
+
+  // The cards stay where they are between polls: a card keeps its slot
+  // while its key is on the list, new keys fill freed slots.
+  const slots = useRef<Array<string | null>>([]);
+  const cards = useMemo(() => {
+    const list = s?.cards ?? [];
+    const byKey = new Map(list.map((c) => [c.key, c]));
+    const next: Array<string | null> = slots.current.map((k) => (k && byKey.has(k) ? k : null));
+    for (const c of list) {
+      if (next.includes(c.key)) continue;
+      const free = next.indexOf(null);
+      if (free === -1) next.push(c.key);
+      else next[free] = c.key;
+    }
+    while (next.length && next[next.length - 1] === null) next.pop();
+    slots.current = next;
+    return next.map((k) => (k ? byKey.get(k) ?? null : null));
+  }, [s]);
+
+  const keys = useMemo(() => cards.flatMap((c) => (c ? [c.key] : [])), [cards]);
+  const allKeys = useMemo(() => (openKey && !keys.includes(openKey) ? [...keys, openKey] : keys), [keys, openKey]);
+  const units = useMany<UnitPayload>(allKeys, unitUrl, UNIT_POLL_MS);
+  const controls = useMany<ControlResult>(allKeys, controlUrl, CONTROL_POLL_MS);
+
+  // A card flashes when it turns solved or retrying while on screen.
+  const prev = useRef<Map<string, StageCard["status"]>>(new Map());
+  const [flashes, setFlashes] = useState<Record<string, "solved" | "retry">>({});
+  useEffect(() => {
+    const next: Record<string, "solved" | "retry"> = {};
+    for (const c of cards) {
+      if (!c) continue;
+      const was = prev.current.get(c.key);
+      if (was && was !== c.status && c.status === "solved") next[c.key] = "solved";
+      if (was && was !== c.status && c.status === "retrying") next[c.key] = "retry";
+    }
+    prev.current = new Map(cards.flatMap((c) => (c ? [[c.key, c.status] as const] : [])));
+    if (Object.keys(next).length) setFlashes((f) => ({ ...f, ...next }));
+  }, [cards]);
+
+  // The expanded card: its unit and the latest attempt's run.
+  const openCard = openKey ? (cards.find((c) => c?.key === openKey) ?? null) : null;
+  const openUnit = openKey ? (units[openKey] ?? null) : null;
+  const openTaskId = openUnit?.tasks.at(-1)?.id ?? null;
+  const task = usePoll<TaskPayload>(openTaskId ? taskUrl(openTaskId) : "/api/task/none", 10_000);
+  const close = useCallback(() => router.replace("/"), [router]);
+  const open = useCallback((key: string) => router.replace(`/?open=${key}`), [router]);
+
+  // The kill: one POST, one toast, nothing else on the screen changes by hand.
+  const [toast, setToast] = useState<string | null>(null);
+  const [killing, setKilling] = useState(false);
+  const kill = async () => {
+    setKilling(true);
+    try {
+      const res = await fetch("/api/kill", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ n: KILL_N }) });
+      if (!res.ok) throw new Error(`${res.status}`);
+      setToast(`${KILL_N} agents stopped`);
+    } catch {
+      setToast("could not reach the kill switch");
+    } finally {
+      setKilling(false);
+    }
+  };
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), TOAST_MS);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const totals = s?.metrics.totals ?? null;
+  const solved = s?.counts.solved ?? 0;
+  const alive = s?.workers.alive ?? 0;
+  const target = s?.workers.target ?? 0;
+  const stopped = (s?.cards ?? []).filter((c) => c.status === "stopped").length;
+  const controlRate = typeof baseline.data?.solveRate === "number" ? baseline.data.solveRate : null;
+
+  return (
+    <main style={{ position: "relative", width: 1920, height: 1080, padding: "36px 48px", display: "flex", flexDirection: "column", gap: 24, background: "#000", color: "var(--fg)", overflow: "hidden", margin: "0 auto" }}>
+      <header style={{ height: 60, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 40 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 18, minWidth: 0 }}>
+          <svg width="24" height="24" viewBox="0 0 22 22" fill="none" stroke="#ededed" strokeWidth="1.6">
+            <circle cx="11" cy="11" r="9" />
+            <path d="M6 11h10" />
+          </svg>
+          <span style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em" }}>goalkeeper</span>
+          <span style={{ fontSize: 22, color: "#333" }}>/</span>
+          <span style={{ fontSize: 20, color: "var(--fg-dim)", whiteSpace: "nowrap" }}>Solve {s?.counts.units ?? 400} ARC puzzles</span>
+          <span style={{ fontSize: 13, color: "var(--accent)", border: "1px solid var(--accent-line)", borderRadius: 999, padding: "5px 12px", whiteSpace: "nowrap" }}>goal written by a human · {hhmm(s?.goal?.writtenAt)}</span>
+          {stage.error ? <span style={{ fontSize: 12, color: "var(--status-blocked)" }}>stale: {stage.error}</span> : null}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 28, flexShrink: 0 }}>
+          <Hero solveRate={s?.metrics.solveRate ?? []} perMinute={s?.metrics.perMinute ?? []} libraryTokens={totals?.libraryTokens ?? null} controlRate={controlRate} width={300} height={44} />
+          <Kpi
+            value={
+              <>
+                {solved}
+                <span style={{ color: "#555" }}> / {s?.counts.units ?? 400}</span>
+              </>
+            }
+            note="puzzles solved"
+          />
+          <Kpi value={`${alive} / ${target || alive}`} note={stopped ? `${stopped} restarting` : "agents running"} color={stopped ? "#f07178" : undefined} />
+          <Kpi value={compact(totals?.contextLast20Avg)} note="tokens each agent reads" />
+          <Kpi value={compact(totals?.libraryTokens)} note="tokens in the library" />
+          <Link href="/library" style={{ height: 44, display: "flex", alignItems: "center", gap: 10, padding: "0 16px", border: "1px solid #333", borderRadius: 10, textDecoration: "none", fontSize: 15 }}>
+            <span>Library</span>
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#ededed" strokeWidth="1.6">
+              <path d="M4 8h8M9 5l3 3-3 3" />
+            </svg>
+          </Link>
+        </div>
+      </header>
+
+      <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gridTemplateRows: "repeat(2, minmax(0, 1fr))", gap: 18 }}>
+        {cards.slice(0, 8).map((c, i) =>
+          c ? (
+            <Card key={c.key} card={c} unit={units[c.key] ?? null} control={controls[c.key]} onOpen={() => open(c.key)} flash={flashes[c.key] ?? null} />
+          ) : (
+            <div key={`empty-${i}`} style={{ border: "1px dashed #1a1a1a", borderRadius: 14 }} />
+          ),
+        )}
+        {!cards.length && s ? <div style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--fg-dimmer)", fontSize: 16 }}>no agent is holding a puzzle right now</div> : null}
+      </div>
+
+      {toast ? (
+        <div className="toast" style={{ position: "absolute", left: "50%", top: 116, transform: "translateX(-50%)", height: 48, padding: "0 20px", display: "flex", alignItems: "center", gap: 12, border: "1px solid #3a1a1b", borderRadius: 12, background: "#140808", boxShadow: "0 12px 40px rgba(0,0,0,.6)", fontSize: 16, whiteSpace: "nowrap", zIndex: 5 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#d4575b" }} />
+          <span style={{ color: "#f07178" }}>{toast}</span>
+          {toast.startsWith(`${KILL_N} agents`) ? <span style={{ color: "var(--fg-dim)" }}>· their {KILL_N} puzzles went back in the queue · replacements starting · nothing lost</span> : null}
+        </div>
+      ) : null}
+      <button type="button" onClick={kill} disabled={killing} style={{ position: "absolute", right: 48, bottom: 10, height: 26, padding: "0 12px", borderRadius: 7, background: "transparent", border: "1px dashed #3a3a3a", color: "var(--fg-dimmer)", fontSize: 12, cursor: "pointer" }}>
+        {killing ? "stopping" : `Simulate failure: stop ${KILL_N} agents`}
+      </button>
+
+      {openKey ? (
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }} onClick={close}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: 1480, height: 1010, border: "1px solid #262626", borderRadius: 18, background: "#0a0a0a", padding: "30px 36px", boxShadow: "0 30px 80px rgba(0,0,0,.8)", overflow: "hidden" }}>
+            <Expanded card={openCard} unit={openUnit} control={controls[openKey]} task={openTaskId ? task.data : null} onClose={close} contextAvg={totals?.contextLast20Avg ?? null} />
+          </div>
+        </div>
+      ) : null}
+    </main>
+  );
 }
 
 export default function StagePage() {
-  const stage = usePoll<StagePayload>("/api/stage", STAGE_POLL_MS);
-  const baseline = usePoll<BaselinePayload>("/api/baseline", BASELINE_POLL_MS);
-  const curveBox = useSize<HTMLDivElement>();
-  const s = stage.data;
-
-  const totals = s?.metrics.totals ?? null;
-  const attempted = totals?.attempted ?? s?.units.filter((u) => u.attempt !== null).length ?? 0;
-  const solved = s?.counts.solved ?? 0;
-  const merged = (s?.counts.merged ?? 0) + solved;
-  const lastBucket = s?.metrics.solveRate.at(-1) ?? null;
-  const solveRate = lastBucket && lastBucket.attempted > 0 ? lastBucket.solved / lastBucket.attempted : attempted > 0 ? solved / attempted : null;
-  const firstTry = s ? lastDefined(s.metrics.perMinute, (m) => m.firstTryPass) : null;
-  const uptime = secondsSince(s?.goal?.writtenAt ?? null, stage.at ?? Date.now());
-  const model = process.env.NEXT_PUBLIC_WORKER_MODEL ?? baseline.data?.model ?? null;
-
   return (
-    <main
-      className="stage"
-      style={{
-        height: "100vh",
-        display: "grid",
-        gridTemplateRows: "auto 240px minmax(0, 1fr)",
-        gridTemplateColumns: "minmax(0, 1fr) 640px",
-        gap: 12,
-        padding: 12,
-        overflow: "hidden",
-      }}
-    >
-      <header style={{ gridColumn: "1 / -1", display: "flex", flexDirection: "column", gap: 8 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 16 }}>
-          <div style={{ minWidth: 0, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={s?.goal?.statement ?? undefined}>
-            <span style={{ fontFamily: "var(--mono)", color: "var(--accent)", marginRight: 12 }}>goalkeeper</span>
-            <span>{s?.goal?.statement ?? (stage.loading ? "loading" : "no goal")}</span>
-          </div>
-          <span style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--fg-dim)", whiteSpace: "nowrap" }}>
-            written once by a human at {hhmm(s?.goal?.writtenAt)}
-            {stage.error ? <span style={{ color: "var(--status-blocked)", marginLeft: 12 }}>stale: {stage.error}</span> : null}
-          </span>
-        </div>
-        <KpiStrip
-          items={[
-            { label: "solve rate", value: pct(solveRate, 1), caption: baseline.data ? `single shot ${pct(baseline.data.solveRate, 1)}` : "hidden test passes / attempted", size: "lg", tone: "var(--accent)" },
-            { label: "solved", value: solved, caption: `of ${s?.counts.units ?? 0}`, tone: "var(--status-solved)" },
-            { label: "merged", value: merged, caption: "passed the examples", tone: "var(--status-merged)" },
-            { label: "attempted", value: attempted, caption: `${s?.counts.claimed ?? 0} working now` },
-            { label: "blocked", value: s?.counts.blocked ?? 0, caption: `${s?.counts.parked ?? 0} parked`, tone: "var(--status-blocked)" },
-            { label: "library tokens", value: compact(totals?.libraryTokens), caption: `${compact(totals?.librarySources, 0)} sources, rising`, size: "lg" },
-            { label: "context per request", value: compact(totals?.contextLast20Avg), caption: "tokens, flat", size: "lg" },
-            { label: "first-attempt pass", value: pct(firstTry), caption: "rolling 20" },
-            { label: "median steps", value: totals?.stepsMedian ?? "-", caption: "to merge" },
-            { label: "workers", value: `${s?.workers.alive ?? 0}/${s?.workers.target ?? 0}`, caption: "alive / target" },
-            { label: "uptime", value: duration(uptime), caption: `since ${hhmm(s?.goal?.writtenAt)}` },
-          ]}
-        />
-      </header>
-
-      <section ref={curveBox.ref} style={{ gridColumn: "1 / -1", minWidth: 0, minHeight: 0 }} aria-label="solve rate over time">
-        {curveBox.width > 0 ? (
-          <SolveCurve
-            buckets={s?.metrics.solveRate ?? []}
-            baselineRate={baseline.data?.solveRate ?? null}
-            width={curveBox.width}
-            height={curveBox.height || 240}
-            caption={model ? `${model}, same model all day` : "same model all day"}
-          />
-        ) : null}
-      </section>
-
-      <section style={{ minWidth: 0, minHeight: 0, display: "flex", flexDirection: "column", gap: 6 }} aria-label="puzzles">
-        <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--fg-dim)" }}>
-          {s?.counts.units ?? 0} puzzles: {s?.counts.open ?? 0} open, {s?.counts.claimed ?? 0} working, {s?.counts.merged ?? 0} merged, {s?.counts.solved ?? 0} solved, {s?.counts.blocked ?? 0} blocked
-        </div>
-        <div style={{ flex: 1, minHeight: 0 }}>
-          <UnitGrid units={s?.units ?? []} />
-        </div>
-      </section>
-
-      <aside style={{ minWidth: 0, minHeight: 0, display: "grid", gridTemplateRows: "minmax(0, auto) minmax(0, 1fr)", gap: 12 }}>
-        <section aria-label="workers" style={{ minHeight: 0, overflow: "hidden" }}>
-          <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--fg-dim)", marginBottom: 4 }}>
-            workers {s?.workers.alive ?? 0} alive of {s?.workers.target ?? 0}
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            {(s?.workers.rows ?? []).map((r) => (
-              <WorkerRow key={`${r.worker}-${r.taskId}-${r.diedAt ?? "live"}`} row={r} />
-            ))}
-            {s && !s.workers.rows.length ? <div style={{ color: "var(--fg-dim)", fontFamily: "var(--mono)", fontSize: 12 }}>no workers</div> : null}
-          </div>
-        </section>
-        <section aria-label="live feed" style={{ minHeight: 0, overflow: "hidden" }}>
-          <div style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--fg-dim)", marginBottom: 4 }}>live feed</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            {(s?.feed ?? []).slice(0, FEED_SHOWN).map((l) => (
-              <FeedLine key={`${l.id}-${l.at}-${l.outcome}`} line={l} />
-            ))}
-          </div>
-        </section>
-      </aside>
-    </main>
+    <Suspense fallback={null}>
+      <Stage />
+    </Suspense>
   );
 }
