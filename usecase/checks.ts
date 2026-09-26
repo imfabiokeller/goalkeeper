@@ -12,7 +12,7 @@ import { MAX_PROGRAM_CHARS, runProgram, type Grid } from "./sandbox.ts";
 export type Proposal = {
   key: string; // the ARC task id, equals the task key
   rule: string; // one sentence, the hypothesis in words
-  program: string; // JavaScript defining transform(grid), under 4000 chars
+  program: string; // JavaScript defining transform(grid), under 8000 chars
 };
 
 export type Pair = { input: Grid; output: Grid };
