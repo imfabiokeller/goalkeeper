@@ -78,6 +78,10 @@ type Cached = { path: string; mtimeMs: number; totals: BaselinePayload; puzzles:
 let cache: Cached | null = null;
 
 // The first report that exists, parsed once per mtime.
+// The small report is also bundled statically, so a serverless function
+// that did not trace the file still answers.
+import bundledReport from "../../../usecase/tools/baseline.json" with { type: "json" };
+
 async function loadReport(cwd: string): Promise<Cached | null> {
   for (const rel of BASELINE_CANDIDATES) {
     const path = join(cwd, rel);
@@ -96,7 +100,10 @@ async function loadReport(cwd: string): Promise<Cached | null> {
       // unreadable or half written: try the next location
     }
   }
-  return null;
+  if (cache?.path === "bundled") return cache;
+  const text = JSON.stringify(bundledReport);
+  cache = { path: "bundled", mtimeMs: 0, totals: baselineFromReport(text), puzzles: puzzlesFromReport(text) };
+  return cache;
 }
 
 export async function readBaseline(cwd = process.cwd()): Promise<BaselinePayload> {

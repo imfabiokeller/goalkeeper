@@ -101,7 +101,18 @@ export function classifyRow(d: RowDoc): { kind: LibraryRowKind; text: string } {
   }
 }
 
-export async function buildLibrary(c: Collections): Promise<LibraryPayload> {
+// The rows filter: which records the "whole library" list shows, matched
+// in the database so a chip searches every record, not the newest 40.
+export type RowFilter = "all" | "worked" | "dead" | "gate" | "run";
+export function rowFilterMatch(kind: RowFilter): Record<string, unknown> {
+  if (kind === "worked") return { kind: "worker-run", "raw.gate.pass": true };
+  if (kind === "dead") return { "raw.gate.pass": false, "raw.proposal.rule": { $type: "string" } };
+  if (kind === "gate") return { kind: "gate" };
+  if (kind === "run") return { kind: "worker-run" };
+  return {};
+}
+
+export async function buildLibrary(c: Collections, rowFilter: RowFilter = "all"): Promise<LibraryPayload> {
   const [perKind, storage, refutedRules, metrics, newest, goal, solveDocs, rowDocs, worked, dead, inputsTotal] = await Promise.all([
     c.sources
       .aggregate<{ _id: string; entries: number; tokens: number }>([{ $group: { _id: "$kind", entries: { $sum: 1 }, tokens: { $sum: { $add: ["$tokens.in", "$tokens.out"] } } } }])
@@ -116,6 +127,7 @@ export async function buildLibrary(c: Collections): Promise<LibraryPayload> {
     c.state.find({ score: 1 }, { sort: { scoredAt: 1, mergedAt: 1 }, projection: { key: 1, scoredAt: 1, mergedAt: 1, "data.rule": 1, taskId: 1 } }).toArray() as unknown as Promise<SolveDoc[]>,
     c.sources
       .aggregate<RowDoc>([
+        { $match: rowFilterMatch(rowFilter) },
         { $sort: { createdAt: -1 } },
         { $limit: LIBRARY_ROWS },
         {

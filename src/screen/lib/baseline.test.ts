@@ -19,7 +19,7 @@ describe("baseline", () => {
   });
   it("finds the file under the cwd and is null without it", async () => {
     const root = mkdtempSync(join(tmpdir(), "gk-baseline-"));
-    expect(await readBaseline(root)).toBeNull();
+    expect(await readBaseline(root)).toMatchObject({ n: 40 }); // the bundled report when no file is on disk
     mkdirSync(join(root, "usecase", "tools"), { recursive: true });
     writeFileSync(join(root, "usecase", "tools", "baseline.json"), JSON.stringify({ totals: { solveRate: 0.125, n: 8, model: "m" } }));
     expect(await readBaseline(root)).toMatchObject({ solveRate: 0.125, n: 8 });

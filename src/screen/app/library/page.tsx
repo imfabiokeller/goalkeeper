@@ -423,8 +423,7 @@ function rowMatches(r: LibraryRow, f: Filter): boolean {
   return r.kind === f;
 }
 
-function WholeLibrary({ d, solvedKeys, onPick }: { d: LibraryPayload | null; solvedKeys: Set<string>; onPick: (key: string) => void }) {
-  const [filter, setFilter] = useState<Filter>("all");
+function WholeLibrary({ d, solvedKeys, onPick, filter, setFilter }: { d: LibraryPayload | null; solvedKeys: Set<string>; onPick: (key: string) => void; filter: Filter; setFilter: (f: Filter) => void }) {
   const [q, setQ] = useState("");
   const rows = (d?.rows ?? []).filter((r) => rowMatches(r, filter) && (!q || `${r.key ?? ""} ${r.text}`.toLowerCase().includes(q.toLowerCase())));
   const counts = d?.kindCounts;
@@ -494,7 +493,9 @@ function selFromUrl(): string | null {
 }
 
 export default function LibraryPage() {
-  const poll = usePoll<LibraryPayload>("/api/library", LIBRARY_POLL_MS);
+  // The rows filter is matched in the database (every record, not the newest 40).
+  const [filter, setFilter] = useState<Filter>("all");
+  const poll = usePoll<LibraryPayload>(filter === "all" ? "/api/library" : `/api/library?kind=${filter}`, LIBRARY_POLL_MS);
   const base = usePoll<BaselinePayload>("/api/baseline", BASELINE_POLL_MS);
   const d = poll.data;
   const [sel, setSel] = useState<string | null>(null);
@@ -568,7 +569,7 @@ export default function LibraryPage() {
 
       <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: 20 }}>
         <SolvePanel s={solve} loading={!!sel && solvePoll.loading} onPick={pick} />
-        <WholeLibrary d={d} solvedKeys={solvedKeys} onPick={pick} />
+        <WholeLibrary d={d} solvedKeys={solvedKeys} onPick={pick} filter={filter} setFilter={setFilter} />
       </div>
     </main>
   );
