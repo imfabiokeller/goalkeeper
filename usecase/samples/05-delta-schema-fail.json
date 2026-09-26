@@ -1,0 +1,26 @@
+{
+  "note": "Delta June quarter 2026. Grounded and consistent, but net income was left in millions, the period label is in the wrong format, and there is a field that is not in the shape.",
+  "input": "dal-2026-07-10",
+  "expect": { "schema": false, "grounded": true, "consistent": true },
+  "proposal": {
+    "key": "dal-2026-07-10",
+    "company": "Delta Air Lines, Inc.",
+    "periodEnd": "2026-06-30",
+    "periodLabel": "2Q26",
+    "revenue": 19757000000,
+    "netIncome": 1604,
+    "dilutedEps": 2.44,
+    "revenuePriorYear": 16648000000,
+    "revenueChangePct": 19,
+    "operatingIncome": 1900000000,
+    "currency": "USD",
+    "quotes": {
+      "periodEnd": "Delta Air Lines Announces June Quarter 2026 Financial Results",
+      "revenue": "Operating revenue | 19,757 | 16,648 | 3,109 | 19 | %",
+      "netIncome": "Net income | 1,604 | 2,130 | (526) | (25) | %",
+      "dilutedEps": "Earnings per share of $2.44",
+      "revenuePriorYear": "Operating revenue | 19,757 | 16,648 | 3,109 | 19 | %",
+      "revenueChangePct": "Operating revenue | 19,757 | 16,648 | 3,109 | 19 | %"
+    }
+  }
+}

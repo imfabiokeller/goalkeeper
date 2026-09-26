@@ -1,0 +1,519 @@
+news release
+
+GoDaddy Reports Second Quarter 2026 Financial Results
+
+Company builds on its track record of profitable growth, strong cash generation and leadership in AI-driven innovation
+
+TEMPE, Ariz., July 30, 2026 - GoDaddy Inc. (NYSE: GDDY) today reported financial results for the second quarter ended June 30, 2026.
+
+"GoDaddy is advancing a company-wide AI transformation with Airo at the center, creating an agentic operating system that helps our customers accomplish more," said GoDaddy CEO Aman Bhutani. "Small businesses are engaging with technology in entirely new ways, and Airo's momentum reinforces that we are meeting them where they are going. Our disciplined operating model gives us the capacity to invest in the future and create durable value for customers and shareholders."
+
+"We are executing our AI transformation with the financial discipline that has long defined GoDaddy, and our second quarter results reflect that," said GoDaddy CFO Mark McCaffrey. "We delivered solid revenue growth, expanded profitability and strong free cash flow, while maintaining our disciplined, returns-based approach to capital allocation through substantial share buybacks."
+
+Second Quarter 2026 Business and Financial Highlights
+
+•Total revenue of $1.3 billion, up 7% year-over-year on a reported basis and 6% on a constant currency basis.
+
+•Total bookings of $1.4 billion, up 6% year-over-year on a reported basis and 5% on a constant currency basis.
+
+•Applications and Commerce (A&C) revenue grew 11% year-over-year to $514.8 million.
+
+•Core Platform (Core) revenue grew 4% year-over-year to $783.2 million.
+
+•Operating income of $342.5 million, up 29% year-over-year, representing a 26% margin.
+
+•Net income of $240.1 million, up 20% year-over-year, representing an 18% margin.
+
+•Normalized EBITDA (NEBITDA) of $434.1 million, up 14% year-over-year, representing a 33% margin.
+
+•Net cash provided by operating activities of $442.5 million, up 16% year-over-year.
+
+•Free cash flow of $443.5 million, up 13% year-over-year.
+
+•Airo continued to gain traction, reaching an annualized bookings run rate of $50 million, five times the $10 million shared one quarter ago, as customer adoption and engagement continues to build.
+
+•GoDaddy advanced the identity and discovery layers of the agentic web by announcing its intent to contribute Agent Name Service to the Linux Foundation and co-developing the
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net
+
+Agentic Resource Discovery, or ARD, with Cisco, Databricks, GitHub, Google, Hugging Face, Microsoft, Nvidia, Salesforce, ServiceNow and Snowflake.
+
+•GoDaddy launched the GoDaddy Developer Platform, introducing a new generation of APIs that allow developers and AI systems to search, purchase, configure and manage domains directly within the tools where they work.
+
+•Total customers of 20.5 million, up 22 thousand during the quarter and 35 thousand since December 31, 2025.
+
+Consolidated Second Quarter Financial Highlights
+
+Three Months Ended June 30, | Six Months Ended June 30,
+
+2026 | 2025 | Change | Constant Currency | 2026 | 2025 | Change
+
+(in millions, except customers in thousands and ARPU in dollars)
+
+Total Revenue | $ | 1,298.0 | $ | 1,217.6 | 6.6 | % | 6.3 | % | $ | 2,564.9 | $ | 2,411.9 | 6.3 | %
+
+Applications and Commerce revenue | $ | 514.8 | $ | 463.9 | 11.0 | % | $ | 1,013.0 | $ | 910.3 | 11.3 | %
+
+Core Platform revenue | $ | 783.2 | $ | 753.7 | 3.9 | % | $ | 1,551.9 | $ | 1,501.6 | 3.3 | %
+
+International revenue | $ | 427.1 | $ | 395.9 | 7.9 | % | 7.1 | % | $ | 843.0 | $ | 784.7 | 7.4 | %
+
+Operating income | $ | 342.5 | $ | 266.3 | 28.6 | % | $ | 653.0 | $ | 513.6 | 27.1 | %
+
+Operating income margin | 26.4 | % | 21.9 | % | 450bps | 25.5 | % | 21.3 | % | 420bps
+
+Net income(1) | $ | 240.1 | $ | 199.9 | 20.1 | % | $ | 454.7 | $ | 419.4 | 8.4 | %
+
+Net income margin(1) | 18.5 | % | 16.4 | % | NM | 17.7 | % | 17.4 | % | NM
+
+Net cash provided by operating activities | $ | 442.5 | $ | 379.9 | 16.5 | % | $ | 914.0 | $ | 784.6 | 16.5 | %
+
+Segment EBITDA - A&C | $ | 241.1 | $ | 205.8 | 17.2 | % | $ | 466.3 | $ | 402.7 | 15.8 | %
+
+Segment EBITDA margin - A&C | 46.8 | % | 44.4 | % | 250bps | 46.0 | % | 44.2 | % | 180bps
+
+Segment EBITDA - Core | $ | 261.9 | $ | 246.1 | 6.4 | % | $ | 515.4 | $ | 481.4 | 7.1 | %
+
+Segment EBITDA margin - Core | 33.4 | % | 32.7 | % | 70bps | 33.2 | % | 32.1 | % | 110bps
+
+Non-GAAP Results(2):
+
+NEBITDA | $ | 434.1 | $ | 381.7 | 13.7 | % | $ | 847.6 | $ | 746.1 | 13.6 | %
+
+NEBITDA Margin | 33.4 | % | 31.3 | % | 210bps | 33.0 | % | 30.9 | % | 210bps
+
+Free cash flow | $ | 443.5 | $ | 391.5 | 13.3 | % | $ | 917.1 | $ | 802.8 | 14.2 | %
+
+Operating and Business Metrics:
+
+Total bookings | $ | 1,422.1 | $ | 1,345.3 | 5.7 | % | 5.2 | % | $ | 2,877.4 | $ | 2,762.3 | 4.2 | %
+
+Average revenue per user (ARPU) | $ | 250 | $ | 230 | 8.7 | % | $ | 250 | $ | 230 | 8.7 | %
+
+Annualized recurring revenue | $ | 4,421.4 | $ | 4,181.0 | 5.7 | % | $ | 4,421.4 | $ | 4,181.0 | 5.7 | %
+
+_______________________________
+
+(1)Net income for the six months ended June 30, 2025 included a one-time benefit for the recognition of an uncertain tax position of $34.6 million.
+
+(2)Reconciliations of non-GAAP results to their most directly comparable GAAP financial measures are set forth in "Reconciliation of Non-GAAP Financial Measures" below.
+
+Share Repurchases
+
+Year to date through July 29, 2026, GoDaddy repurchased 9.8 million shares of its common stock for an aggregate purchase price of $851.8 million, resulting in a 7% gross reduction in fully diluted shares outstanding since the beginning of the year.
+
+Balance Sheet
+
+As of June 30, 2026, total cash and cash equivalents were $1.2 billion, total debt was $3.8 billion and net debt was $2.7 billion.
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net
+
+Business Outlook
+
+For the third quarter ending September 30, 2026, GoDaddy expects total revenue in the range of $1.315 billion to $1.335 billion, representing year-over-year growth of 5% at the midpoint versus the same period in 2025. The third quarter represents GoDaddy's toughest comparison against strong Aftermarket performance during the same period in the prior year.
+
+For the full year ending December 31, 2026, GoDaddy is narrowing its revenue guidance to a range of $5.215 billion to $5.255 billion. This represents year-over-year growth of 6% at the midpoint, versus the $4.951 billion of revenue generated for the full year ended December 31, 2025. Within total revenue, GoDaddy expects third quarter and full year A&C revenue growth in the low double-digits and Core revenue growth in the low single-digits.
+
+For the third quarter ending September 30, 2026, GoDaddy expects NEBITDA margin to be approximately 33%. For the full year, GoDaddy reaffirms its NEBITDA margin target of over 33%.
+
+For the full year ending December 31, 2026, GoDaddy reaffirms its free cash flow target of approximately $1.8 billion, versus the $1.6 billion of free cash flow generated in 2025.
+
+GoDaddy's consolidated financial statements are prepared in accordance with generally accepted accounting principles in the United States (GAAP). GoDaddy does not provide reconciliations of forward-looking non-GAAP measures to the most directly comparable forward-looking GAAP equivalents, because projections of changes in individual balance sheet amounts are not possible without unreasonable effort, and presentation of such reconciliations would imply an inappropriate degree of precision. For non-forward-looking non-GAAP measures, a reconciliation to the nearest GAAP equivalent is included in this press release following the financial statements.
+
+Upcoming Investor Event
+
+GoDaddy will hold an in-person Investor Night on December 1, 2026 at its Tempe, Arizona headquarters, during which leaders will discuss GoDaddy's strategy and AI-first transformation, as well as refresh select financial targets and provide demonstrations of recently launched experiences. Given limited space for the live event, interested shareholders and analysts are encouraged to email investors@godaddy.com for an invitation. The event, along with supporting materials, will be accessible live or via an archived replay through the Investor Relations section of GoDaddy's website at https://investors.godaddy.net.
+
+Quarterly Earnings Webcast
+
+GoDaddy will host a webcast to discuss second quarter 2026 results at 5:00 p.m. Eastern Time on July 30, 2026. To participate in the webcast, please register online at https://investors.godaddy.net/investor-relations/overview/default.aspx. The live webcast of the event, together with a slide presentation including supplemental financial information and reconciliations of certain non-GAAP measures to their nearest comparable GAAP measures, will be available through GoDaddy's Investor Relations website at https://investors.godaddy.net. A transcript of pre-recorded remarks will be available on the Investor Relations website at the time of the webcast. Following the event, a recorded replay of the webcast will be available on the website.
+
+GoDaddy uses its Investor Relations website at https://investors.godaddy.net as a means of disclosing material non-public information and to comply with its disclosure obligations under
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net
+
+Regulation FD. Accordingly, investors should monitor GoDaddy’s Investor Relations website, in addition to following press releases, Securities and Exchange Commission (SEC) filings, public conference calls and webcasts.
+
+Forward-Looking Statements
+
+This press release contains forward-looking statements which are subject to the safe harbor provisions of the Private Securities Litigation Reform Act of 1995. These statements are based on estimates and information available to us at the time of this press release and are not guarantees of future performance. Statements in this press release involve risks, uncertainties, assumptions and other important factors. If the risks or uncertainties materialize or the assumptions prove incorrect, our results may differ materially from those expressed or implied by such forward-looking statements. All statements other than statements of historical fact could be deemed forward-looking statements, including, but not limited to any statements regarding: our business outlook; launches of new or expansion of existing products or services, including our AI-powered solutions, tools and services, such as Airo® and Airo.ai; changes in product mix; our development of and involvement in infrastructure initiatives, including Agent Name Service (ANS) and Agentic Resource Discovery (ARD); any projections of product or service availability, technology developments and innovation; customer growth; other future events; historical results that may suggest future trends for our business; our plans, strategies or objectives with respect to future operations, partnerships and partner integrations and marketing strategy; future financial results; our forecasted levels of future taxable income and ability to realize our deferred tax assets; and assumptions underlying and timing of any of the foregoing.
+
+Actual results could differ materially from our current expectations as a result of many factors, including, but not limited to: the unpredictable nature of our rapidly evolving market; fluctuations in our financial and operating results; our rate of growth; interruptions or delays in our service or our web hosting; our dependence on payment card networks and acquiring processors; cyberattacks or breaches of our security measures; our ability to innovate and continue to release, and gain customer acceptance of, our existing and future products and services; our ability to deploy new and evolving technologies, such as generative and agentic AI, machine learning, data analytics and similar tools, to power our offerings and services, and within our operations, and risks related to such technologies; our ability to develop, launch, scale and establish partnerships related to ANS and ARD; our ability to manage our growth; our ability to establish and maintain our partnerships; our ability to hire, retain and motivate employees; the effects of competition; technological, regulatory and legal developments; litigation, legal proceedings, orders and government inquiries; privacy, legislative and regulatory concerns or developments; macroeconomic conditions and developments in the economy, financial markets and credit markets; continued escalation of geopolitical tensions; the level of interest rates and inflationary pressures; and execution of share repurchases.
+
+Additional risks and uncertainties that could affect GoDaddy's business and financial results are included in the filings we make with the SEC from time to time, including those described in "Risk Factors" and "Management's Discussion and Analysis of Financial Condition and Results of Operations" in our most recently filed periodic reports on Form 10-K and Form 10-Q, which are available on GoDaddy's website at https://investors.godaddy.net and on the SEC's website at www.sec.gov. Additional information will also be set forth in other filings that GoDaddy makes with the SEC from time to time. All forward-looking statements in this press release are based on information available to GoDaddy as of the date hereof. Except to the extent required by law,
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net
+
+GoDaddy does not assume any obligation to update the forward-looking statements provided to reflect events that occur or circumstances that exist after the date on which they were made.
+
+Non-GAAP Financial Measures and Other Operating and Business Metrics
+
+In addition to our financial results prepared in accordance with GAAP, this press release includes certain non-GAAP financial measures and other operating and business metrics. We believe that these non-GAAP financial measures and other operating and business metrics are useful as a supplement in evaluating our ongoing operational performance and enhancing an overall understanding of our past financial performance. The non-GAAP financial measures included in this press release should not be considered in isolation from, or as a substitute for, financial information prepared in accordance with GAAP. In addition, similarly titled measures may be calculated differently by other companies and may not be comparable. A reconciliation between each non-GAAP financial measure and its nearest GAAP equivalent is included in this press release following the financial statements. We use both GAAP and non-GAAP measures to evaluate and manage our operations.
+
+Total bookings. Total bookings is an operating metric representing the total value of customer contracts entered into during the period, excluding refunds. We believe total bookings provides additional insight into the performance of our business and the effectiveness of our marketing efforts since we typically collect payment at the inception of a customer contract but recognize revenue ratably over the term of the contract.
+
+Constant currency. Constant currency is calculated by translating bookings and revenue for each month in the current period using the foreign currency exchange rates for the corresponding month in the prior period, excluding any hedging gains or losses realized during the period. We believe constant currency information is useful in analyzing underlying trends in our business by eliminating the impact of fluctuations in foreign currency exchange rates and allows for period-to-period comparisons of our performance.
+
+Normalized EBITDA (NEBITDA). NEBITDA is a supplemental measure of our operating performance used by management to evaluate our business. We calculate NEBITDA as net income excluding depreciation and amortization, interest expense (net), provision or benefit for income taxes, equity-based compensation expense, acquisition-related costs, restructuring-related expenses and certain other items. We believe that the inclusion or exclusion of certain recurring and non-recurring items provides a supplementary measure of our core operating results and permits useful alternative period-over-period comparisons of our operations. NEBITDA should not be viewed as a substitute for comparable GAAP measures.
+
+NEBITDA margin. NEBITDA margin is used by management as a supplemental measure of our operating performance and refers to the ratio of NEBITDA to revenue, expressed as a percentage.
+
+Free cash flow. Free cash flow is a supplemental measure of our liquidity used by management to evaluate our business prior to the impact of restructuring and after purchases of property and equipment. We use free cash flow as a supplemental measure of our liquidity, including our ability to generate cash flow in excess of capital requirements and return cash to shareholders, though it should not be considered as an alternative to, or more meaningful than, comparable GAAP measures.
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net
+
+Net debt. We define net debt as total debt less cash and cash equivalents and short-term investments. Total debt consists of the current portion of long-term debt plus long-term debt and unamortized original issue discount and debt issuance costs. Our management reviews net debt as part of its management of our overall liquidity, financial flexibility, capital structure and leverage and we believe such information is useful to investors. Furthermore, certain analysts and debt rating agencies monitor our net debt as part of their assessments of our business.
+
+Annualized recurring revenue (ARR). ARR is an operating metric defined as annualized quarterly recurring GAAP revenue, net of refunds, from new and renewed subscription-based services. ARR is exclusive of any revenue that is non-recurring, including, without limitation, domain aftermarket, domain transfers, one-time set-up or migration fees and non-recurring professional website services fees. We believe ARR helps illustrate the scale of certain of our products and facilitates comparisons to other companies in our industry.
+
+Average revenue per user (ARPU). We calculate ARPU as total revenue during the preceding 12 month period divided by the average of the number of total customers at the beginning and end of the period. ARPU is one measure that provides insight into our ability to sell additional products to our customers.
+
+Total customers. We define a customer as an individual or entity, each with a unique account and paid transactions in the trailing twelve months or with paid subscriptions as of the end of the period. Total customers is one way we measure the scale of our business and can be a contributing factor to our ability to increase our revenue base.
+
+About GoDaddy
+
+GoDaddy, the world's largest domain name registrar, helps millions of entrepreneurs globally start, grow, and scale their businesses. People come to GoDaddy to name their idea, build a website and logo, sell their products and services, and accept payments. GoDaddy Airo®, the company’s AI-powered experience, makes growing a small business faster and easier by helping them to get their idea online in minutes, drive traffic and boost sales. GoDaddy’s expert guides are available 24/7 to provide assistance. To learn more about the company, visit www.GoDaddy.com.
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net
+
+GoDaddy Inc.
+
+Consolidated Statements of Operations (unaudited)
+
+(In millions, except shares in thousands and per share amounts)
+
+Three Months Ended June 30, | Six Months Ended June 30,
+
+2026 | 2025 | 2026 | 2025
+
+Revenue:
+
+Applications and Commerce | $ | 514.8 | $ | 463.9 | $ | 1,013.0 | $ | 910.3
+
+Core Platform | 783.2 | 753.7 | 1,551.9 | 1,501.6
+
+Total revenue | 1,298.0 | 1,217.6 | 2,564.9 | 2,411.9
+
+Costs and operating expenses(1):
+
+Cost of revenue (excluding depreciation and amortization) | 469.8 | 442.3 | 928.9 | 882.8
+
+Technology and development | 211.4 | 214.3 | 424.6 | 419.6
+
+Marketing and advertising | 89.0 | 93.4 | 181.3 | 193.5
+
+Customer care | 72.8 | 73.5 | 147.2 | 144.6
+
+General and administrative | 90.5 | 96.9 | 181.5 | 194.0
+
+Restructuring and other | 8.7 | 0.3 | 10.9 | 2.4
+
+Depreciation and amortization | 13.3 | 30.6 | 37.5 | 61.4
+
+Total costs and operating expenses | 955.5 | 951.3 | 1,911.9 | 1,898.3
+
+Operating income | 342.5 | 266.3 | 653.0 | 513.6
+
+Interest expense | (37.4) | (38.3) | (75.2) | (75.5)
+
+Other income (expense), net | 11.9 | 11.1 | 21.1 | 21.0
+
+Income before income taxes | 317.0 | 239.1 | 598.9 | 459.1
+
+Provision for income taxes | (76.9) | (39.2) | (144.2) | (39.7)
+
+Net income | $ | 240.1 | $ | 199.9 | $ | 454.7 | $ | 419.4
+
+Net income per share of Class A common stock:
+
+Basic | $ | 1.84 | $ | 1.44 | $ | 3.44 | $ | 2.99
+
+Diluted | $ | 1.83 | $ | 1.41 | $ | 3.43 | $ | 2.92
+
+Weighted-average shares of Class A common stock outstanding:
+
+Basic | 130,764 | 138,734 | 132,187 | 140,200
+
+Diluted | 130,994 | 141,408 | 132,766 | 143,387
+
+___________________________
+
+(1) Costs and operating expenses include equity-based compensation expense as follows:
+
+Cost of revenue | $ | 0.4 | $ | 0.3 | $ | 0.7 | $ | 0.6
+
+Technology and development | 36.8 | 43.3 | 75.8 | 84.5
+
+Marketing and advertising | 5.6 | 8.5 | 12.1 | 16.7
+
+Customer care | 5.2 | 5.7 | 10.1 | 10.8
+
+General and administrative | 22.2 | 23.2 | 46.8 | 48.8
+
+Total equity-based compensation expense | $ | 70.2 | $ | 81.0 | $ | 145.5 | $ | 161.4
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net
+
+GoDaddy Inc.
+
+Consolidated Balance Sheets (unaudited)
+
+(In millions, except per share amounts)
+
+June 30, | December 31,
+
+2026 | 2025
+
+Assets
+
+Current assets:
+
+Cash and cash equivalents | $ | 1,155.5 | $ | 1,080.9
+
+Accounts and other receivables | 92.9 | 83.1
+
+Registry deposits | 32.6 | 43.9
+
+Prepaid domain name registry fees | 537.1 | 512.2
+
+Prepaid expenses and other current assets | 154.7 | 120.8
+
+Total current assets | 1,972.8 | 1,840.9
+
+Property and equipment, net | 140.1 | 145.4
+
+Operating lease assets | 51.1 | 41.9
+
+Prepaid domain name registry fees, net of current portion | 251.3 | 241.2
+
+Goodwill | 3,607.7 | 3,633.3
+
+Intangible assets, net | 966.1 | 986.3
+
+Deferred tax assets | 912.6 | 1,052.6
+
+Other assets | 94.9 | 93.3
+
+Total assets | $ | 7,996.6 | $ | 8,034.9
+
+Liabilities and stockholders' equity
+
+Current liabilities:
+
+Accounts payable | $ | 122.9 | $ | 67.5
+
+Accrued expenses and other current liabilities | 455.1 | 528.7
+
+Deferred revenue | 2,527.9 | 2,384.2
+
+Long-term debt | 15.0 | 15.1
+
+Total current liabilities | 3,120.9 | 2,995.5
+
+Deferred revenue, net of current portion | 983.0 | 934.9
+
+Long-term debt, net of current portion | 3,759.4 | 3,765.2
+
+Operating lease liabilities, net of current portion | 67.0 | 62.0
+
+Other long-term liabilities | 59.6 | 62.2
+
+Commitments and contingencies
+
+Stockholders' equity:
+
+Preferred stock, $0.001 par value | — | —
+
+Class A common stock, $0.001 par value | 0.1 | 0.1
+
+Additional paid-in capital | 3,141.3 | 2,975.2
+
+Accumulated deficit | (3,175.0) | (2,789.4)
+
+Accumulated other comprehensive income | 40.3 | 29.2
+
+Total stockholders' equity | 6.7 | 215.1
+
+Total liabilities and stockholders' equity | $ | 7,996.6 | $ | 8,034.9
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net
+
+GoDaddy Inc.
+
+Consolidated Statements of Cash Flows (unaudited)
+
+(In millions)
+
+Six Months Ended June 30,
+
+2026 | 2025
+
+Operating activities
+
+Net income | $ | 454.7 | $ | 419.4
+
+Adjustments to reconcile net income to net cash provided by operating activities:
+
+Depreciation and amortization | 37.5 | 61.4
+
+Equity-based compensation | 145.5 | 161.4
+
+Deferred taxes | 130.8 | 64.7
+
+Other | 16.6 | 18.7
+
+Changes in operating assets and liabilities:
+
+Prepaid domain name registry fees | (35.3) | (43.1)
+
+Accounts payable | 55.6 | (0.4)
+
+Accrued expenses and other current liabilities | (39.9) | (34.7)
+
+Deferred revenue | 193.4 | 223.8
+
+Other operating assets and liabilities | (44.9) | (86.6)
+
+Net cash provided by operating activities | 914.0 | 784.6
+
+Investing activities
+
+Purchases of property and equipment | (9.7) | (7.7)
+
+Other investing activities | — | (2.3)
+
+Net cash used in investing activities | (9.7) | (10.0)
+
+Financing activities
+
+Repurchases of Class A common stock | (824.4) | (792.5)
+
+Other financing activities | (4.1) | 10.8
+
+Net cash used in financing activities | (828.5) | (781.7)
+
+Effect of exchange rate changes on cash and cash equivalents | (1.2) | 4.8
+
+Net increase (decrease) in cash and cash equivalents | 74.6 | (2.3)
+
+Cash and cash equivalents, beginning of period | 1,080.9 | 1,089.0
+
+Cash and cash equivalents, end of period | $ | 1,155.5 | $ | 1,086.7
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net
+
+Reconciliation of Non-GAAP Financial Measures
+
+The following tables reconcile each non-GAAP financial measure to its most directly comparable GAAP financial measure:
+
+Three Months Ended June 30, | Six Months Ended June 30,
+
+2026 | 2025 | 2026 | 2025
+
+(in millions)
+
+NEBITDA and NEBITDA Margin:
+
+Net income | $ | 240.1 | $ | 199.9 | $ | 454.7 | $ | 419.4
+
+Depreciation and amortization | 13.3 | 30.6 | 37.5 | 61.4
+
+Equity-based compensation expense | 70.2 | 81.0 | 145.5 | 161.4
+
+Interest expense, net | 26.7 | 29.5 | 54.9 | 57.1
+
+Restructuring and other(1) | 6.9 | 1.5 | 10.8 | 7.1
+
+Provision for income taxes | 76.9 | 39.2 | 144.2 | 39.7
+
+NEBITDA | $ | 434.1 | $ | 381.7 | $ | 847.6 | $ | 746.1
+
+Net income margin | 18.5 | % | 16.4 | % | 17.7 | % | 17.4 | %
+
+NEBITDA margin | 33.4 | % | 31.3 | % | 33.0 | % | 30.9 | %
+
+_______________________________
+
+(1)In addition to the restructuring and other in our statements of operations, other charges are primarily composed of lease-related expenses associated with closed facilities, charges related to certain legal matters, expenses incurred in relation to the refinancing of our long-term debt, acquisition-related expenses and incremental expenses associated with certain professional services.
+
+June 30, 2026
+
+(in millions)
+
+Net Debt:
+
+Current portion of long-term debt | $ | 15.0
+
+Long-term debt | 3,759.4
+
+Unamortized original issue discount and debt issuance costs | 42.5
+
+Total debt | 3,816.9
+
+Less: cash and cash equivalents | (1,155.5)
+
+Net debt | $ | 2,661.4
+
+Three Months Ended June 30, | Six Months Ended June 30,
+
+2026 | 2025 | 2026 | 2025
+
+(in millions)
+
+Free Cash Flow:
+
+Net cash provided by operating activities | $ | 442.5 | $ | 379.9 | $ | 914.0 | $ | 784.6
+
+Capital expenditures | (5.1) | (4.1) | (9.7) | (7.7)
+
+Cash paid for restructuring and other charges(1) | 6.1 | 15.7 | 12.8 | 25.9
+
+Free cash flow | $ | 443.5 | $ | 391.5 | $ | 917.1 | $ | 802.8
+
+_______________________________
+
+(1)In addition to payments made pursuant to restructuring activities, cash paid for restructuring and other charges includes lease-related payments associated with closed facilities, payments related to certain legal matters, cash paid for acquisition-related costs including tax and milestone payments related to previous acquisitions, incremental payments associated with certain professional services and third party payments incurred in relation to the refinancing of our long-term debt.
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net
+
+Shares Outstanding
+
+Total shares of common stock outstanding were as follows:
+
+June 30,
+
+2026 | 2025
+
+(in thousands)
+
+Shares Outstanding:
+
+Class A common stock outstanding | 126,834 | 138,863
+
+Effect of dilutive securities(1) | 230 | 2,674
+
+Total shares outstanding | 127,064 | 141,537
+
+_______________________________
+
+(1)Calculated using the treasury stock method, which excludes the impact of antidilutive securities.
+
+CONTACTS:
+
+Investors
+
+Christie Masoner
+
+investors@godaddy.com
+
+Media
+
+Kristy Nicholas
+
+pr@godaddy.com
+
+Source: GoDaddy Inc.
+
+© 2026 GoDaddy Inc. All Rights Reserved.
+
+100 S. Mill Ave Ste. 1600 Tempe, AZ 85281 | 480.505.8800 | https://investors.godaddy.net

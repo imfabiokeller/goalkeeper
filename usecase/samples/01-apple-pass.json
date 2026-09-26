@@ -1,0 +1,25 @@
+{
+  "note": "Apple Q3 FY2026, correct on every field. Narrative gives revenue and EPS; net income and the year-ago revenue come from table rows.",
+  "input": "aapl-2026-07-30",
+  "expect": { "schema": true, "grounded": true, "consistent": true },
+  "proposal": {
+    "key": "aapl-2026-07-30",
+    "company": "Apple Inc.",
+    "periodEnd": "2026-06-27",
+    "periodLabel": "Q3 FY2026",
+    "revenue": 109417000000,
+    "netIncome": 29789000000,
+    "dilutedEps": 2.02,
+    "revenuePriorYear": 94036000000,
+    "revenueChangePct": 16,
+    "currency": "USD",
+    "quotes": {
+      "periodEnd": "today announced financial results for its fiscal 2026 third quarter ended June 27, 2026",
+      "revenue": "Total net sales (1) | 109,417 | 94,036 | 364,357 | 313,695",
+      "netIncome": "Net income | $ | 29,789 | $ | 23,434 | $ | 101,464 | $ | 84,544",
+      "dilutedEps": "Diluted earnings per share was $2.02, up 29 percent year over year",
+      "revenuePriorYear": "Total net sales (1) | 109,417 | 94,036 | 364,357 | 313,695",
+      "revenueChangePct": "The Company posted quarterly revenue of $109.4 billion, up 16 percent year over year."
+    }
+  }
+}

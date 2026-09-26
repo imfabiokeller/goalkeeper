@@ -1,0 +1,25 @@
+{
+  "note": "NVIDIA Q2 FY2027, correct. Fiscal year differs from the calendar year; GAAP EPS chosen over non-GAAP as the guidelines say.",
+  "input": "nvda-2026-08-26",
+  "expect": { "schema": true, "grounded": true, "consistent": true },
+  "proposal": {
+    "key": "nvda-2026-08-26",
+    "company": "NVIDIA Corporation",
+    "periodEnd": "2026-07-26",
+    "periodLabel": "Q2 FY2027",
+    "revenue": 96221000000,
+    "netIncome": 59688000000,
+    "dilutedEps": 2.46,
+    "revenuePriorYear": 46743000000,
+    "revenueChangePct": 106,
+    "currency": "USD",
+    "quotes": {
+      "periodEnd": "today reported revenue for the second quarter ended July 26, 2026, of $96.2 billion",
+      "revenue": "Revenue | $96,221 | $81,615 | $46,743 | 18 | % | 106 | %",
+      "netIncome": "Net income | $59,688 | $58,321 | $26,422 | 2 | % | 126 | %",
+      "dilutedEps": "Diluted earnings per share | $2.46 | $2.39 | $1.08 | 3 | % | 128 | %",
+      "revenuePriorYear": "Revenue | $96,221 | $81,615 | $46,743 | 18 | % | 106 | %",
+      "revenueChangePct": "Revenue of $96.2 billion, up 106% from a year ago"
+    }
+  }
+}

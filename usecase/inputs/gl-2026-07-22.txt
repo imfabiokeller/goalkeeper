@@ -1,0 +1,669 @@
+GLOBE LIFE INC. REPORTS
+
+Second Quarter 2026 Results
+
+McKinney, TX, July 22, 2026—Globe Life Inc. (NYSE: GL) reported today that for the quarter ended June 30, 2026, net income was $3.65 per diluted common share, compared with $3.05 per diluted common share for the year-ago quarter. Net operating income was $3.61 per diluted common share, compared with $3.27 per diluted common share for the year-ago quarter. The Company also increased full-year 2026 earnings guidance to a range of $15.55 to $15.95, an increase of $0.10 at the midpoint.
+
+HIGHLIGHTS:
+
+l | Net income per share increased 20% and net operating income per share increased 10% over the year-ago quarter. Globe Life has produced double-digit growth in net operating income per share in eight of the last nine quarters.
+
+l | Net income as an ROE was 18.4% for the six months ended June 30, 2026. Book value per share was $78.18, an increase of 18% over the year-ago quarter.
+
+l | Net operating income as an ROE excluding accumulated other comprehensive income (AOCI) was 14.3% for the six months ended June 30, 2026. Book value per share excluding AOCI was $100.04, an increase of 11% over the year-ago quarter.
+
+l | Total premium revenue grew 7% over the year-ago quarter.
+
+l | At the American Income Life Division, life premium increased 5% and life underwriting margin increased 4% over the year-ago quarter.
+
+l | At the Liberty National Division, life underwriting margin increased 10% and life net sales increased 6% over the year-ago quarter. Additionally, the average producing agent count increased 8% over the year-ago quarter.
+
+l | At the Family Heritage Division, health underwriting margin increased 10%, health premium increased 9%, and health net sales increased 4% over the year-ago quarter. Additionally, the average producing agent count increased 7% over the year-ago quarter.
+
+l | At the Direct to Consumer Division, life underwriting margin increased 10% over the year-ago quarter.
+
+l | At the United American Division, health premium increased 29% and health net sales increased 10% over the year-ago quarter.
+
+l | 1.1 million shares of Globe Life Inc. common stock were repurchased during the quarter at a total cost of $175 million.
+
+Note: As used in the earnings release, "Globe Life," the "Company," "we," "our," and "us" refer to Globe Life Inc., a Delaware corporation incorporated in 1979, its subsidiaries and affiliates.
+
+1
+
+GL Q2 2026 Earnings Release
+
+GLOBE LIFE INC.
+
+Earnings Release—Q2 2026
+
+(Dollar amounts in thousands, except share and per share data)
+
+(Unaudited)
+
+RESULTS OF OPERATIONS
+
+Net operating income, a non-GAAP(1) financial measure, has been used consistently by Globe Life’s management for many years to evaluate the operating performance of the Company, and is a measure commonly used in the life insurance industry. It differs from net income primarily because it excludes certain non-operating items such as realized investment gains and losses and certain significant and unusual items included in net income. Management believes an analysis of net operating income is important in understanding the profitability and operating trends of the Company’s business. Net income is the most directly comparable GAAP measure.
+
+The following table represents Globe Life's operating summary for the three months ended June 30, 2026 and 2025:
+
+Operating Summary
+
+Per Share
+
+Three Months Ended June 30, | Three Months Ended June 30,
+
+2026 | 2025 | % Chg. | 2026 | 2025 | % Chg.
+
+Insurance underwriting income(2) | $ | 4.69 | $ | 4.28 | 10 | $ | 370,289 | $ | 354,176 | 5
+
+Excess investment income(2) | 0.49 | 0.42 | 17 | 38,315 | 34,828 | 10
+
+Interest on debt | (0.46) | (0.42) | 10 | (36,050) | (34,885) | 3
+
+Parent company expense | (0.06) | (0.04) | (4,569) | (3,555)
+
+Income tax expense | (0.89) | (0.82) | 9 | (70,202) | (68,062) | 3
+
+Stock compensation benefit (expense), net of tax | (0.17) | (0.14) | (13,098) | (11,407)
+
+Net operating income | 3.61 | 3.27 | 10 | 284,685 | 271,095 | 5
+
+Reconciling items, net of tax:
+
+Realized gain (loss) | 0.07 | (0.18) | 5,639 | (14,674)
+
+Legal proceedings | (0.03) | (0.04) | (2,577) | (3,672)
+
+Net income(3) | $ | 3.65 | $ | 3.05 | $ | 287,747 | $ | 252,749
+
+Weighted average diluted shares outstanding | 78,909 | 82,793
+
+(1)GAAP is defined as accounting principles generally accepted in the United States of America.
+
+(2)Definitions included within this document.
+
+(3)A GAAP-basis condensed consolidated statement of operations is included in the appendix of this report.
+
+Note: Tables in this earnings release may not sum due to rounding.
+
+2
+
+GL Q2 2026 Earnings Release
+
+GLOBE LIFE INC.
+
+Earnings Release—Q2 2026
+
+(Dollar amounts in thousands, except share and per share data)
+
+(Unaudited)
+
+MANAGEMENT VS. GAAP MEASURES
+
+Shareholders' equity, excluding AOCI, and book value per share, excluding AOCI, are non-GAAP measures that are utilized by management to view the business without the effect of changes in AOCI, which are primarily attributable to fluctuation in interest rates. Management views the business in this manner because it creates more meaningful and easily identifiable trends, as we exclude fluctuations resulting from changes in interest rates. Shareholders' equity and book value per share are the most directly comparable GAAP measures.
+
+Six Months Ended June 30,
+
+2026 | 2025
+
+Net income | $ | 558,273 | $ | 507,312
+
+Net operating income | 558,205 | 530,432
+
+Net income as an ROE(1) | 18.4 | % | 18.8 | %
+
+Net operating income as an ROE (excluding AOCI)(1) | 14.3 | % | 14.4 | %
+
+June 30,
+
+2026 | 2025
+
+Shareholders' equity | $ | 6,155,815 | $ | 5,419,030
+
+Impact of adjustment to exclude AOCI | 1,721,729 | 1,983,868
+
+Shareholders' equity, excluding AOCI | $ | 7,877,544 | $ | 7,402,898
+
+Book value per share | $ | 78.18 | $ | 66.07
+
+Impact of adjustment to exclude AOCI | 21.86 | 24.19
+
+Book value per share, excluding AOCI | $ | 100.04 | $ | 90.26
+
+(1) Calculated using average shareholders' equity for the measurement period.
+
+3
+
+GL Q2 2026 Earnings Release
+
+GLOBE LIFE INC.
+
+Earnings Release—Q2 2026
+
+(Dollar amounts in thousands, except share and per share data)
+
+(Unaudited)
+
+INSURANCE OPERATIONS:
+
+Life insurance accounted for 78% of the Company’s insurance underwriting margin for the quarter and 66% of total premium revenue.
+
+Health insurance accounted for 22% of the Company's insurance underwriting margin for the quarter and 34% of total premium revenue.
+
+The following table summarizes Globe Life's premium revenue by product type for the three months ended June 30, 2026 and 2025:
+
+Insurance Premium Revenue
+
+Quarter Ended
+
+June 30, 2026 | June 30, 2025 | % Chg.
+
+Life insurance | $ | 860,767 | $ | 839,544 | 3
+
+Health insurance | 436,855 | 378,099 | 16
+
+Total | $ | 1,297,622 | $ | 1,217,643 | 7
+
+INSURANCE UNDERWRITING INCOME
+
+Insurance underwriting margin is management’s measure of profitability of the Company's life and health segments’ underwriting performance, and consists of premiums less policy obligations (excluding interest on policy liabilities), commissions and other acquisition expenses. Insurance underwriting income is the sum of the insurance underwriting margins of the life and health segments, plus annuity and other income, less administrative expenses. It excludes the investment segment, interest on debt, Parent Company expense, stock compensation expense and income taxes. Management believes this information helps provide a better understanding of the business and a more meaningful analysis of underwriting results by distribution channel. Insurance underwriting income, a non-GAAP measure, is a component of net operating income, which is reconciled to net income in the Results of Operations section above.
+
+The following table summarizes Globe Life's insurance underwriting income by segment for the three months ended June 30, 2026 and 2025:
+
+Insurance Underwriting Income
+
+Quarter Ended
+
+June 30, 2026 | % of Premium | June 30, 2025 | % of Premium | % Chg.
+
+Insurance underwriting margins:
+
+Life | $ | 359,350 | 42 | $ | 340,074 | 41 | 6
+
+Health | 99,285 | 23 | 98,057 | 26 | 1
+
+458,635 | 438,131 | 5
+
+Annuity and other income | 3,100 | 2,092
+
+Administrative expenses | (91,446) | (86,047)
+
+Insurance underwriting income | $ | 370,289 | $ | 354,176 | 5
+
+Per share | $ | 4.69 | $ | 4.28 | 10
+
+The ratio of administrative expenses to premium was 7.0%, compared with 7.1% for the year-ago quarter.
+
+4
+
+GL Q2 2026 Earnings Release
+
+GLOBE LIFE INC.
+
+Earnings Release—Q2 2026
+
+(Dollar amounts in thousands, except share and per share data)
+
+(Unaudited)
+
+LIFE INSURANCE RESULTS BY DISTRIBUTION CHANNEL
+
+Our distribution channels consist of the following exclusive divisions: American Income Life Division (American Income), Liberty National Division (Liberty National), Family Heritage Division (Family Heritage), Direct to Consumer Division (Direct to Consumer); and an independent agency, United American Division (United American).
+
+Total premium, underwriting margins, first-year collected premium and net sales by all distribution channels are shown at https://investors.globelifeinsurance.com at "Financial Reports and Other Financial Information."
+
+Life Underwriting Margin
+
+Quarter Ended
+
+June 30,
+
+2026 | 2025
+
+Amount | % of Premium | Amount | % of Premium | % Chg.
+
+American Income | $ | 213,604 | 46 | $ | 204,533 | 46 | 4
+
+Direct to Consumer | 75,876 | 31 | 68,959 | 28 | 10
+
+Liberty National | 36,652 | 36 | 33,446 | 34 | 10
+
+Other | 33,218 | 67 | 33,136 | 66 | —
+
+Total | $ | 359,350 | 42 | $ | 340,074 | 41 | 6
+
+Life Premium
+
+Quarter Ended
+
+June 30,
+
+2026 | 2025 | % Chg.
+
+American Income | $ | 466,334 | $ | 445,511 | 5
+
+Direct to Consumer | 244,220 | 246,223 | (1)
+
+Liberty National | 100,516 | 97,263 | 3
+
+Other | 49,697 | 50,547 | (2)
+
+Total | $ | 860,767 | $ | 839,544 | 3
+
+Life Net Sales(1)
+
+Quarter Ended
+
+June 30,
+
+2026 | 2025 | % Chg.
+
+American Income | $ | 94,733 | $ | 96,227 | (2)
+
+Direct to Consumer | 26,578 | 31,096 | (15)
+
+Liberty National | 26,131 | 24,615 | 6
+
+Other | 2,165 | 2,947
+
+Total | $ | 149,607 | $ | 154,885 | (3)
+
+(1)Net sales is calculated as annualized premium issued, net of cancellations in the first thirty days after issue, except in the case of Direct to Consumer, where net sales is annualized premium issued at the time the first full premium is paid after any introductory offer period (typically 1 month) has expired. Management considers net sales to be a better indicator of premium growth than annualized premium issued since annualized premium issued is before cancellations, as cancellations do not contribute to premium income.
+
+5
+
+GL Q2 2026 Earnings Release
+
+GLOBE LIFE INC.
+
+Earnings Release—Q2 2026
+
+(Dollar amounts in thousands, except share and per share data)
+
+(Unaudited)
+
+HEALTH INSURANCE RESULTS BY DISTRIBUTION CHANNEL
+
+Health Underwriting Margin
+
+Quarter Ended
+
+June 30,
+
+2026 | 2025
+
+Amount | % of Premium | Amount | % of Premium | % Chg.
+
+United American | $ | 10,914 | 5 | $ | 12,402 | 8 | (12)
+
+Family Heritage | 45,087 | 36 | 40,927 | 35 | 10
+
+Liberty National | 23,145 | 49 | 24,372 | 51 | (5)
+
+American Income | 18,221 | 59 | 19,325 | 62 | (6)
+
+Direct to Consumer | 1,918 | 9 | 1,031 | 5
+
+Total | $ | 99,285 | 23 | $ | 98,057 | 26 | 1
+
+Health Premium
+
+Quarter Ended
+
+June 30,
+
+2026 | 2025 | % Chg.
+
+United American | $ | 211,416 | $ | 163,978 | 29
+
+Family Heritage | 126,273 | 115,856 | 9
+
+Liberty National | 47,403 | 47,631 | —
+
+American Income | 30,805 | 31,422 | (2)
+
+Direct to Consumer | 20,958 | 19,212 | 9
+
+Total | $ | 436,855 | $ | 378,099 | 16
+
+Health Net Sales(1)
+
+Quarter Ended
+
+June 30,
+
+2026 | 2025 | % Chg.
+
+United American | $ | 27,894 | $ | 25,454 | 10
+
+Family Heritage | 30,725 | 29,561 | 4
+
+Liberty National | 6,991 | 8,182 | (15)
+
+American Income | 4,093 | 4,749 | (14)
+
+Direct to Consumer | 696 | 786 | (11)
+
+Total | $ | 70,399 | $ | 68,732 | 2
+
+(1)Net sales is calculated as annualized premium issued, net of cancellations in the first thirty days after issue, except in the case of Direct to Consumer, where net sales is annualized premium issued at the time the first full premium is paid after any introductory offer period (typically 1 month) has expired. Management considers net sales to be a better indicator of premium growth than annualized premium issued since annualized premium issued is before cancellations, as cancellations do not contribute to premium income.
+
+6
+
+GL Q2 2026 Earnings Release
+
+GLOBE LIFE INC.
+
+Earnings Release—Q2 2026
+
+(Dollar amounts in thousands, except share and per share data)
+
+(Unaudited)
+
+PRODUCING EXCLUSIVE AGENT COUNT RESULTS BY DISTRIBUTION CHANNEL
+
+Quarterly Average Producing Agent Count(1)
+
+Quarter Ended | Quarter Ended
+
+June 30, | March 31,
+
+2026 | 2025 | % Chg. | 2026
+
+American Income | 11,391 | 12,241 | (7) | 11,064
+
+Liberty National | 4,194 | 3,882 | 8 | 4,031
+
+Family Heritage | 1,608 | 1,498 | 7 | 1,561
+
+(1) The quarterly average producing agent count is based on the actual count at the beginning and end of each week during the period.
+
+INVESTMENTS
+
+Management uses excess investment income as the measure to evaluate the performance of the investment segment. It is defined as net investment income less the required interest attributable to policy liabilities. We also view excess investment income per diluted common share as an important and useful measure to evaluate performance of the investment segment, since it takes into consideration our stock repurchase program.
+
+The following table summarizes Globe Life's investment income, excess investment income, and excess investment income per diluted common share.
+
+Excess Investment Income
+
+Quarter Ended
+
+June 30,
+
+2026 | 2025 | % Chg.
+
+Net investment income | $ | 293,820 | $ | 282,169 | 4
+
+Required interest on policy liabilities(1) | (255,505) | (247,341) | 3
+
+Excess investment income | $ | 38,315 | $ | 34,828 | 10
+
+Per share | $ | 0.49 | $ | 0.42 | 17
+
+(1)Interest on policy liabilities, at original discount rates, is a component of total policyholder benefits, a GAAP measure.
+
+Net investment income increased 4% and average invested assets increased 2%. Required interest on policy liabilities increased 3% and average policy liabilities increased 4%.
+
+7
+
+GL Q2 2026 Earnings Release
+
+GLOBE LIFE INC.
+
+Earnings Release—Q2 2026
+
+(Dollar amounts in thousands, except share and per share data)
+
+(Unaudited)
+
+The composition of the investment portfolio at book value at June 30, 2026 is as follows:
+
+Investment Portfolio
+
+As of
+
+June 30, 2026
+
+Amount | % of Total
+
+Fixed maturities at fair value(1) | $ | 17,940,189 | 86
+
+Mortgage loans | 425,513 | 2
+
+Policy loans | 758,676 | 4
+
+Other long-term investments(2) | 1,466,858 | 7
+
+Short-term investments | 198,327 | 1
+
+Total | $ | 20,789,563
+
+(1) As of June 30, 2026, fixed maturities at amortized cost were $19.3 billion, net of $3.3 million of allowance for credit losses.
+
+(2) Includes $1.10 billion of investments accounted for under the fair value option which have a cost of $1.08 billion as of June 30, 2026.
+
+Fixed maturities at amortized cost, net of allowance for credit losses, by asset class as of June 30, 2026 are as follows:
+
+Fixed Maturity Portfolio by Sector
+
+As of
+
+June 30, 2026
+
+Investment Grade | Below Investment Grade | Total Amortized Cost, net
+
+Corporate bonds | $ | 14,797,965 | $ | 470,927 | $ | 15,268,892
+
+Municipals | 3,423,079 | 1,959 | 3,425,038
+
+Government, agencies, and GSEs(1) | 464,427 | — | 464,427
+
+Other asset-backed securities | 102,711 | 42,930 | 145,641
+
+Total | $ | 18,788,182 | $ | 515,816 | $ | 19,303,998
+
+(1) Government-Sponsored Enterprises
+
+Below are fixed maturities available for sale by amortized cost, allowance for credit losses, and fair value at June 30, 2026 and the corresponding amounts of net unrealized gains and losses recognized in accumulated other comprehensive income (loss).
+
+As of | Amortized Cost | Allowance for Credit Losses | Net Unrealized Gains (Losses) | Fair Value
+
+June 30, 2026 | $ | 19,307,295 | $ | (3,297) | $ | (1,363,809) | $ | 17,940,189
+
+At amortized cost, net of allowance for credit losses, and at fair value, 97% of fixed maturities were rated “investment grade.” The fixed maturity portfolio earned an annual taxable equivalent effective yield of 5.30% during the second quarter of 2026, compared with 5.29% in the year-ago quarter.
+
+Globe Life is not a party to any credit default swaps and does not participate in securities lending.
+
+8
+
+GL Q2 2026 Earnings Release
+
+GLOBE LIFE INC.
+
+Earnings Release—Q2 2026
+
+(Dollar amounts in thousands, except share and per share data)
+
+(Unaudited)
+
+Comparable information for acquisitions of fixed maturity and other investments is as follows:
+
+Fixed Maturity Acquisitions
+
+Quarter Ended
+
+June 30,
+
+2026 | 2025
+
+Amount | $ | 399,143 | $ | 263,252
+
+Average annual effective yield | 6.3 | % | 6.4 | %
+
+Average rating | A | A
+
+Average life (in years) to:
+
+Next call | 32.0 | 31.2
+
+Maturity | 36.1 | 33.8
+
+Other Investment Acquisitions
+
+Quarter Ended
+
+June 30,
+
+2026 | 2025
+
+Limited partnerships | $ | 63,728 | $ | 36,985
+
+Mortgage loans | 25,179 | 31,215
+
+Common stock | 2,340 | 1,342
+
+Company owned life insurance | — | —
+
+Total | $ | 91,247 | $ | 69,542
+
+SHARE REPURCHASES:
+
+During the quarter, the Company repurchased 1.1 million shares of Globe Life Inc. common stock at a total cost of $175 million and an average share price of $154.28.
+
+LIQUIDITY/CAPITAL:
+
+Globe Life's operations consist primarily of writing basic protection life and supplemental health insurance policies which generate strong and stable cash flows. These cash flows are not impacted by volatile equity markets. Liquidity at the Parent Company is sufficient to meet additional capital needs of the insurance companies.
+
+NON-GAAP MEASURES:
+
+In this news release, Globe Life includes non-GAAP measures to enhance investors' understanding of management's view of the business. The non-GAAP measures are not a substitute for GAAP, but rather a supplement to increase transparency by providing broader perspective. Globe Life's definitions of non-GAAP measures may differ from other companies' definitions. More detailed financial information, including various GAAP and non-GAAP measurements, is located at https://investors.globelifeinsurance.com on the Investors page under “Financial Reports and Other Financial Information."
+
+9
+
+GL Q2 2026 Earnings Release
+
+CAUTION REGARDING FORWARD-LOOKING STATEMENTS:
+
+This press release may contain forward-looking statements within the meaning of the federal securities laws. These prospective statements reflect management’s current expectations, but are not guarantees of future performance. Whether or not actual results differ materially from forward-looking statements may depend on numerous foreseeable and unforeseeable events or developments, which may be national in scope, related to the insurance industry generally, or applicable to the Company specifically. Such events or developments could include, but are not necessarily limited to:
+
+1) Economic and other conditions, including the impact of inflation, immigration, geopolitical events, escalating tariff and non-tariff trade measures imposed by the U.S. and other countries, and other governmental actions on the U.S. economy and/or U.S. consumer confidence, leading to unexpected changes in lapse rates and/or sales of our policies, as well as levels of mortality, morbidity, and utilization of health care services that differ from Globe Life's assumptions;
+
+2) Regulatory developments, including changes in accounting standards or governmental regulations (particularly those impacting taxes and changes to the Federal Medicare program that would affect Medicare Supplement);
+
+3) Market trends in the senior-aged health care industry that provide alternatives to traditional Medicare (such as Health Maintenance Organizations and other managed care or private plans) and that could affect the sales of traditional Medicare Supplement insurance;
+
+4) Ratings changes with respect to our financial strength and credit ratings and potential adverse impacts to liquidity;
+
+5) Interest rate changes that affect product sales, financing costs, and/or investment yields;
+
+6) General economic, industry sector or individual debt issuers’ financial conditions (including developments and volatility arising from geopolitical events, particularly in certain industries that may compromise part of our investment portfolio) that may affect the current market value of securities we own, or that may impair an issuer’s ability to make principal and/or interest payments due on those securities;
+
+7) Changes in the competitiveness of the Company's products and pricing;
+
+8) Litigation results and regulatory actions;
+
+9) Levels of administrative and operational efficiencies that differ from our assumptions (including any reduction in efficiencies resulting from increased costs arising from the impact of higher than anticipated inflation);
+
+10) The ability to obtain timely and appropriate premium rate increases for health insurance policies from our regulators;
+
+11) The ability of our subsidiaries to pay dividends to the Parent Company and to receive required regulatory approvals on such amounts;
+
+12) The customer response to new products and marketing initiatives;
+
+13) Reported amounts in the consolidated financial statements which are based on management estimates and judgments which may differ from the actual amounts ultimately realized;
+
+14) Compromise by a malicious actor or other event that causes a loss of secure data from, or inaccessibility to, our computer and other information technology systems;
+
+15) The Company's ability to attract and retain agents;
+
+16) The severity, magnitude, and impact of natural or man-made catastrophic events, including but not limited to pandemics, tornadoes, hurricanes, earthquakes, war and terrorism, on our operations and personnel, commercial activity and demand for our products; and
+
+17) Globe Life’s ability to access the commercial paper and debt markets, particularly if such markets become unpredictable or unstable for a certain period.
+
+Readers are also directed to consider other risks and uncertainties described in other documents on file with the Securities and Exchange Commission, including those described in the "Risk Factors" section of our most recent Annual Report on Form 10-K. Globe Life specifically disclaims any obligation to update or revise any forward-looking statement because of new information, future developments or otherwise.
+
+10
+
+GL Q2 2026 Earnings Release
+
+EARNINGS RELEASE CONFERENCE CALL WEBCAST:
+
+Globe Life will provide a live audio webcast of its second quarter 2026 earnings release conference call with financial analysts at 11:00 am (Eastern) tomorrow, July 23, 2026. Access to the live webcast and replay will be available at https://investors.globelifeinsurance.com on the Calls and Meetings page, at the Conference Calls on the Web icon. Immediately following this press release, supplemental financial reports will be available before the conference call on the Investors page menu of the Globe Life website at “Financial Reports.”
+
+For additional information contact: | Stephen Mota, Vice President - Investor Relations Globe Life Inc. 7677 Henneman Way P.O. Box 8080 McKinney, Texas 75070-8080 Phone: 972-569-3627 or email: investors@globe.life Website: https://investors.globelifeinsurance.com
+
+11
+
+GL Q2 2026 Earnings Release
+
+GLOBE LIFE INC.
+
+Earnings Release—Q2 2026
+
+(Dollar amounts in thousands, except share and per share data)
+
+(Unaudited)
+
+APPENDIX
+
+GLOBE LIFE INC.
+
+GAAP CONDENSED CONSOLIDATED STATEMENTS OF OPERATIONS
+
+Three Months Ended June 30, | Six Months Ended June 30,
+
+2026 | 2025 | 2026 | 2025
+
+Revenue:
+
+Life premium | $ | 860,767 | $ | 839,544 | $ | 1,713,972 | $ | 1,669,407
+
+Health premium | 436,855 | 378,099 | 853,763 | 747,890
+
+Total premium | 1,297,622 | 1,217,643 | 2,567,735 | 2,417,297
+
+Net investment income | 293,820 | 282,169 | 583,644 | 562,783
+
+Realized gains (losses) | 7,138 | (18,574) | 5,660 | (18,489)
+
+Other income | 1,150 | 49 | 2,310 | 118
+
+Total revenue | 1,599,730 | 1,481,287 | 3,159,349 | 2,961,709
+
+Benefits and expenses:
+
+Life policyholder benefits(1) | 513,959 | 519,355 | 1,032,809 | 1,029,111
+
+Health policyholder benefits(2) | 277,012 | 229,924 | 540,746 | 463,853
+
+Other policyholder benefits | 7,280 | 6,719 | 14,280 | 13,799
+
+Total policyholder benefits | 798,251 | 755,998 | 1,587,835 | 1,506,763
+
+Amortization of deferred acquisition costs | 120,537 | 111,401 | 238,819 | 216,916
+
+Commissions, premium taxes, and non-deferred acquisition costs | 173,754 | 157,411 | 343,640 | 321,734
+
+Other operating expense | 116,251 | 108,293 | 229,986 | 217,039
+
+Interest expense | 36,050 | 34,885 | 70,050 | 69,877
+
+Total benefits and expenses | 1,244,843 | 1,167,988 | 2,470,330 | 2,332,329
+
+Income before income taxes | 354,887 | 313,299 | 689,019 | 629,380
+
+Income tax benefit (expense) | (67,140) | (60,550) | (130,746) | (122,068)
+
+Net income | $ | 287,747 | $ | 252,749 | $ | 558,273 | $ | 507,312
+
+Basic net income per common share | $ | 3.71 | $ | 3.09 | $ | 7.16 | $ | 6.13
+
+Diluted net income per common share | $ | 3.65 | $ | 3.05 | $ | 7.04 | $ | 6.07
+
+(1)Net of total remeasurement gain of $23.5 million before tax for the three months ended June 30, 2026 and a total remeasurement gain of $16.7 million before tax for the same period in 2025. Net of total remeasurement gain of $42.4 million for the six months ended June 30, 2026, and a total remeasurement gain of $25.3 million for the same period in 2025.
+
+(2)Net of total remeasurement gain of $1.3 million before tax for the three months ended June 30, 2026 and a total remeasurement gain of $3.9 million before tax for the same period in 2025. Net of a total remeasurement gain of $7.3 million for the six months ended June 30, 2026, and a total remeasurement gain of $4.3 million for the same period in 2025.
+
+12
+
+GL Q2 2026 Earnings Release

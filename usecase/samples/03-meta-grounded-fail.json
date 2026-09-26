@@ -1,0 +1,25 @@
+{
+  "note": "Meta Q2 FY2026 with two grounding errors: the EPS digits are transposed (6.81 for 6.18) and the periodEnd quote is a paraphrase, not the sentence in the release.",
+  "input": "meta-2026-07-29",
+  "expect": { "schema": true, "grounded": false, "consistent": true },
+  "proposal": {
+    "key": "meta-2026-07-29",
+    "company": "Meta Platforms, Inc.",
+    "periodEnd": "2026-06-30",
+    "periodLabel": "Q2 FY2026",
+    "revenue": 60801000000,
+    "netIncome": 15848000000,
+    "dilutedEps": 6.81,
+    "revenuePriorYear": 47516000000,
+    "revenueChangePct": 28,
+    "currency": "USD",
+    "quotes": {
+      "periodEnd": "Meta reported financial results for the quarter ended June 30, 2026",
+      "revenue": "Revenue | $ | 60,801 | $ | 47,516 | 28 | %",
+      "netIncome": "Net income | $ | 15,848 | $ | 18,337 | (14) | %",
+      "dilutedEps": "Diluted earnings per share (EPS) | $ | 6.18 | $ | 7.14 | (13) | %",
+      "revenuePriorYear": "Revenue | $ | 60,801 | $ | 47,516 | 28 | %",
+      "revenueChangePct": "Revenue | $ | 60,801 | $ | 47,516 | 28 | %"
+    }
+  }
+}

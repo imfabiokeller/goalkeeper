@@ -57,6 +57,10 @@ verified by a deterministic gate, so nothing drifts.
 - [docs/DEMO.md](docs/DEMO.md): the three-minute script and the video.
 - [docs/QA.md](docs/QA.md): the judges' questions and the answers.
 - [docs/PRIOR-ART.md](docs/PRIOR-ART.md): what exists and how this differs.
+- [docs/USE-CASE.md](docs/USE-CASE.md): what the harness needs from a
+  pure-state demo use case.
+- [usecase/README.md](usecase/README.md): the demo use case, headline
+  earnings from press releases, with inputs, lens, checks and samples.
 
 ## Built during the event
 

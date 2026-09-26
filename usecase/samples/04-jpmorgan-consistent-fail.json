@@ -1,0 +1,25 @@
+{
+  "note": "JPMorgan Q2 2026. Every quote is real, but the 41 percent attached to revenueChangePct is the net income growth; the two revenue figures imply 28 percent.",
+  "input": "jpm-2026-07-14",
+  "expect": { "schema": true, "grounded": true, "consistent": false },
+  "proposal": {
+    "key": "jpm-2026-07-14",
+    "company": "JPMorgan Chase & Co.",
+    "periodEnd": "2026-06-30",
+    "periodLabel": "Q2 FY2026",
+    "revenue": 57347000000,
+    "netIncome": 21155000000,
+    "dilutedEps": 7.70,
+    "revenuePriorYear": 44912000000,
+    "revenueChangePct": 41,
+    "currency": "USD",
+    "quotes": {
+      "periodEnd": "$375 billion in stockholders' equity as of June 30, 2026",
+      "revenue": "Net revenue - reported | $ | 57,347 | $ | 49,836 | $ | 44,912",
+      "netIncome": "Net income | $ | 21,155 | $ | 16,494 | $ | 14,987",
+      "dilutedEps": "NET INCOME OF $21.2 BILLION ($7.70 PER SHARE)",
+      "revenuePriorYear": "Net revenue - reported | $ | 57,347 | $ | 49,836 | $ | 44,912",
+      "revenueChangePct": "Net income was $21.2 billion, up 41%"
+    }
+  }
+}

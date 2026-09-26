@@ -1,0 +1,6463 @@
+Exhibit 99.1
+
+Blackstone
+Reports Second Quarter 2026 Results
+
+New York, July 23, 2026: Blackstone (NYSE:BX) today reported its second quarter 2026
+results.
+
+Stephen A. Schwarzman, Chairman and Chief Executive Officer, said, “Blackstone delivered an outstanding second quarter, highlighted by strong
+growth in earnings and nearly $70 billion of inflows. Our decision to lean into the artificial intelligence megatrend is leading to standout investment performance across numerous strategies and creating extraordinary opportunities for growth.
+We’ve become a trusted partner at scale to many of the key innovators in this ecosystem, which positions our firm extremely well for the future.”
+
+Blackstone issued a full detailed presentation of its second quarter 2026 results, which can be viewed at www.blackstone.com.
+
+Dividend
+
+Blackstone has declared a quarterly dividend of $1.29 per share to record holders of common stock at the close of business on August 3, 2026.
+This dividend will be paid on August 10, 2026.
+
+Quarterly Investor Call Details
+
+Blackstone will host its second quarter 2026 investor conference via public webcast on July 23, 2026, at 9:00 a.m. ET. To register, please use the
+following link:
+
+https://event.webcasts.com/starthere.jsp?ei=1767654&tp_key=310a533cbf. For those unable to listen to the live
+
+Blackstone
+
+345 Park
+Avenue, New York, NY 10154
+
+T 212 583 5000
+
+www.blackstone.com
+
+broadcast, there will be a webcast replay on the Shareholders section of Blackstone’s website at
+https://ir.blackstone.com/.
+
+About Blackstone
+
+Blackstone is the world’s largest
+alternative asset manager. Blackstone seeks to deliver compelling returns for institutional and individual investors by strengthening the companies in which the firm invests. Blackstone’s over $1.3 trillion in assets under management
+include global investment strategies focused on real estate, private equity, credit, infrastructure, life sciences, growth equity, secondaries and hedge funds. Further information is available at www.blackstone.com. Follow @blackstone on
+LinkedIn, X (Twitter), and Instagram.
+
+Forward-Looking Statements
+
+This presentation may contain
+forward-looking statements within the meaning of Section 27A of the Securities Act of 1933, as amended, and Section 21E of the Securities Exchange Act of 1934, as amended, which reflect our current views with respect to, among other
+things, our operations, taxes, earnings and financial performance, share repurchases and dividends. You can identify these forward-looking statements by the use of words such as “outlook,” “indicator,” “believes,”
+“expects,” “potential,” “continues,” “may,” “will,” “should,” “seeks,” “approximately,” “predicts,” “intends,”
+“plans,” “scheduled,” “estimates,” “anticipates,” “opportunity,” “leads,” “forecast,” “possible” or the negative version of these words or other
+comparable words. Such forward-looking statements are subject to various risks and uncertainties. Accordingly, there are or will be important factors that could cause actual outcomes or results to differ materially from those indicated in these
+statements. We believe these factors include but are not limited to those described under the section entitled “Risk Factors” in our Annual Report on Form 10-K for the year ended December 31,
+2025, as such factors may be updated from time to time in our subsequent filings with the United States Securities and Exchange Commission (“SEC”), which are accessible on the SEC’s website at www.sec.gov. These factors should not
+be construed as exhaustive and should be read in conjunction with the other cautionary statements that are included in this report and in our other periodic filings. The forward-looking statements speak only as of the date of this report, and we
+undertake no obligation to publicly update or review any forward-looking statement, whether as a result of new information, future developments or otherwise.
+
+This presentation does not constitute an offer of any Blackstone Fund.
+
+Investor and Media Relations Contacts
+
+ Weston Tucker  Blackstone
+ Tel: +1 (212) 583-5231
+ tucker@blackstone.com
+
+Christine Anderson Blackstone
+Tel: +1 (212) 583-5182
+christine.anderson@blackstone.com
+
+                    
+
+Blackstone’s Second
+
+Quarter 2026 Earnings
+
+JULY 23, 2026
+
+  
+
+ 
+
+BLACKSTONE’S SECOND QUARTER 2026 GAAP RESULTS
+
+§
+
+GAAP Net Income was $2.4 billion for the quarter and $3.6 billion year-to-date (“YTD”). GAAP Net Income Attributable
+to Blackstone Inc. was $1.2 billion for the quarter and $1.9 billion YTD.
+
+($
+in thousands, except per share data) (unaudited)
+
+2Q’25
+
+2Q’26
+
+2Q’25 YTD
+
+2Q’26 YTD
+
+2Q’25 LTM
+
+2Q’26 LTM
+
+Revenues
+
+Management and Advisory Fees, Net
+
+ $
+2,035,495
+
+ $
+2,266,006
+
+ 
+
+ $
+3,939,812
+
+ $
+4,414,626
+
+ 
+
+ $
+7,614,287
+
+ $
+8,550,415
+
+Incentive Fees
+
+195,414
+
+159,080
+
+387,239
+
+324,499
+
+983,777
+
+915,462
+
+Performance Allocations
+
+1,143,103
+
+1,952,315
+
+1,968,354
+
+3,338,940
+
+4,045,177
+
+5,675,892
+
+Principal Investments
+
+462,562
+
+520,406
+
+806,817
+
+278,424
+
+937,177
+
+417,543
+
+Interest and Dividend Revenue
+
+100,389
+
+134,224
+
+197,809
+
+242,164
+
+406,130
+
+460,448
+
+Other
+
+(225,063
+)
+
+11,947
+
+(298,673
+)
+
+62,920
+
+(239,431
+)
+
+90,720
+
+Total Revenues
+
+ $
+
+  3,711,900
+
+ $
+
+  5,043,978
+
+ $
+
+  7,001,358
+
+ $
+
+  8,661,573
+
+ $
+
+  13,747,117
+
+ $
+
+  16,110,480
+
+Expenses
+
+Compensation and Benefits
+
+1,421,530
+
+1,814,135
+
+2,853,370
+
+3,558,550
+
+5,332,917
+
+6,325,709
+
+General, Administrative and Other
+
+360,817
+
+409,110
+
+693,190
+
+781,931
+
+1,373,221
+
+1,613,289
+
+Interest Expense
+
+135,822
+
+145,023
+
+253,937
+
+282,076
+
+480,806
+
+536,453
+
+Fund Expenses
+
+14,434
+
+7,344
+
+26,538
+
+15,348
+
+36,304
+
+38,026
+
+Total Expenses
+
+ $
+
+1,932,603
+
+ $
+
+2,375,612
+
+ $
+
+3,827,035
+
+ $
+
+4,637,905
+
+ $
+
+7,223,248
+
+ $
+
+8,513,477
+
+Other Income
+
+ $
+136,330
+
+ $
+140,086
+
+ $
+193,905
+
+ $
+239,841
+
+ $
+215,576
+
+ $
+469,924
+
+Income Before Provision for
+Taxes
+
+ $
+1,915,627
+
+ $
+2,808,452
+
+ $
+3,368,228
+
+ $
+4,263,509
+
+ $
+6,739,445
+
+ $
+8,066,927
+
+Provision for Taxes
+
+ 289,494
+
+452,386
+
+533,321
+
+649,536
+
+1,011,075
+
+1,241,238
+
+Net Income
+
+ $
+1,626,133
+
+ $
+2,356,066
+
+ $
+2,834,907
+
+ $
+3,613,973
+
+ $
+5,728,370
+
+ $
+6,825,689
+
+Redeemable NCI in Consolidated
+Entities
+
+18,209
+
+ 5,154
+
+26,109
+
+26,164
+
+4,231
+
+45,555
+
+Non-Redeemable NCI in Consolidated Entities
+
+843,680
+
+1,121,723
+
+1,429,702
+
+1,708,891
+
+2,860,335
+
+3,261,098
+
+Net Income Attributable to
+Blackstone Inc.
+
+ $
+764,244
+
+ $
+1,229,189
+
+ $
+1,379,096
+
+ $
+1,878,918
+
+ $
+2,863,804
+
+ $
+3,519,036
+
+Net Income Per Share of Common Stock,
+Basic
+
+ $
+0.98
+
+ $
+1.54
+
+ $
+1.77
+
+ $
+2.37
+
+ $
+3.71
+
+ $
+4.47
+
+Net Income Per Share of Common
+Stock, Diluted
+
+ $
+0.98
+
+ $
+
+1.54
+
+ $
+1.77
+
+ $
+
+2.37
+
+ $
+3.71
+
+ $
+
+4.47
+
+Throughout this presentation, all current period amounts are preliminary and unaudited. Totals may not add due to rounding. See pages 36-38, Definitions and Dividend Policy, for definitions of
+terms used throughout this presentation. NCI means non-controlling interests.
+
+Blackstone  |   1
+
+BLACKSTONE’S SECOND QUARTER 2026 HIGHLIGHTS
+
+Financial Measures
+
+§
+ Fee Related Earnings (“FRE”) of $1.8 billion ($1.43/share) in the quarter
+
+– FRE
+was $6.3 billion over the last twelve months (“LTM”) ($5.14/share)
+§
+ Distributable Earnings (“DE”) of $2.0 billion ($1.52/share) in the quarter
+
+– DE
+was $7.9 billion over the LTM ($6.15/share)
+§
+ Net Accrued Performance Revenues of $7.5 billion ($6.00/share)
+
+Capital Metrics
+
+§
+ Total Assets Under Management (“AUM”) of $1,346.3 billion
+
+– Fee-Earning AUM of $961.6 billion
+
+–
+Perpetual Capital AUM of $555.6 billion
+§
+ Inflows of $68.3 billion in the quarter and $262.5 billion over the LTM
+§
+ Deployment of $34.2 billion in the quarter and $138.5 billion over the LTM
+§
+ Realizations of $31.8 billion in the quarter and $144.5 billion over the LTM
+
+Capital Returned
+to Shareholders
+
+§
+ Dividend of $1.29 per common share payable on August 10, 2026
+–
+Dividends of $5.23 per common share over the LTM
+§
+ Repurchased 0.2 million common shares in the quarter and 0.8 million common shares over the LTM
+§
+ $1.7 billion to be distributed to shareholders with respect to the second quarter and $6.9 billion over the LTM through dividends and share repurchases
+
+  
+
+Blackstone  |   2
+
+BLACKSTONE’S SECOND QUARTER 2026 SEGMENT EARNINGS
+
+($ in thousands, except per share
+data)
+
+2Q’25
+
+2Q’26
+
+ % Change 
+ vs. 2Q’25 
+
+2Q’25 YTD
+
+2Q’26 YTD
+
+%
+Change  vs. 2Q’25 YTD 
+
+Management and Advisory Fees, Net
+
+$
+2,020,012
+
+$
+2,250,296
+
+11%
+
+$
+3,912,010
+
+$
+4,383,104
+
+12%
+
+Fee Related Performance
+Revenues
+
+472,050
+
+793,391
+
+68%
+
+765,965
+
+1,281,489
+
+67%
+
+Fee Related Compensation
+
+(700,316
+)
+
+(880,129
+)
+
+26%
+
+(1,317,298
+)
+
+(1,609,599
+)
+
+22%
+
+Other Operating Expenses
+
+(332,243
+)
+
+(380,130
+)
+
+14%
+
+(639,118
+)
+
+(723,585
+)
+
+13%
+
+Fee Related Earnings
+
+$
+1,459,503
+
+$
+1,783,428
+
+22%
+
+$
+2,721,559
+
+$
+3,331,409
+
+22%
+
+ 
+
+Realized Performance
+Revenues
+
+553,121
+
+730,885
+
+32%
+
+1,013,144
+
+1,511,379
+
+49%
+
+Realized Performance Compensation
+
+(256,624
+)
+
+(344,124
+)
+
+34%
+
+(477,548
+)
+
+(708,180
+)
+
+48%
+
+Realized Principal Investment
+Income
+
+29,421
+
+27,499
+
+(7)%
+
+147,331
+
+59,472
+
+(60)%
+
+Net Realizations
+
+325,918
+
+414,260
+
+27%
+
+682,927
+
+862,671
+
+26%
+
+Total Segment Distributable
+Earnings
+
+$
+1,785,421
+
+$
+2,197,688
+
+23%
+
+$
+3,404,486
+
+$
+4,194,080
+
+23%
+
+ 
+
+Distributable Earnings
+
+$
+1,565,763
+
+$
+1,977,249
+
+26%
+
+$
+2,976,568
+
+$
+3,742,087
+
+26%
+
+ 
+
+Additional Metrics:
+
+Net Income Per Share of Common Stock, Basic
+
+$
+0.98
+
+$
+1.54
+
+57%
+
+$
+1.77
+
+$
+2.37
+
+34%
+
+FRE per Share
+
+$
+1.19
+
+$
+1.43
+
+20%
+
+$
+2.22
+
+$
+2.69
+
+21%
+
+DE per Common Share
+
+$
+1.21
+
+$
+1.52
+
+26%
+
+$
+2.30
+
+$
+2.88
+
+25%
+
+Total Segment Revenues
+
+$
+3,074,604
+
+$
+3,802,071
+
+24%
+
+$
+5,838,450
+
+$
+7,235,444
+
+24%
+
+Total Assets Under Management
+
+$
+  1,211,207,341
+
+$
+  1,346,263,835
+
+11%
+
+$
+  1,211,207,341
+
+$
+  1,346,263,835
+
+11%
+
+Fee-Earning Assets Under Management
+
+$
+887,114,205
+
+$
+
+961,592,654
+
+8%
+
+$
+887,114,205
+
+$
+
+961,592,654
+
+8%
+
+Fee Related Earnings per Share is based on end of period DE Shares Outstanding (see page 24, Share Summary). DE per Common Share is based on DE Attributable to Common Shareholders (see page 23, Shareholder Dividends) and end of
+period Participating Common Shares outstanding. YTD FRE per Share and DE per Common Share amounts represent the sum of the last two quarters. See pages 32-33 for the Reconciliation of GAAP to Total
+Segments.
+
+Blackstone  |   3
+
+INVESTMENT PERFORMANCE AND NET ACCRUED PERFORMANCE REVENUES
+
+§
+
+Appreciation across strategies led to higher Net Accrued Performance Revenues quarter-over-quarter of $7.5 billion ($6.00/share).
+
+Investment Performance
+
+(appreciation / gross returns)
+
+2Q’26 
+
+ 2Q’26 LTM 
+
+Real Estate
+
+Opportunistic
+
+0.4%
+
+(1.4)%
+
+Core+
+
+0.2%
+
+3.2%
+
+Private Equity
+
+Corporate Private Equity
+
+3.7%
+
+14.4%
+
+Tactical Opportunities
+
+3.9%
+
+9.9%
+
+Secondaries
+
+1.7%
+
+8.1%
+
+Infrastructure
+
+7.2%
+
+28.6%
+
+Credit & Insurance
+
+Private Credit
+
+1.0%
+
+6.8%
+
+Liquid Credit
+
+2.2%
+
+3.9%
+
+Multi-Asset Investing
+
+Absolute Return Composite
+
+5.8%
+
+15.5%
+
+Net Accrued Performance Revenues
+
+($ in millions)
+
+  
+
+Investment Performance represents fund appreciation for Real Estate and Private Equity and gross returns for Credit & Insurance and Multi-Asset Investing. Secondaries appreciation excludes GP Stakes. Private Credit net
+returns were 0.4% and 3.9% for 2Q’26 and 2Q’26 LTM, respectively. Liquid Credit net returns were 2.1% and 3.4% for 2Q’26 and 2Q’26 LTM, respectively. Absolute Return Composite net returns were 5.4% and 14.1% for 2Q’26
+and 2Q’26 LTM, respectively. See notes on page 34 for additional details on these strategies and our investment performance.
+
+Blackstone  |   4
+
+CAPITAL METRICS – ADDITIONAL DETAIL
+
+§
+
+Inflows were $68.3 billion in the quarter, bringing LTM inflows to $262.5 billion.
+
+§
+
+Deployed $34.2 billion in the quarter and $138.5 billion over the LTM.
+
+–
+
+Committed an additional $17.1 billion that was not yet deployed in the quarter.
+
+§
+
+Realizations were $31.8 billion in the quarter and $144.5 billion over the LTM.
+
+Inflows
+
+Capital Deployed
+
+Realizations
+
+($ in millions)
+
+2Q’26
+
+2Q’26 LTM
+
+2Q’26
+
+2Q’26 LTM
+
+2Q’26
+
+2Q’26 LTM
+
+Real Estate
+
+$
+8,193
+
+$
+27,098
+
+$
+5,815
+
+$
+21,891
+
+$
+6,615
+
+$
+29,650
+
+Opportunistic
+
+1,319
+
+2,355
+
+2,542
+
+7,777
+
+2,715
+
+10,792
+
+Core+
+
+4,733
+
+13,498
+
+772
+
+3,100
+
+2,018
+
+8,320
+
+Debt Strategies
+
+2,140
+
+11,245
+
+2,501
+
+11,013
+
+1,882
+
+10,538
+
+Private Equity
+
+24,520
+
+76,006
+
+14,515
+
+47,404
+
+11,023
+
+45,682
+
+Corporate Private Equity
+
+15,182
+
+34,852
+
+8,579
+
+26,986
+
+5,834
+
+24,255
+
+Tactical Opportunities
+
+891
+
+3,864
+
+1,264
+
+2,899
+
+1,150
+
+6,387
+
+Secondaries
+
+5,662
+
+23,983
+
+3,263
+
+12,919
+
+2,614
+
+11,523
+
+Infrastructure
+
+2,785
+
+13,307
+
+1,410
+
+4,601
+
+1,425
+
+3,518
+
+Credit & Insurance
+
+31,012
+
+142,998
+
+12,733
+
+65,365
+
+13,495
+
+65,720
+
+Multi-Asset Investing
+
+4,576
+
+16,412
+
+1,112
+
+3,797
+
+710
+
+3,412
+
+Total Blackstone
+
+$
+   68,300
+
+$
+  262,515
+
+$
+   34,175
+
+$
+  138,457
+
+$
+   31,843
+
+$
+  144,464
+ 
+
+Corporate Private Equity also includes Life Sciences, Growth, BTAS, and BXPE. AUM and related capital metrics are reported in the segment where the assets are managed.
+
+Blackstone  |   5
+
+ASSETS UNDER MANAGEMENT
+
+§
+
+Total AUM increased to $1,346.3 billion, up 11% year-over-year, with $68.3 billion of inflows in the quarter and $262.5 billion over the LTM.
+
+§
+
+Fee-Earning AUM of $961.6 billion was up 8% year-over-year, with $43.3 billion of inflows in the quarter and $168.4 billion over the LTM.
+
+§
+
+Perpetual Capital AUM reached $555.6 billion, up 15% year-over-year.
+
+–
+
+Fee-Earning Perpetual Capital AUM increased to $463.0 billion, representing 48% of Fee-Earning AUM.
+
+Multi-Asset Investing had $186 million and $724 million of Perpetual Capital AUM as of 2Q’25 and 2Q’26, respectively.
+
+Blackstone  |   6
+
+ADDITIONAL CAPITAL DETAIL
+
+§
+
+Invested Performance Eligible AUM reached $653.4 billion at quarter end, up 8% year-over-year.
+
+§
+
+Total Dry Powder of $228.1 billion available for future investments.
+
+Invested Performance Eligible AUM represents the fair value of invested assets that are eligible to earn performance revenues.
+
+Blackstone  |   7
+
+Segment Highlights
+
+  
+
+Blackstone  |   8
+
+SEGMENT DISTRIBUTABLE EARNINGS COMPOSITION
+
+§
+
+2Q’26 Total Segment Distributable Earnings were $2.2 billion.
+
+§
+
+LTM Total Segment Distributable Earnings were $8.7 billion.
+
+Segment Distributable Earnings
+
+($ in millions)
+
+  
+
+Blackstone  |   9
+
+REAL ESTATE
+
+§
+
+Total AUM: $314.1 billion with inflows of $8.2 billion in the quarter and $27.1 billion over the LTM.
+
+–
+
+Inflows in the quarter included $2.1 billion in BREDS, primarily from $1.1 billion in a drawdown fund focused on non-opportunistic real estate credit, $2.0 billion
+from the initial public offering of Blackstone Digital Infrastructure Trust Inc. (“BXDC”), and $1.2 billion of capital raised in BREIT.
+
+§
+
+Capital Deployed: $5.8 billion in the quarter, including a BREP investment in a joint venture with Related Digital to develop a data center campus in Michigan and a BREP
+investment in a large logistics platform in France, and $21.9 billion over the LTM.
+
+§
+
+Realizations: $6.6 billion in the quarter, including Digital Realty JV and Lumina, and $29.7 billion over the LTM.
+
+§
+
+Appreciation: Opportunistic funds appreciated 0.4% in the quarter and declined (1.4)% over the LTM; Core+ funds appreciated 0.2% in the quarter and 3.2% over the LTM.
+
+  % Change 
+
+  % Change 
+
+ ($ in thousands)
+
+2Q’25
+
+2Q’26
+
+  vs. 2Q’25 
+
+2Q’25 YTD
+
+2Q’26 YTD
+
+  vs. 2Q’25 YTD 
+
+Management and Advisory Fees, Net
+
+ $
+711,292
+
+ $
+727,081
+
+2%
+
+ $
+1,412,140
+
+ $
+1,404,558
+
+(1)%
+
+Fee Related Performance Revenues
+
+89,590
+
+242,718
+
+171%
+
+127,393
+
+395,716
+
+211%
+
+Fee Related Compensation
+
+(170,209
+)
+
+(262,168
+)
+
+54%
+
+(340,734
+)
+
+(455,305
+)
+
+34%
+
+Other Operating Expenses
+
+(87,048
+)
+
+(94,624
+)
+
+9%
+
+(170,329
+)
+
+(184,824
+)
+
+9%
+
+Fee Related Earnings
+
+ $
+543,625
+
+ $
+613,007
+
+13%
+
+ $
+1,028,470
+
+ $
+1,160,145
+
+13%
+
+ 
+
+Realized Performance Revenues
+
+43,587
+
+210,868
+
+384%
+
+62,597
+
+252,942
+
+304%
+
+Realized Performance Compensation
+
+(24,139
+)
+
+(85,259
+)
+
+253%
+
+(32,909
+)
+
+(108,215
+)
+
+229%
+
+Realized Principal Investment Income (Loss)
+
+2,797
+
+6,660
+
+138%
+
+3,146
+
+(2,145
+
+)
+
+n/m
+
+Net Realizations
+
+22,245
+
+132,269
+
+495%
+
+32,834
+
+142,582
+
+334%
+
+Segment Distributable Earnings
+
+ $
+565,870
+
+ $
+745,276
+
+32%
+
+ $
+1,061,304
+
+ $
+1,302,727
+
+23%
+
+ 
+
+ 
+
+ 
+
+Segment Revenues
+
+ $
+847,266
+
+ $
+1,187,327
+
+40%
+
+ $
+1,605,276
+
+ $
+2,051,071
+
+28%
+
+Total AUM
+
+ $
+324,994,725
+
+ $
+314,149,797
+
+(3)%
+
+ $
+324,994,725
+
+ $
+314,149,797
+
+(3)%
+
+Fee-Earning
+AUM
+
+ $
+ 285,826,676
+
+ $
+
+ 277,420,420
+
+(3)%
+
+ $
+ 285,826,676
+
+ $
+
+ 277,420,420
+
+(3)%
+
+  
+
+Blackstone  |   10
+
+PRIVATE EQUITY
+
+§
+
+Total AUM: Increased 17% to $454.2 billion with inflows of $24.5 billion in the quarter and $76.0 billion over the LTM.
+
+–
+
+Inflows in the quarter included $5.7 billion for the fifth energy transition fund, $5.7 billion in Secondaries, primarily from the tenth flagship Secondaries strategy, and $2.8 billion in Infrastructure.
+
+–
+
+The third Corporate Private Equity Asia fund held its final close with $1.8 billion of capital raised in the quarter, bringing total capital commitments to $13.1 billion.
+
+–
+
+$2.4 billion of capital raised for BXPE and $861 million of capital raised for BXINFRA.
+
+§
+
+Capital Deployed: $14.5 billion in the quarter, including Hologic, Champions Group, and Arlington Industries, and $47.4 billion over the LTM.
+
+–
+
+Committed an additional $5.6 billion in the quarter, including Eurowind Energy, Dresser Utility Solutions, and Senior PLC.
+
+§
+
+Realizations: $11.0 billion in the quarter, including Sabre Industries and Desotec, and $45.7 billion over the LTM.
+
+§
+
+Appreciation: Corporate Private Equity appreciated 3.7% in the quarter and 14.4% over the LTM.
+
+–
+
+Tactical Opportunities appreciated 3.9% in the quarter and 9.9% over the LTM; Secondaries appreciated 1.7% in the quarter and 8.1% over the LTM; Infrastructure appreciated 7.2% in the quarter and 28.6% over the LTM.
+
+  % Change 
+
+  % Change 
+
+ ($ in thousands)
+
+2Q’25
+
+2Q’26
+
+  vs. 2Q’25 
+
+2Q’25 YTD
+
+2Q’26 YTD
+
+  vs. 2Q’25 YTD 
+
+Management and Advisory Fees, Net
+
+ $
+706,298
+
+ $
+794,580
+
+12%
+
+ $
+1,328,090
+
+ $
+1,596,502
+
+20%
+
+Fee Related Performance Revenues
+
+192,331
+
+391,387
+
+103%
+
+253,235
+
+562,084
+
+122%
+
+Fee Related Compensation
+
+(266,925
+)
+
+(337,528
+)
+
+26%
+
+(470,244
+)
+
+(600,341
+)
+
+28%
+
+Other Operating Expenses
+
+(112,300
+)
+
+(131,515
+)
+
+17%
+
+(215,194
+)
+
+(244,443
+)
+
+14%
+
+Fee Related Earnings
+
+ $
+519,404
+
+ $
+716,924
+
+38%
+
+ $
+895,887
+
+ $
+1,313,802
+
+47%
+
+ 
+
+Realized Performance Revenues
+
+408,980
+
+490,807
+
+20%
+
+759,053
+
+1,128,796
+
+49%
+
+Realized Performance Compensation
+
+(196,824
+)
+
+(251,204
+)
+
+28%
+
+(367,965
+)
+
+(545,740
+)
+
+48%
+
+Realized Principal Investment Income
+
+19,859
+
+24,952
+
+26%
+
+29,035
+
+70,300
+
+142%
+
+Net Realizations
+
+232,015
+
+264,555
+
+14%
+
+420,123
+
+653,356
+
+56%
+
+Segment Distributable Earnings
+
+ $
+751,419
+
+ $
+981,479
+
+31%
+
+ $
+1,316,010
+
+ $
+1,967,158
+
+49%
+
+ 
+
+Segment Revenues
+
+ $
+1,327,468
+
+ $
+1,701,726
+
+28%
+
+ $
+2,369,413
+
+ $
+3,357,682
+
+42%
+
+Total AUM
+
+ $
+388,907,242
+
+ $
+454,152,320
+
+17%
+
+ $
+388,907,242
+
+ $
+454,152,320
+
+17%
+
+Fee-Earning
+AUM
+
+ $
+ 232,160,209
+
+ $
+
+ 267,817,860
+
+15%
+
+ $
+ 232,160,209
+
+ $
+
+ 267,817,860
+
+15%
+
+BXPE represents the aggregate BXPE fund platform, which comprises both U.S. and non-U.S. vehicles. BXINFRA represents the aggregate BXINFRA fund platform, which comprises both U.S. and non-U.S. vehicles. BXPE and BXINFRA capital raised include amounts allocated to other strategies. Secondaries appreciation excludes GP Stakes.
+
+Blackstone  |   11
+
+CREDIT & INSURANCE
+
+§
+
+Total AUM: Increased 15% to $469.3 billion with inflows of $31.0 billion in the quarter and $143.0 billion over the LTM.
+
+–
+
+Inflows in the quarter included $13.3 billion for the global direct lending strategy, inclusive of $1.0 billion of equity raised for BCRED.
+
+–
+
+Inflows also included $9.9 billion for the infrastructure and asset based credit strategies, inclusive of $7.5 billion for insurance SMAs.
+
+§
+
+Capital Deployed: $12.7 billion in the quarter driven by infrastructure and asset based credit strategies and global direct lending, and $65.4 billion over the LTM.
+
+–
+
+Committed an additional $9.7 billion in the quarter.
+
+§
+
+Realizations: $13.5 billion in the quarter and $65.7 billion over the LTM.
+
+§
+
+Returns: Private Credit gross return of 1.0% (0.4% net) and Liquid Credit gross return of 2.2% (2.1% net) in the quarter.
+
+–
+
+Private Credit gross return of 6.8% (3.9% net) and Liquid Credit gross return of 3.9% (3.4% net) over the LTM.
+
+  % Change 
+
+  % Change 
+
+ ($ in thousands)
+
+2Q’25
+
+2Q’26
+
+  vs. 2Q’25 
+
+2Q’25 YTD
+
+2Q’26 YTD
+
+  vs. 2Q’25 YTD 
+
+Management and Advisory Fees, Net
+
+ $
+470,627
+
+ $
+572,756
+
+22%
+
+ $
+917,671
+
+ $
+1,081,243
+
+18%
+
+Fee Related Performance Revenues
+
+190,129
+
+159,286
+
+(16)%
+
+385,337
+
+323,689
+
+(16)%
+
+Fee Related Compensation
+
+(220,305
+)
+
+(237,568
+)
+
+8%
+
+(421,923
+)
+
+(464,061
+)
+
+10%
+
+Other Operating Expenses
+
+(107,426
+)
+
+(124,404
+)
+
+16%
+
+(203,704
+)
+
+(238,967
+)
+
+17%
+
+Fee Related Earnings
+
+ $
+333,025
+
+ $
+370,070
+
+11%
+
+ $
+677,381
+
+ $
+701,904
+
+4%
+
+ 
+
+ 
+
+Realized Performance Revenues
+
+87,393
+
+11,540
+
+(87)%
+
+178,990
+
+89,666
+
+(50)%
+
+Realized Performance Compensation
+
+(30,433
+)
+
+(3,746
+)
+
+(88)%
+
+(70,928
+)
+
+(34,943
+)
+
+(51)%
+
+Realized Principal Investment Income (Loss)
+
+5,800
+
+(4,622
+
+)
+
+n/m
+
+113,703
+
+(10,327
+
+)
+
+n/m
+
+Net Realizations
+
+62,760
+
+3,172
+
+(95)%
+
+221,765
+
+44,396
+
+(80)%
+
+Segment Distributable Earnings
+
+ $
+395,785
+
+ $
+373,242
+
+(6)%
+
+ $
+899,146
+
+ $
+746,300
+
+(17)%
+
+ 
+
+Segment Revenues
+
+ $
+753,949
+
+ $
+738,960
+
+(2)%
+
+ $
+1,595,701
+
+ $
+1,484,271
+
+(7)%
+
+Total AUM
+
+ $
+407,296,172
+
+ $
+469,317,440
+
+15%
+
+ $
+407,296,172
+
+ $
+469,317,440
+
+15%
+
+Fee-Earning
+AUM
+
+ $
+ 288,931,236
+
+ $
+
+ 318,240,694
+
+10%
+
+ $
+ 288,931,236
+
+ $
+
+ 318,240,694
+
+10%
+
+See notes on page 34.
+
+Blackstone  |   12
+
+MULTI-ASSET INVESTING
+
+§
+
+Total AUM: Increased 21% to $108.6 billion with inflows of $4.6 billion in the quarter and $16.4 billion over the LTM.
+
+§
+
+Returns: Absolute Return Composite gross return of 5.8% in the quarter (5.4% net), compared to the HFRX Global Hedge Fund Index, which was 5.4%.
+
+–
+
+Absolute Return benefited from positive performance across strategies, including equities, quantitative, macro, and credit during the quarter.
+
+–
+
+Gross return of 15.5% over the LTM (14.1% net), outperforming a 9.7% return for the HFRX Global Hedge Fund Index, with significantly less volatility than the broader markets.
+
+  % Change 
+
+  % Change 
+
+ ($ in thousands)
+
+2Q’25
+
+2Q’26
+
+  vs. 2Q’25 
+
+2Q’25 YTD
+
+2Q’26 YTD
+
+  vs. 2Q’25 YTD 
+
+Management and Advisory Fees, Net
+
+ $
+131,795
+
+ $
+155,879
+
+18%
+
+ $
+254,109
+
+ $
+300,801
+
+18%
+
+Fee Related Compensation
+
+(42,877
+)
+
+(42,865
+)
+
+(0)%
+
+(84,397
+)
+
+(89,892
+)
+
+7%
+
+Other Operating Expenses
+
+(25,469
+)
+
+(29,587
+)
+
+16%
+
+(49,891
+)
+
+(55,351
+)
+
+11%
+
+Fee Related Earnings
+
+ $
+63,449
+
+ $
+83,427
+
+31%
+
+ $
+119,821
+
+ $
+155,558
+
+30%
+
+ 
+
+Realized Performance Revenues
+
+13,161
+
+17,670
+
+34%
+
+12,504
+
+39,975
+
+220%
+
+Realized Performance Compensation
+
+(5,228
+)
+
+(3,915
+)
+
+(25)%
+
+(5,746
+)
+
+(19,282
+)
+
+236%
+
+Realized Principal Investment Income
+
+965
+
+509
+
+(47)%
+
+1,447
+
+1,644
+
+14%
+
+Net Realizations
+
+8,898
+
+14,264
+
+60%
+
+8,205
+
+22,337
+
+172%
+
+Segment Distributable Earnings
+
+ $
+72,347
+
+ $
+97,691
+
+35%
+
+ $
+128,026
+
+ $
+177,895
+
+39%
+
+ 
+
+Segment Revenues
+
+ $
+145,921
+
+ $
+174,058
+
+19%
+
+ $
+268,060
+
+ $
+342,420
+
+28%
+
+Total AUM
+
+ $
+90,009,202
+
+ $
+ 108,644,278
+
+21%
+
+ $
+90,009,202
+
+ $
+ 108,644,278
+
+21%
+
+Fee-Earning
+AUM
+
+ $
+ 80,196,084
+
+ $
+
+98,113,680
+
+22%
+
+ $
+ 80,196,084
+
+ $
+
+98,113,680
+
+22%
+
+  
+
+Blackstone  |   13
+
+Supplemental Details
+
+  
+
+Blackstone  |   14
+
+TOTAL SEGMENTS
+
+ ($ in thousands)
+
+2Q’25
+
+3Q’25
+
+4Q’25
+
+1Q’26
+
+2Q’26
+
+2Q’25 YTD
+
+2Q’26 YTD
+
+Base Management Fees
+
+ $
+1,876,672
+
+ $
+1,919,702
+
+ $
+1,945,364
+
+ $
+1,952,414
+
+ $
+1,960,897
+
+ $
+3,683,791
+
+ $
+3,913,311
+
+Transaction, Advisory and Other
+Fees, Net
+
+165,690
+
+156,211
+
+149,621
+
+211,697
+
+321,156
+
+276,999
+
+532,853
+
+Management Fee Offsets
+
+(22,350
+)
+
+(34,093
+)
+
+(32,766
+)
+
+(31,303
+)
+
+(31,757
+
+)
+
+(48,780
+)
+
+(63,060
+
+)
+
+Total Management and Advisory Fees,
+Net
+
+2,020,012
+
+2,041,820
+
+2,062,219
+
+2,132,808
+
+2,250,296
+
+3,912,010
+
+4,383,104
+
+Fee Related Performance Revenues
+
+472,050
+
+453,018
+
+606,445
+
+488,098
+
+793,391
+
+765,965
+
+1,281,489
+
+Fee Related Compensation
+
+(700,316
+)
+
+(658,091
+)
+
+(715,312
+)
+
+(729,470
+)
+
+(880,129
+)
+
+(1,317,298
+)
+
+(1,609,599
+
+)
+
+Other Operating Expenses
+
+(332,243
+)
+
+(356,070
+)
+
+(418,051
+)
+
+(343,455
+)
+
+(380,130
+)
+
+(639,118
+)
+
+(723,585
+)
+
+Fee Related Earnings
+
+ $
+1,459,503
+
+ $
+1,480,677
+
+ $
+1,535,301
+
+ $
+1,547,981
+
+ $
+1,783,428
+
+ $
+2,721,559
+
+ $
+3,331,409
+
+Realized Performance
+Revenues
+
+553,121
+
+744,953
+
+1,057,432
+
+780,494
+
+730,885
+
+1,013,144
+
+1,511,379
+
+Realized Performance Compensation
+
+(256,624
+)
+
+(302,642
+)
+
+(310,405
+)
+
+(364,056
+)
+
+(344,124
+)
+
+(477,548
+)
+
+(708,180
+)
+
+Realized Principal Investment
+Income
+
+29,421
+
+62,535
+
+209,877
+
+31,973
+
+27,499
+
+147,331
+
+59,472
+
+Total Net Realizations
+
+ $
+325,918
+
+ $
+504,846
+
+ $
+956,904
+
+ $
+448,411
+
+ $
+414,260
+
+ $
+682,927
+
+ $
+862,671
+
+Total Segment Distributable
+Earnings
+
+ $
+1,785,421
+
+ $
+1,985,523
+
+ $
+2,492,205
+
+ $
+1,996,392
+
+ $
+2,197,688
+
+ $
+3,404,486
+
+ $
+4,194,080
+
+Distributable Earnings
+
+ $
+1,565,763
+
+ $
+1,889,487
+
+ $
+2,244,809
+
+ $
+1,764,838
+
+ $
+1,977,249
+
+ $
+2,976,568
+
+ $
+3,742,087
+
+Additional Metrics:
+
+Total Segment Revenues
+
+ $
+3,074,604
+
+ $
+3,302,326
+
+ $
+3,935,973
+
+ $
+3,433,373
+
+ $
+3,802,071
+
+ $
+5,838,450
+
+ $
+7,235,444
+
+Total Assets Under
+Management
+
+ $
+ 1,211,207,341
+
+ $
+ 1,241,731,296
+
+ $
+ 1,274,931,234
+
+ $
+ 1,304,017,634
+
+ $
+ 1,346,263,835
+
+ $
+ 1,211,207,341
+
+ $
+ 1,346,263,835
+
+Fee-Earning
+Assets Under Management
+
+ $
+887,114,205
+
+ $
+906,221,028
+
+ $
+921,674,454
+
+ $
+937,596,454
+
+ $
+961,592,654
+
+ $
+887,114,205
+
+ $
+961,592,654
+
+  
+
+Blackstone  |   15
+
+ASSETS UNDER MANAGEMENT - ROLLFORWARD
+
+Total AUM Rollforward
+
+($ in millions)
+
+Three Months Ended June 30, 2026
+
+ 
+
+Twelve Months Ended June 30, 2026
+
+Real
+
+ Estate 
+
+ Private 
+Equity
+
+Credit &
+
+ Insurance 
+
+ Multi-Asset 
+Investing
+
+ Total 
+
+Real
+
+ Estate 
+
+ Private 
+Equity
+
+Credit &
+
+ Insurance 
+
+ Multi-Asset 
+
+ Investing 
+
+Total
+
+Beginning Balance
+
+$
+315,284
+
+$
+429,910
+
+$
+457,462
+
+$
+101,361
+
+ $
+ 1,304,018
+
+ $
+ 324,995
+
+$
+388,907
+
+$
+407,296
+
+$
+90,009
+
+$
+1,211,207
+
+Inflows
+
+8,193
+
+24,520
+
+31,012
+
+4,576
+
+68,300
+
+27,098
+
+76,006
+
+142,998
+
+16,412
+
+262,515
+
+Outflows
+
+(2,157
+)
+
+(1,458
+)
+
+(7,626
+)
+
+(2,298
+)
+
+(13,539
+
+)
+
+(8,986
+)
+
+(9,245
+)
+
+(25,448
+)
+
+(8,233
+)
+
+(51,912
+
+)
+
+Net Flows
+
+6,036
+
+23,062
+
+23,385
+
+2,278
+
+54,761
+
+18,112
+
+66,761
+
+117,550
+
+8,180
+
+210,603
+
+Realizations
+
+(6,615
+)
+
+(11,023
+)
+
+(13,495
+)
+
+(710
+)
+
+(31,843
+)
+
+(29,650
+)
+
+(45,682
+)
+
+(65,720
+)
+
+(3,412
+)
+
+(144,464
+)
+
+Market Activity
+
+(555
+)
+
+12,204
+
+1,965
+
+5,715
+
+19,328
+
+693
+
+44,167
+
+10,191
+
+13,867
+
+68,918
+
+Ending Balance
+
+$
+ 314,150
+
+$
+ 454,152
+
+$
+ 469,317
+
+$
+ 108,644
+
+ $
+ 1,346,264
+
+ $
+ 314,150
+
+$
+ 454,152
+
+$
+ 469,317
+
+$
+ 108,644
+
+$
+ 1,346,264
+
+% Change
+
+(0)%
+
+6%
+
+3%
+
+7%
+
+3%
+
+(3)%
+
+17%
+
+15%
+
+21%
+
+11%
+
+Fee-Earning AUM Rollforward
+
+($ in millions)
+
+Three Months Ended June 30, 2026
+
+ 
+
+Twelve Months Ended June 30, 2026
+
+Real
+
+ Estate 
+
+ Private 
+Equity
+
+Credit &
+
+ Insurance 
+
+ Multi-Asset 
+Investing
+
+ Total 
+
+Real
+
+ Estate 
+
+ Private 
+Equity
+
+Credit &
+
+ Insurance 
+
+ Multi-Asset 
+
+ Investing 
+
+Total
+
+Beginning Balance
+
+$
+277,503
+
+$
+255,841
+
+$
+313,255
+
+$
+90,998
+
+$
+ 937,596
+
+ $
+ 285,827
+
+$
+232,160
+
+$
+288,931
+
+$
+80,196
+
+$
+887,114
+
+Inflows
+
+6,090
+
+15,363
+
+17,225
+
+4,613
+
+43,291
+
+21,183
+
+51,975
+
+79,237
+
+15,987
+
+168,382
+
+Outflows
+
+(1,106
+)
+
+(4,117
+)
+
+(5,256
+)
+
+(2,122
+)
+
+(12,601
+
+)
+
+(6,083
+)
+
+(14,934
+)
+
+(19,381
+)
+
+(7,612
+)
+
+(48,010
+
+)
+
+Net Flows
+
+4,985
+
+11,246
+
+11,969
+
+2,490
+
+30,690
+
+15,101
+
+37,041
+
+59,856
+
+8,375
+
+120,372
+
+Realizations
+
+(4,474
+)
+
+(4,559
+)
+
+(8,037
+)
+
+(677
+)
+
+(17,747
+)
+
+(24,003
+)
+
+(19,222
+)
+
+(36,114
+)
+
+(3,178
+)
+
+(82,518
+)
+
+Market Activity
+
+(593
+)
+
+5,289
+
+1,054
+
+5,303
+
+11,053
+
+496
+
+17,839
+
+5,568
+
+12,721
+
+36,624
+
+Ending Balance
+
+$
+ 277,420
+
+$
+ 267,818
+
+$
+ 318,241
+
+$
+ 98,114
+
+$
+   961,593
+
+ $
+277,420
+
+$
+ 267,818
+
+$
+ 318,241
+
+$
+ 98,114
+
+$
+   961,593
+
+% Change
+
+(0)%
+
+5%
+
+2%
+
+8%
+
+3%
+
+(3)%
+
+15%
+
+10%
+
+22%
+
+8%
+
+Inflows include contributions, capital raised, other increases in available capital (recallable capital and increased side-by-side commitments),
+purchases, inter-segment allocations and acquisitions. Outflows represent redemptions, client withdrawals and decreases in available capital (expired capital, expense drawdowns and decreased side-by-side commitments). Realizations represent realization proceeds from the disposition or other monetization of assets, current income or capital returned to investors from CLOs. Market Activity includes
+realized and unrealized gains (losses) on portfolio investments and the impact of foreign exchange rate fluctuations. AUM is reported in the segment where the assets are managed.
+
+Blackstone  |   16
+
+DECONSOLIDATED BALANCE SHEET HIGHLIGHTS
+
+§
+
+At June 30, 2026, Blackstone had $12.2 billion in total cash, cash equivalents, corporate treasury, and other investments and $22.7 billion of cash and net investments, or $18.23 per share.
+
+§
+
+Blackstone has a $4.3 billion credit revolver ($3.5 billion undrawn) and maintains A+/A+ ratings.
+
+($ in millions)
+
+2Q’26
+
+Cash and Cash Equivalents
+
+$
+  2,507
+
+Corporate Treasury and Other Investments
+
+9,735
+
+GP/Fund Investments
+
+2,968
+
+Net Accrued Performance Revenues
+
+7,468
+
+Cash and Net Investments
+
+$
+  22,678
+
+Outstanding Debt (at par)
+
+13,192
+
+Cash and Net Investments
+
+(per share)
+
+A+ / A+
+
+rated by S&P and Fitch
+
+$4.3B
+
+credit revolver with
+
+October 2030 maturity
+
+$12.2B
+
+total cash, corporate
+
+treasury and other
+
+Balance Sheet Highlights exclude the consolidated Blackstone Funds. Other Investments was $9.1 billion as of June 30, 2026, which was comprised of $8.5 billion of liquid investments and $601 million of
+illiquid investments. See notes on pages 31 and 35 for additional details on non-GAAP balance sheet measures.
+
+Blackstone  |   17
+
+NET ACCRUED PERFORMANCE REVENUES - ADDITIONAL DETAIL
+
+  ($ in millions, except per share data)
+
+2Q’25
+
+1Q’26
+
+2Q’26
+
+2Q’26
+
+ Per Share 
+
+Real Estate
+
+BREP Global
+
+$
+721
+
+$
+549
+
+$
+553
+
+$
+0.44
+
+BREP Europe
+
+27
+
+70
+
+81
+
+0.07
+
+BREP Asia
+
+98
+
+101
+
+114
+
+0.09
+
+BPP
+
+45
+
+86
+
+114
+
+0.09
+
+BREDS
+
+32
+
+27
+
+30
+
+0.02
+
+Real Estate
+
+$
+923
+
+$
+833
+
+$
+891
+
+$
+0.72
+
+Private Equity
+
+BCP Global
+
+1,869
+
+1,860
+
+1,764
+
+1.42
+
+BCP Asia
+
+344
+
+216
+
+262
+
+0.21
+
+Energy/Energy Transition
+
+515
+
+1,007
+
+1,052
+
+0.85
+
+Core Private Equity
+
+266
+
+276
+
+256
+
+0.21
+
+Tactical Opportunities
+
+227
+
+152
+
+150
+
+0.12
+
+Secondaries
+
+1,270
+
+1,088
+
+1,148
+
+0.92
+
+Infrastructure
+
+247
+
+772
+
+936
+
+0.75
+
+Life Sciences
+
+239
+
+228
+
+253
+
+0.20
+
+BTAS
+
+236
+
+257
+
+262
+
+0.21
+
+Private Equity
+
+$
+5,212
+
+$
+5,855
+
+$
+6,081
+
+$
+4.89
+
+Credit & Insurance
+
+$
+369
+
+$
+255
+
+$
+252
+
+$
+0.20
+
+Multi-Asset Investing
+
+$
+103
+
+$
+56
+
+$
+243
+
+$
+0.20
+
+Net Accrued Performance Revenues
+
+$
+  6,608
+
+$
+  7,000
+
+$
+  7,468
+
+$
+  6.00
+
+2Q’26 QoQ Rollforward
+
+($ in millions)
+
+Net
+
+Net
+
+  Performance 
+
+Realized
+
+1Q’26
+
+Revenues
+
+  Distributions 
+
+2Q’26
+
+Real Estate
+
+$
+833
+
+ $
+339
+
+ $
+(281
+)
+
+ $
+891
+
+Private Equity
+
+5,855
+
+732
+
+(506
+)
+
+6,081
+
+Credit & Insurance
+
+255
+
+117
+
+(119
+)
+
+252
+
+Multi-Asset Investing
+
+56
+
+201
+
+(14
+)
+
+243
+
+Total
+
+$
+ 7,000
+
+ $
+  1,388
+
+ $
+  (920
+)
+
+ $
+ 7,468
+
+QoQ Change
+
+7%
+
+2Q’26 LTM Rollforward
+
+($ in millions)
+
+Net
+
+Net
+
+  Performance 
+
+Realized
+
+2Q’25
+
+Revenues
+
+  Distributions 
+
+2Q’26
+
+Real Estate
+
+$
+923
+
+ $
+884
+
+ $
+(915
+)
+
+ $
+891
+
+Private Equity
+
+5,212
+
+2,624
+
+(1,755
+)
+
+6,081
+
+Credit & Insurance
+
+369
+
+563
+
+(680
+)
+
+252
+
+Multi-Asset Investing
+
+103
+
+550
+
+(410
+)
+
+243
+
+Total
+
+$
+ 6,608
+
+ $
+4,621
+
+ $
+(3,760
+)
+
+ $
+ 7,468
+
+YoY Change
+
+13%
+
+ 
+
+Net Accrued Performance Revenues (“NAPR”) are presented net of performance compensation and excludes Performance Revenues realized but not yet distributed as of the reporting date and clawback amounts, if any, which
+are disclosed in the 10-K/Q. Real Estate and Private Equity include co-investments, as applicable. Per Share calculations are based on end of period DE Shares
+Outstanding (see page 24, Share Summary).
+
+Blackstone  |   18
+
+INVESTMENT RECORDS AS OF JUNE 30, 2026 (a)
+
+ ($/€ in
+thousands, except where noted)  Fund (Investment Period Beginning Date / Ending Date)
+
+Committed
+Capital
+
+Available
+Capital (b)
+
+Unrealized Investments
+
+Realized Investments
+
+Total Investments
+
+Net IRRs (d)
+
+Value
+
+MOIC (c)
+
+Value
+
+MOIC (c)
+
+Value
+
+MOIC (c)
+
+Realized
+
+ Total 
+
+Real Estate
+
+Pre-BREP - BREP IV
+(Jan 1992 / Dec 2005)
+
+$
+5,441,163
+
+$
+- 
+
+$
+- 
+
+n/a
+
+$
+12,219,526
+
+2.0x
+
+$
+12,219,526
+
+2.0x
+
+24%
+
+24%
+
+BREP V (Dec 2005 / Feb 2007)
+
+5,539,418
+
+- 
+
+2,331
+
+n/a
+
+13,468,476
+
+2.3x
+
+13,470,807
+
+2.3x
+
+11%
+
+11%
+
+BREP VI (Feb 2007 / Aug 2011)
+
+11,060,122
+
+- 
+
+1,748
+
+n/a
+
+27,765,450
+
+2.5x
+
+27,767,198
+
+2.5x
+
+13%
+
+13%
+
+BREP VII (Aug 2011 / Apr 2015)
+
+13,506,800
+
+845,588
+
+867,492
+
+0.4x
+
+29,432,126
+
+2.1x
+
+30,299,618
+
+1.9x
+
+17%
+
+14%
+
+BREP VIII (Apr 2015 / Jun 2019)
+
+16,651,125
+
+1,215,310
+
+8,377,561
+
+1.3x
+
+24,654,936
+
+2.1x
+
+33,032,497
+
+1.8x
+
+19%
+
+11%
+
+BREP IX (Jun 2019 / Aug 2022)
+
+21,374,992
+
+2,812,950
+
+16,292,849
+
+1.0x
+
+12,614,323
+
+1.9x
+
+28,907,172
+
+1.3x
+
+30%
+
+4%
+
+*BREP X (Aug 2022 / Feb 2028)
+
+30,643,847
+
+16,025,374
+
+18,765,019
+
+1.3x
+
+3,219,851
+
+1.9x
+
+21,984,870
+
+1.3x
+
+30%
+
+12%
+
+Total Global BREP
+
+$
+104,217,467
+
+$
+20,899,222
+
+$
+44,307,000
+
+1.1x
+
+$
+123,374,688
+
+2.2x
+
+$
+167,681,688
+
+1.7x
+
+16%
+
+14%
+
+BREP Int’l I-II
+(Jan 2001 / Jun 2008) (e)
+
+€
+2,453,920
+
+€
+- 
+
+€
+- 
+
+n/a
+
+€
+3,956,202
+
+1.9x
+
+€
+3,956,202
+
+1.9x
+
+12%
+
+12%
+
+BREP Europe III (Jun 2008 / Sep 2013)
+
+3,205,420
+
+86,085
+
+17,071
+
+0.1x
+
+5,993,336
+
+2.1x
+
+6,010,407
+
+2.0x
+
+14%
+
+13%
+
+BREP Europe IV (Sep 2013 / Dec 2016)
+
+6,676,611
+
+598,954
+
+624,365
+
+0.6x
+
+10,438,878
+
+1.9x
+
+11,063,243
+
+1.7x
+
+16%
+
+11%
+
+BREP Europe V (Dec 2016 / Oct 2019)
+
+8,007,488
+
+597,691
+
+3,724,421
+
+0.7x
+
+6,902,190
+
+3.8x
+
+10,626,611
+
+1.4x
+
+40%
+
+5%
+
+BREP Europe VI (Oct 2019 / Sep 2023)
+
+9,941,770
+
+2,763,031
+
+6,117,864
+
+0.9x
+
+4,049,113
+
+2.4x
+
+10,166,977
+
+1.2x
+
+62%
+
+2%
+
+*BREP Europe VII (Sep 2023 / Mar 2029)
+
+9,762,262
+
+5,734,678
+
+4,873,649
+
+1.3x
+
+167,092
+
+1.4x
+
+5,040,741
+
+1.3x
+
+n/m
+
+13%
+
+Total BREP Europe
+
+€
+40,047,471
+
+€
+9,780,439
+
+€
+15,357,370
+
+0.9x
+
+€
+31,506,811
+
+2.2x
+
+€
+46,864,181
+
+1.5x
+
+16%
+
+9%
+
+BREP Asia I (Jun 2013 / Dec 2017)
+
+$
+4,262,075
+
+$
+646,265
+
+$
+1,209,142
+
+1.7x
+
+$
+7,685,485
+
+2.0x
+
+$
+8,894,627
+
+1.9x
+
+15%
+
+12%
+
+BREP Asia II (Dec 2017 / Mar 2022)
+
+7,361,035
+
+1,178,550
+
+4,995,177
+
+1.1x
+
+3,404,324
+
+1.6x
+
+8,399,501
+
+1.3x
+
+11%
+
+3%
+
+*BREP Asia III (Mar 2022 / Sep 2027)
+
+8,219,868
+
+4,351,718
+
+5,078,659
+
+1.3x
+
+503,885
+
+1.8x
+
+5,582,544
+
+1.3x
+
+34%
+
+9%
+
+Total BREP Asia
+
+$
+19,842,978
+
+$
+6,176,533
+
+$
+11,282,978
+
+1.3x
+
+$
+11,593,694
+
+1.8x
+
+$
+22,876,672
+
+1.5x
+
+14%
+
+7%
+
+BREP Co-Investment (f)
+
+8,691,884
+
+551,495
+
+1,564,893
+
+1.2x
+
+15,372,186
+
+2.2x
+
+16,937,079
+
+2.1x
+
+16%
+
+16%
+
+Total BREP
+
+$
+  179,426,235
+
+$
+  38,798,469
+
+$
+  74,435,691
+
+1.1x
+
+$
+  188,783,012
+
+2.2x
+
+$
+  263,218,703
+
+1.7x
+
+16%
+
+13%
+
+*BREDS High-Yield (Various) (g)
+
+27,606,074
+
+8,615,842
+
+3,704,090
+
+1.0x
+
+26,072,271
+
+1.3x
+
+29,776,361
+
+1.3x
+
+10%
+
+9%
+
+Private Equity
+
+Corporate Private Equity
+
+BCP I-III (Oct 1987 / Nov 2002)
+
+$
+6,187,603
+
+$
+- 
+
+$
+- 
+
+n/a
+
+$
+14,239,072
+
+2.4x
+
+$
+14,239,072
+
+2.4x
+
+19%
+
+19%
+
+BCOM (Jun 2000 / Jun 2006)
+
+2,137,330
+
+- 
+
+- 
+
+n/a
+
+2,995,106
+
+1.4x
+
+2,995,106
+
+1.4x
+
+6%
+
+6%
+
+BCP IV (Nov 2002 / Dec 2005)
+
+6,450,000
+
+- 
+
+- 
+
+n/a
+
+21,720,334
+
+2.9x
+
+21,720,334
+
+2.9x
+
+36%
+
+36%
+
+BCP V (Dec 2005 / Jan 2011)
+
+21,009,112
+
+982,018
+
+- 
+
+n/a
+
+38,870,191
+
+1.9x
+
+38,870,191
+
+1.9x
+
+8%
+
+8%
+
+BCP VI (Jan 2011 / May 2016)
+
+15,192,032
+
+1,340,945
+
+2,127,333
+
+3.1x
+
+30,730,898
+
+2.2x
+
+32,858,231
+
+2.2x
+
+13%
+
+12%
+
+BCP VII (May 2016 / Feb 2020)
+
+18,873,411
+
+1,309,645
+
+13,928,047
+
+1.5x
+
+24,466,786
+
+2.6x
+
+38,394,833
+
+2.1x
+
+24%
+
+12%
+
+BCP VIII (Feb 2020 / Apr 2024)
+
+25,820,052
+
+5,881,691
+
+25,743,798
+
+1.4x
+
+10,795,620
+
+2.4x
+
+36,539,418
+
+1.6x
+
+26%
+
+10%
+
+*BCP IX (Apr 2024 / Apr 2030)
+
+21,829,911
+
+18,396,522
+
+5,316,361
+
+1.5x
+
+293,543
+
+1.5x
+
+5,609,904
+
+1.5x
+
+n/m
+
+24%
+
+Energy I (Aug 2011 / Feb 2015)
+
+2,435,007
+
+170,540
+
+- 
+
+n/a
+
+4,897,287
+
+2.0x
+
+4,897,287
+
+2.0x
+
+12%
+
+12%
+
+Energy II (Feb 2015 / Feb 2020)
+
+4,926,378
+
+778,845
+
+3,236,286
+
+2.6x
+
+6,342,126
+
+1.8x
+
+9,578,412
+
+2.0x
+
+9%
+
+9%
+
+Energy III (Feb 2020 / Jun 2024)
+
+4,398,275
+
+1,815,918
+
+7,255,903
+
+3.0x
+
+5,060,366
+
+3.0x
+
+12,316,269
+
+3.0x
+
+33%
+
+33%
+
+Energy Transition IV (Jun 2024 / Jun 2026)
+
+5,880,459
+
+2,763,373
+
+6,518,880
+
+2.0x
+
+157,155
+
+1.7x
+
+6,676,035
+
+2.0x
+
+n/m
+
+94%
+
+*Energy Transition V (Jun 2026 / Jun 2032)
+
+5,671,639
+
+5,671,639
+
+- 
+
+n/a
+
+- 
+
+n/a
+
+- 
+
+n/a
+
+n/a
+
+n/a
+
+BCP Asia I (Dec 2017 / Sep 2021)
+
+2,437,080
+
+417,510
+
+1,275,730
+
+1.3x
+
+3,676,038
+
+3.0x
+
+4,951,768
+
+2.3x
+
+33%
+
+19%
+
+*BCP Asia II (Sep 2021 / Sep 2027)
+
+6,843,926
+
+3,570,292
+
+6,463,390
+
+1.9x
+
+1,041,893
+
+3.4x
+
+7,505,283
+
+2.0x
+
+93%
+
+27%
+
+BCP Asia III (TBD)
+
+13,100,000
+
+13,100,000
+
+- 
+
+n/a
+
+- 
+
+n/a
+
+- 
+
+n/a
+
+n/a
+
+n/a
+
+Core Private Equity I (Jan 2017 / Mar 2021) (h)
+
+4,760,130
+
+1,193,521
+
+6,588,435
+
+2.1x
+
+4,220,471
+
+3.7x
+
+10,808,906
+
+2.5x
+
+32%
+
+14%
+
+*Core Private Equity II (Mar 2021 / Mar 2027) (h)
+
+8,244,519
+
+6,007,302
+
+5,420,354
+
+1.5x
+
+2,081,525
+
+4.2x
+
+7,501,879
+
+1.8x
+
+38%
+
+16%
+
+Total Corporate Private Equity
+
+$
+176,196,864
+
+$
+63,399,761
+
+$
+83,874,517
+
+1.7x
+
+$
+171,588,411
+
+2.3x
+
+$
+255,462,928
+
+2.0x
+
+16%
+
+15%
+
+The returns presented herein represent those of the applicable Blackstone Funds and not those of Blackstone Inc. n/m represents “not
+meaningful” generally due to the limited time since initial investment. n/a represents “not applicable”. Notes on pages 21-22. BREP – Blackstone Real Estate Partners, BREDS –
+Blackstone Real Estate Debt Strategies, BCP – Blackstone Capital Partners, BCOM – Blackstone Communications. * Represents funds that are
+currently in their investment period.
+
+Blackstone  |   19
+
+INVESTMENT RECORDS AS OF JUNE 30, 2026 (a)
+– (CONT’D)
+
+ ($/€ in
+thousands, except where noted)  Fund (Investment Period Beginning Date / Ending Date)
+
+Committed
+Capital
+
+Available
+Capital (b)
+
+Unrealized Investments
+
+Realized Investments
+
+Total Investments
+
+Net IRRs (d)
+
+Value
+
+MOIC (c)
+
+Value
+
+MOIC (c)
+
+Value
+
+MOIC (c)
+
+Realized
+
+ Total 
+
+Private Equity (continued)
+
+Tactical Opportunities
+
+*Tactical Opportunities (Various)
+
+33,780,643
+
+14,441,280
+
+13,027,191
+
+1.2x
+
+32,984,254
+
+1.9x
+
+46,011,445
+
+1.6x
+
+15%
+
+10%
+
+*Tactical Opportunities Co-Investment
+and Other (Various)
+
+10,477,806
+
+1,084,293
+
+3,558,538
+
+1.3x
+
+12,089,490
+
+1.8x
+
+15,648,028
+
+1.7x
+
+18%
+
+15%
+
+Total Tactical Opportunities
+
+$
+44,258,449
+
+$
+15,525,573
+
+$
+16,585,729
+
+1.2x
+
+$
+45,073,744
+
+1.9x
+
+$
+61,659,473
+
+1.6x
+
+16%
+
+11%
+
+Growth
+
+BXG I (Jul 2020 / Feb 2025)
+
+4,961,566
+
+292,405
+
+5,152,451
+
+1.2x
+
+670,399
+
+1.3x
+
+5,822,850
+
+1.2x
+
+n/m
+
+2%
+
+*BXG II (Feb 2025 / Feb 2030)
+
+4,610,169
+
+3,742,666
+
+854,654
+
+1.1x
+
+9,154
+
+n/m
+
+863,808
+
+1.1x
+
+n/m
+
+n/m
+
+Total Growth
+
+$
+9,571,735
+
+$
+4,035,071
+
+$
+6,007,105
+
+1.2x
+
+$
+679,553
+
+1.3x
+
+$
+6,686,658
+
+1.2x
+
+n/m
+
+2%
+
+Strategic Partners (Secondaries)
+
+Strategic Partners I-V (Various)
+(i)
+
+11,035,527
+
+9,572
+
+2,126
+
+n/a
+
+16,796,758
+
+n/a
+
+16,798,884
+
+1.7x
+
+n/a
+
+13%
+
+Strategic Partners VI (Apr 2014 / Apr 2016) (i)
+
+4,362,772
+
+379,409
+
+420,348
+
+n/a
+
+4,665,673
+
+n/a
+
+5,086,021
+
+1.7x
+
+n/a
+
+13%
+
+Strategic Partners VII (May 2016 / Mar 2019) (i)
+
+7,489,970
+
+1,605,255
+
+2,258,612
+
+n/a
+
+8,553,876
+
+n/a
+
+10,812,488
+
+1.9x
+
+n/a
+
+15%
+
+Strategic Partners Real Assets II (May 2017 / Jun 2020)
+(i)
+
+1,749,807
+
+595,603
+
+1,351,477
+
+n/a
+
+1,397,378
+
+n/a
+
+2,748,855
+
+1.9x
+
+n/a
+
+15%
+
+Strategic Partners VIII (Mar 2019 / Oct 2021) (i)
+
+10,763,600
+
+3,410,713
+
+5,873,822
+
+n/a
+
+9,027,494
+
+n/a
+
+14,901,316
+
+1.7x
+
+n/a
+
+17%
+
+*Strategic Partners Real Estate, SMA and Other (Various)
+(i)
+
+7,055,591
+
+1,224,720
+
+3,165,936
+
+n/a
+
+2,940,627
+
+n/a
+
+6,106,563
+
+1.4x
+
+n/a
+
+10%
+
+Strategic Partners Infrastructure III (Jun 2020 / Jun 2024) (i)
+
+3,250,100
+
+666,246
+
+2,626,038
+
+n/a
+
+884,418
+
+n/a
+
+3,510,456
+
+1.6x
+
+n/a
+
+15%
+
+Strategic Partners IX (Oct 2021 / Mar 2026) (i)
+
+19,692,625
+
+1,504,371
+
+19,455,372
+
+n/a
+
+1,307,669
+
+n/a
+
+20,763,041
+
+1.5x
+
+n/a
+
+17%
+
+*Strategic Partners GP Solutions (Jun 2021 / Dec 2026) (i)
+
+2,095,211
+
+342,116
+
+1,295,854
+
+n/a
+
+94,182
+
+n/a
+
+1,390,036
+
+1.1x
+
+n/a
+
+(0)%
+
+*Strategic Partners Infrastructure IV (Jul 2024 / Sep 2029)
+(i)
+
+4,837,949
+
+3,501,386
+
+406,950
+
+n/a
+
+- 
+
+n/a
+
+406,950
+
+1.9x
+
+n/a
+
+n/m
+
+*Strategic Partners X (Mar 2026 / May 2031) (i)
+
+11,024,493
+
+8,606,558
+
+- 
+
+n/a
+
+- 
+
+n/a
+
+- 
+
+n/a
+
+n/a
+
+n/a
+
+Total Strategic Partners (Secondaries)
+
+$
+  83,357,645
+
+$
+  21,845,949
+
+$
+  36,856,535
+
+n/a
+
+$
+  45,668,075
+
+n/a
+
+$
+  82,524,610
+
+1.6x
+
+n/a
+
+14%
+
+Life Sciences
+
+Clarus IV (Jan 2018 / Jan 2020)
+
+910,000
+
+40,291
+
+517,753
+
+2.0x
+
+817,615
+
+1.6x
+
+1,335,368
+
+1.7x
+
+10%
+
+9%
+
+BXLS V (Jan 2020 / Mar 2025)
+
+5,056,620
+
+2,303,560
+
+5,195,969
+
+2.1x
+
+1,854,239
+
+1.8x
+
+7,050,208
+
+2.0x
+
+11%
+
+17%
+
+*BXLS VI (Mar 2025 / Mar 2031)
+
+6,486,870
+
+6,375,163
+
+437,377
+
+n/m
+
+- 
+
+n/a
+
+437,377
+
+n/m
+
+n/a
+
+n/m
+
+Credit
+
+Mezzanine / Opportunistic I (Jul 2007 / Oct 2011)
+
+$
+2,000,000
+
+$
+- 
+
+$
+- 
+
+n/a
+
+$
+4,809,113
+
+1.6x
+
+$
+4,809,113
+
+1.6x
+
+n/a
+
+17%
+
+Mezzanine / Opportunistic II (Nov 2011 / Nov 2016)
+
+4,120,000
+
+993,260
+
+57,792
+
+0.5x
+
+6,687,961
+
+1.4x
+
+6,745,753
+
+1.4x
+
+n/a
+
+9%
+
+Mezzanine / Opportunistic III (Sep 2016 / Jan 2021)
+
+6,639,133
+
+1,081,586
+
+787,485
+
+1.2x
+
+9,939,495
+
+1.5x
+
+10,726,980
+
+1.5x
+
+n/a
+
+11%
+
+Mezzanine / Opportunistic IV (Jan 2021 / Aug 2025)
+
+5,016,771
+
+1,368,541
+
+3,047,474
+
+1.1x
+
+4,156,400
+
+1.5x
+
+7,203,874
+
+1.3x
+
+n/a
+
+11%
+
+*Mezzanine / Opportunistic V (Aug 2025 / Aug 2029)
+
+7,630,000
+
+6,911,455
+
+693,976
+
+1.1x
+
+206,964
+
+1.2x
+
+900,940
+
+1.1x
+
+n/a
+
+n/m
+
+Total Mezzanine / Opportunistic
+
+$
+25,405,904
+
+$
+10,354,842
+
+$
+4,586,727
+
+1.1x
+
+$
+25,799,933
+
+1.5x
+
+$
+30,386,660
+
+1.4x
+
+n/a
+
+13%
+
+Stressed / Distressed I (Sep 2009 / May 2013)
+
+3,253,143
+
+- 
+
+- 
+
+n/a
+
+5,777,098
+
+1.3x
+
+5,777,098
+
+1.3x
+
+n/a
+
+9%
+
+Stressed / Distressed II (Jun 2013 / Jun 2018)
+
+5,125,000
+
+547,430
+
+- 
+
+n/a
+
+5,564,200
+
+1.1x
+
+5,564,200
+
+1.1x
+
+n/a
+
+0%
+
+Stressed / Distressed III (Dec 2017 / Dec 2022)
+
+7,356,380
+
+1,085,652
+
+1,022,304
+
+1.2x
+
+5,934,391
+
+1.3x
+
+6,956,695
+
+1.3x
+
+n/a
+
+9%
+
+Total Stressed / Distressed
+
+$
+15,734,523
+
+$
+1,633,082
+
+$
+1,022,304
+
+1.2x
+
+$
+17,275,689
+
+1.2x
+
+$
+18,297,993
+
+1.2x
+
+n/a
+
+7%
+
+European Senior Debt I (Feb 2015 / Feb 2019)
+
+€
+1,964,689
+
+€
+67,044
+
+€
+159,420
+
+0.3x
+
+€
+2,999,625
+
+1.3x
+
+€
+3,159,045
+
+1.1x
+
+n/a
+
+1%
+
+European Senior Debt II (Jun 2019 / Jun 2023) (j)
+
+4,088,344
+
+861,672
+
+2,174,148
+
+0.9x
+
+4,891,963
+
+1.7x
+
+7,066,111
+
+1.3x
+
+n/a
+
+8%
+
+Total European Senior Debt
+
+€
+6,053,033
+
+€
+928,716
+
+€
+2,333,568
+
+0.8x
+
+€
+7,891,588
+
+1.5x
+
+€
+10,225,156
+
+1.2x
+
+n/a
+
+6%
+
+Energy I (Nov 2015 / Nov 2018)
+
+$
+2,856,867
+
+$
+1,154,819
+
+$
+70,845
+
+1.3x
+
+$
+3,556,730
+
+1.5x
+
+$
+3,627,575
+
+1.5x
+
+n/a
+
+10%
+
+Energy II (Feb 2019 / Jun 2023)
+
+3,616,081
+
+1,456,014
+
+423,972
+
+1.3x
+
+3,554,034
+
+1.4x
+
+3,978,006
+
+1.4x
+
+n/a
+
+16%
+
+*Energy III (May 2023 / May 2028)
+
+6,477,000
+
+4,193,381
+
+2,425,168
+
+1.0x
+
+3,298,003
+
+1.3x
+
+5,723,171
+
+1.2x
+
+n/a
+
+15%
+
+Total Energy
+
+$
+12,949,948
+
+$
+6,804,214
+
+$
+2,919,985
+
+1.0x
+
+$
+10,408,767
+
+1.4x
+
+$
+13,328,752
+
+1.3x
+
+n/a
+
+12%
+
+*Senior Direct Lending (Various) (k)
+
+2,820,243
+
+1,233,828
+
+2,692,761
+
+1.1x
+
+341,891
+
+1.2x
+
+3,034,652
+
+1.1x
+
+n/a
+
+9%
+
+Total Credit Drawdown Funds (l)
+
+$
+63,816,276
+
+$
+21,087,768
+
+$
+13,889,746
+
+1.0x
+
+$
+63,217,193
+
+1.4x
+
+$
+77,106,939
+
+1.3x
+
+n/a
+
+10%
+
+The returns presented herein represent those of the applicable Blackstone Funds and not those of Blackstone Inc. n/m represents “not
+meaningful” generally due to the limited time since initial investment. n/a represents “not applicable”. Notes on pages 21-22. BXG – Blackstone Growth, BXLS – Blackstone Life
+Sciences. * Represents funds that are currently in their investment period.
+
+Blackstone  |   20
+
+INVESTMENT RECORDS AS OF JUNE 30, 2026 (a)
+– (CONT’D)
+
+Selected Perpetual
+Capital Strategies(m)
+
+ ($/€ in thousands, except where noted)
+
+Investment
+
+Total
+
+Total Net  
+
+ Strategy (Inception Year)
+
+Strategy
+
+AUM
+
+Return (n)  
+
+Real Estate
+
+BPP - Blackstone Property Partners Platform (2013) (o)
+
+Core+ Real Estate
+
+  
+
+$
+    57,749,790
+
+  
+
+2%
+
+BREIT - Blackstone Real Estate Income Trust (2017) (p)
+
+Core+ Real Estate
+
+56,551,910
+
+9%
+
+BREIT - Class I (q)
+
+Core+ Real Estate
+
+9%
+
+BXMT - Blackstone Mortgage Trust (2013) (r)
+
+Real Estate Debt
+
+6,255,948
+
+6%
+
+Private Equity
+
+BXGP - Blackstone GP Stakes (2014) (s)
+
+Minority GP Interests
+
+10,017,197
+
+12%
+
+BIP - Blackstone Infrastructure Partners (2019) (t)
+
+Infrastructure
+
+74,964,704
+
+18%
+
+BXINFRA - Blackstone Infrastructure Strategies Fund Program (2025)
+(u)
+
+Infrastructure
+
+5,979,642
+
+15%
+
+BXINFRA - Class I (v)
+
+Infrastructure
+
+16%
+
+BXPE - Blackstone Private Equity Strategies Fund Program (2024)
+(w)
+
+Private Equity
+
+25,312,193
+
+19%
+
+BXPE - Class I (x)
+
+Private Equity
+
+20%
+
+Credit
+
+BXSL - Blackstone Secured Lending Fund (2018) (y)
+
+U.S. Direct Lending
+
+16,585,488
+
+11%
+
+BCRED - Blackstone Private Credit Fund (2021) (z)
+
+U.S. Direct Lending
+
+94,623,700
+
+9%
+
+BCRED - Class I (aa)
+
+U.S. Direct Lending
+
+9%
+
+ECRED - Blackstone European Credit Fund (2022) (ab)
+
+European Direct Lending
+
+€
+5,248,866
+
+9%
+
+ECRED - Class I (ac)
+
+European Direct Lending
+
+9%
+
+Investment Records as of June 30, 2026 - Notes
+
+(a)
+Excludes investment vehicles where Blackstone does not earn fees.
+
+(b)
+Available Capital represents total investable capital commitments, including side-by-side, adjusted for certain expenses and expired or recallable capital and may include leverage, less invested capital. This amount is not reduced by outstanding commitments to investments.
+
+(c)
+Multiple of Invested Capital (“MOIC”) represents carrying value, before management fees, expenses and
+Performance Revenues, divided by invested capital.
+
+(d)
+Unless otherwise indicated, Net Internal Rate of Return (“IRR”) represents the annualized inception to
+June 30, 2026 IRR on total invested capital based on realized proceeds and unrealized value, as applicable, after management fees, expenses and Performance Revenues. IRRs are calculated using actual timing of limited partner cash flows. Initial
+inception date of cash flows may differ from the Investment Period Beginning Date.
+
+(e)
+The 12% Realized Net IRR and 12% Total Net IRR exclude investors that opted out of the Hilton investment
+opportunity. Overall BREP International I-II performance reflects a 10% Realized Net IRR and a 10% Total Net IRR.
+
+(f)
+BREP Co-Investment represents
+co-investment capital raised for various BREP investments. The Net IRR reflected is calculated by aggregating each co-investment’s realized proceeds and unrealized
+value, as applicable, after management fees, expenses and Performance Revenues.
+
+(g)
+BREDS High-Yield represents the flagship real estate debt drawdown funds only.
+
+(h)
+Blackstone Core Equity Partners is a core private equity strategy which invests with a more modest risk profile and
+longer hold period than traditional private equity.
+
+(i)
+Strategic Partners’ Unrealized Investment Value, Realized Investment Value, Total Investment Value, Total
+MOIC and Total Net IRRs are reported on a three-month lag and therefore do not include the impact of economic and market activities in the current quarter. Realizations are treated as returns of capital until fully recovered and therefore Unrealized
+and Realized MOICs and Realized Net IRRs are not applicable. Committed Capital and Available Capital are presented as of the current quarter.
+
+(j)
+European Senior Debt II IRR represents the blended return across the commingled levered and unlevered funds within
+the strategy. The total net returns were 12% and 7%, respectively, for the levered and unlevered funds of the strategy.
+
+(k)
+Senior Direct Lending IRR represents the blended return across the commingled levered and unlevered funds within
+the strategy. The total net returns were 10% and 7%, respectively, for the levered and unlevered funds of the strategy.
+
+The returns presented herein represent those of the applicable Blackstone Funds and not those of Blackstone Inc. n/m represents “not meaningful” generally due to the limited time
+since initial investment. n/a represents “not applicable”. Notes continue on page 22.
+
+Blackstone  |   21
+
+INVESTMENT RECORDS AS OF JUNE 30, 2026 (a) – (CONT’D)
+
+(l)
+Funds presented represent the flagship credit drawdown funds only. The Total Credit Net IRR is the combined IRR of
+the credit drawdown funds presented.
+
+(m)
+Represents the performance for select Perpetual Capital Strategies; strategies excluded consist primarily of
+(1) investment strategies that have been investing for less than one year, (2) perpetual capital assets managed for certain insurance clients, and (3) investment vehicles where Blackstone does not earn fees.
+
+(n)
+Unless otherwise indicated, Total Net Return represents the annualized inception to June 30, 2026 IRR on total
+invested capital based on realized proceeds and unrealized value, as applicable, after management fees, expenses and Performance Revenues. IRRs are calculated using actual timing of investor cash flows. Initial inception date of cash flows occurred
+during the Inception Year.
+
+(o)
+BPP represents the aggregate Total AUM and Total Net Return of the BPP Platform, which comprises over 30 fund, co-investment and separately managed account vehicles. It includes certain vehicles managed as part of the BPP Platform but not classified as Perpetual Capital. As of June 30, 2026, these vehicles represented
+$4.4 billion of Total AUM.
+
+(p)
+The BREIT Total Net Return reflects a per share blended return, assuming BREIT had a single share class,
+reinvestment of all dividends received during the period, and no upfront selling commission, net of all fees and expenses incurred by BREIT. This return is not representative of the return experienced by any particular investor or share class. Total
+Net Return is presented on an annualized basis and is from January 1, 2017.
+
+(q)
+Represents the Total Net Return for BREIT’s Class I shares, its largest share class. Performance varies
+by share class. Class I Total Net Return assumes reinvestment of all dividends received during the period, and no upfront selling commission, net of all fees and expenses incurred by BREIT. Class I Total Net Return is presented on an
+annualized basis and is from January 1, 2017.
+
+(r)
+The BXMT Total Net Return reflects annualized market return of a shareholder invested in BXMT since inception,
+May 22, 2013, assuming reinvestment of all dividends received during the period.
+
+(s)
+Blackstone GP Stakes (“BXGP”) represents the aggregate Total AUM and Total Net Return of BSCH I and II
+funds that invest as part of the Secondaries GP Stakes strategy, which targets minority investments in the general partners of private equity and other private-market alternative asset management firms globally. As of June 30, 2026, including
+vehicles that are not classified as Perpetual Capital and co-investment vehicles that do not pay fees, BXGP Total AUM was $13.1 billion.
+
+(t)
+BIP represents the aggregate Total AUM and Total Net Return of infrastructure-focused funds and co-investment vehicles for institutional investors with a primary focus on the U.S. and Europe. As of June 30, 2026, including co-investment vehicles that do not pay
+fees, BIP Total AUM was $85.6 billion.
+
+(u)
+The BXINFRA Total Net Return reflects a per share blended return, assuming the BXINFRA Fund Program had a single
+vehicle and a single share class, reinvestment of any dividends received during the period, and no upfront selling commission, net of all fees and expenses incurred by BXINFRA. This return is not representative of the return experienced by any
+particular vehicle, investor or share class. For purposes of calculating the blended return, U.S. dollar equivalent returns have been included for share classes that are denominated in a foreign currency that are not hedged. Total net return is from
+January 2, 2025 and any share class or vehicle that has an inception date of less than one year from such latest reporting date is excluded from the calculation. BXINFRA Total AUM reflects net asset value as of June 30, 2026. BXINFRA AUM,
+to the extent managed by a different business, is reported in such business for the purposes of segment AUM reporting.
+
+(v)
+Represents the blended Total Net Return for BXINFRA Fund Program Class I shares, the largest share class
+across vehicles. Performance varies by vehicle and share class. Class I Total Net Return assumes reinvestment of any dividends received during the period, and no upfront selling commission, net of all fees and expenses incurred by the
+Class I shares. For purposes of calculating the blended Class I return, U.S. dollar equivalent returns have been included for share classes that are denominated in a foreign currency that are not hedged. The Class I Total Net Return
+is from January 2, 2025 and any share class or vehicle that has an inception date of less than one year from such latest reporting date is excluded from the calculation.
+
+(w)
+The BXPE Total Net Return reflects a per share blended return, assuming the BXPE Fund Program had a single vehicle
+and a single share class, reinvestment of any dividends received during the period, and no upfront selling commission, net of all fees and expenses incurred by BXPE. This return is not representative of the return experienced by any particular
+vehicle, investor or share class. For purposes of calculating the blended return, U.S. dollar equivalent returns have been included for share classes that are denominated in a foreign currency that are not hedged. Total net return is from
+January 2, 2024 and any share class or vehicle that has an inception date of less than one year from such latest reporting date is excluded from the calculation. BXPE Total AUM reflects net asset value as of June 30, 2026. BXPE AUM, to the
+extent managed by a different business, is reported in such business for the purposes of segment AUM reporting.
+
+(x)
+Represents the blended Total Net Return for BXPE Fund Program Class I shares, the largest share class across
+vehicles. Performance varies by vehicle and share class. Class I Total Net Return assumes reinvestment of any dividends received during the period, and no upfront selling commission, net of all fees and expenses incurred by the Class I
+shares. For purposes of calculating the blended Class I return, U.S. dollar equivalent returns have been included for share classes that are denominated in a foreign currency that are not hedged. Class I Total Net Return is from
+January 2, 2024 and any share class or vehicle that has an inception date of less than one year from such latest reporting date is excluded from the calculation.
+
+(y)
+The BXSL Total AUM and Total Net Return are presented as of March 31, 2026. BXSL Total Net Return reflects the
+change in NAV per share, plus distributions per share (assuming dividends and distributions are reinvested in accordance with BXSL’s dividend reinvestment plan) divided by the beginning NAV per share. Total Net Returns are presented on an
+annualized basis and are from November 20, 2018.
+
+(z)
+The BCRED Total Net Return reflects a per share blended return, assuming BCRED had a single share class,
+reinvestment of all dividends received during the period, and no upfront selling commission, net of all fees and expenses incurred by BCRED. This return is not representative of the return experienced by any particular investor or share class. Total
+Net Return is presented on an annualized basis and is from January 7, 2021. Total AUM reflects gross asset value plus amounts borrowed or available to be borrowed under certain credit facilities. BCRED net asset value as of June 30, 2026
+was $42.8 billion.
+
+(aa)
+Represents the Total Net Return for BCRED’s Class I shares, its largest share class. Performance varies
+by share class. Class I Total Net Return assumes reinvestment of all dividends received during the period, and no upfront selling commission, net of all fees and expenses incurred by BCRED. Class I Total Net Return is presented on an
+annualized basis and is from January 7, 2021.
+
+(ab)
+The ECRED Total Net Return reflects a per share blended return, assuming ECRED had a single share class,
+reinvestment of all dividends received during the period, and no upfront selling commission, net of all fees and expenses incurred by ECRED. This return is not representative of the return experienced by any particular investor or share class. Total
+Net Return is presented on an annualized basis and is from October 3, 2022. Total AUM reflects gross asset value plus amounts borrowed or available to be borrowed under certain credit facilities. ECRED net asset value as of June 30, 2026
+was €2.6 billion.
+
+(ac)
+Represents the Total Net Return for ECRED’s Class I shares, its largest share class. Performance varies
+by share class. Total Net Return assumes reinvestment of all dividends received during the period, and no upfront selling commission, net of all fees and expenses incurred by ECRED. Class I Total Net Return is presented on an annualized basis
+and is from October 3, 2022.
+
+  
+
+Blackstone  |   22
+
+SHAREHOLDER DIVIDENDS
+
+§
+
+Generated $1.52 of Distributable Earnings per common share during the quarter, bringing the YTD amount to $2.88 per common share.
+
+§
+
+Blackstone declared a quarterly dividend of $1.29 per common share to record holders as of August 3, 2026; payable on August 10, 2026.
+
+  % Change 
+
+  % Change 
+
+($ in thousands, except per share data)
+
+2Q’25
+
+3Q’25
+
+4Q’25
+
+1Q’26
+
+2Q’26
+
+  vs. 2Q’25 
+
+2Q’25 YTD
+
+2Q’26 YTD
+
+  vs. 2Q’25 YTD 
+
+Distributable Earnings
+
+ $
+ 1,565,763
+
+ $
+ 1,889,487
+
+ $
+ 2,244,809
+
+ $
+ 1,764,838
+
+ $ 1,977,249
+
+26%  
+
+ $
+ 2,976,568
+
+ $
+ 3,742,087
+
+26%
+
+Add: Other Payables Attributable to Common
+Shareholders
+
+142,664
+
+26,913
+
+167,504
+
+160,943
+
+166,382
+
+17%  
+
+281,089
+
+327,325
+
+16%
+
+DE Before Certain Payables
+
+1,708,427
+
+1,916,400
+
+2,412,313
+
+1,925,781
+
+2,143,631
+
+25%  
+
+3,257,657
+
+4,069,412
+
+25%
+
+Percent to Common Shareholders
+
+64
+%
+
+64
+%
+
+64
+%
+
+64
+%
+
+64%
+
+63
+%
+
+64
+%
+
+DE Before Certain Payables Attributable to Common Shareholders
+
+1,086,833
+
+1,220,339
+
+1,537,540
+
+1,229,664
+
+1,378,635
+
+27%  
+
+2,067,273
+
+2,608,299
+
+26%
+
+Less: Other Payables Attributable to Common
+Shareholders
+
+(142,664
+)
+
+(26,913
+)
+
+(167,504
+)
+
+(160,943
+)
+
+(166,382)
+
+17%  
+
+(281,089
+)
+
+(327,325
+)
+
+16%
+
+DE Attributable to Common Shareholders
+
+944,169
+
+1,193,426
+
+1,370,036
+
+1,068,721
+
+1,212,253
+
+28%  
+
+1,786,184
+
+2,280,974
+
+28%
+
+DE per Common Share
+
+ $
+1.21
+
+ $
+1.52
+
+ $
+1.75
+
+ $
+1.36
+
+ $    1.52
+
+26%  
+
+ $
+2.30
+
+ $
+2.88
+
+25%
+
+Less: Retained Capital per Common Share
+
+ $
+(0.18
+)
+
+ $
+(0.23
+)
+
+ $
+(0.26
+)
+
+ $
+(0.20
+)
+
+ $    (0.23)
+
+28%  
+
+ $
+(0.34
+)
+
+ $
+(0.43
+)
+
+26%
+
+Actual Dividend per Common Share
+
+ $
+1.03
+
+ $
+1.29
+
+ $
+1.49
+
+ $
+1.16
+
+ $    1.29
+
+25%  
+
+ $
+1.96
+
+ $
+2.45
+
+25%
+
+Record Date
+
+Aug 3, 2026
+
+Payable Date
+
+Aug 10, 2026
+
+A detailed description of Blackstone’s dividend policy and the definition of Distributable Earnings can be found on pages 36-38, Definitions and Dividend Policy. See additional notes on
+page 35.
+
+Blackstone  |   23
+
+SHARE SUMMARY
+
+§
+
+Distributable Earnings Shares Outstanding as of quarter end of 1,244 million shares.
+
+–
+
+Repurchased 0.2 million common shares in the quarter and 0.8 million common shares over the LTM.
+
+–
+
+Available authorization remaining was $1.6 billion at June 30, 2026.
+
+2Q’25
+
+3Q’25
+
+4Q’25
+
+1Q’26
+
+2Q’26
+
+Participating Common Shares
+
+782,567,390
+
+782,728,403
+
+783,183,010
+
+785,497,027
+
+799,934,579
+
+Participating Partnership Units
+
+447,574,842
+
+446,455,699
+
+445,586,312
+
+444,672,720
+
+443,878,452
+
+Distributable Earnings Shares Outstanding
+
+1,230,142,232
+
+1,229,184,102
+
+1,228,769,322
+
+1,230,169,747
+
+1,243,813,031
+
+Participating Common Shares and Participating Partnership Units include
+both issued and outstanding shares and unvested shares that participate in dividends.
+
+Blackstone  |   24
+
+Reconciliations and Disclosures
+
+  
+
+Blackstone  |   25
+
+BLACKSTONE’S SECOND QUARTER 2026 GAAP CONSOLIDATED STATEMENTS OF OPERATIONS
+
+ ($ in thousands, except per share data) (unaudited)
+
+2Q’25
+
+2Q’26
+
+2Q’25 YTD
+
+2Q’26 YTD
+
+2Q’25 LTM
+
+2Q’26 LTM
+
+  Revenues
+
+  Management and
+Advisory Fees, Net
+
+$
+2,035,495
+
+$
+2,266,006
+
+$
+3,939,812
+
+$
+4,414,626
+
+$
+7,614,287
+
+$
+8,550,415
+
+  Incentive Fees
+
+195,414
+
+159,080
+
+387,239
+
+324,499
+
+983,777
+
+915,462
+
+  Investment
+Income
+
+  Performance Allocations
+
+  Realized
+
+829,820
+
+1,365,175
+
+1,391,870
+
+2,468,348
+
+3,665,458
+
+4,738,721
+
+
+[input truncated at 60,000 characters]

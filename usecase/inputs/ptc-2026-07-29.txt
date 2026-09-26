@@ -1,0 +1,1719 @@
+Ex 99.1
+
+PTC Announces Third fiscal Quarter 2026 Results
+
+Strategic focus on Intelligent Product Lifecycle vision
+
+•
+Strong execution in Q3’26 across all key metrics
+
+o
+Constant currency ARR growth of 9.1% excluding divested businesses, exceeding the high end of our guidance range
+
+o
+Operating and free cash flow growth of 7% and 3%, respectively, both exceeding the high end of our guidance ranges
+
+•
+Raising FY'26 guidance for ARR, Revenue and EPS, reaffirming Cash Flow guidance
+
+•
+~$525 million of shares repurchased in Q3’26, bringing FY'26 repurchases above the high-end of our target for the year
+
+BOSTON, MA, July 29, 2026 - PTC (NASDAQ: PTC) today reported financial results for its third fiscal quarter ended June 30, 2026.
+
+“PTC delivered strong financial execution in Q3’26. Customers increasingly recognize the importance of our Intelligent Product Lifecycle vision. This coincides with the go-to-market and product strategy emphasis the company has undertaken over the past several quarters and results in a more durable business model that positions PTC for long-term success,” said Neil Barua, President and CEO, PTC.
+
+“AI has become a key discussion point in customer conversations, and PTC is uniquely positioned to take advantage of this growing customer interest in AI. The need to modernize product data foundations in order to appropriately leverage AI is becoming clear to organizations, all while PTC establishes an intelligence layer to enable AI capabilities over our trusted solutions across CAD, PLM, ALM and SLM,” concluded Barua.
+
+Third Fiscal Quarter 2026 Key Operating and Financial Metrics1
+
+$ in millions, except per share amounts
+Q3’26
+Q3'25
+YoY Change
+
+Q3’26 Guidance
+
+As reported ARR excluding divested businesses2
+$2,412
+$2,256
+7%
+
+Constant currency ARR excluding divested businesses (FY'26 Plan FX rates3)
+$2,448
+$2,245
+9.1%
+
+8% to 9% growth
+
+Operating cash flow
+$261
+$244
+7%
+
+$255 to $260
+
+Free cash flow
+$249
+$242
+3%
+
+$240 to $245
+
+Revenue4
+$600
+$644
+(7%)5
+
+$580 to $640
+
+Operating margin4
+28%
+33%
+(480 bps)
+
+Non-GAAP operating margin4
+41%
+44%
+(290 bps)
+
+Earnings per share4
+$1.03
+$1.17
+(12%)
+
+$0.68 to $1.25
+
+Non-GAAP earnings per share4
+$1.58
+$1.64
+(4%)
+
+$1.24 to $1.78
+
+1 The definitions of our operating and non-GAAP financial measures and reconciliations of non-GAAP financial measures to comparable GAAP measures are included below and in the reconciliation tables at the end of this press release.
+
+2 As reported ARR excluding divested businesses excludes Kepware and ThingWorx ARR from Q3’25 to facilitate period-to-period comparisons following the divestiture of those businesses in Q2’26. ARR was flat year over year on an as reported basis in Q3’26.
+
+3 On a constant currency basis, using our FY’26 Plan foreign exchange rates (rates as of September 30, 2025) for all periods. Constant currency ARR excluding divested businesses excludes Kepware and ThingWorx ARR from Q3’25.
+
+4 Revenue and, as a result, operating margin and earnings per share are impacted under ASC 606.
+
+5 In Q3’26, revenue declined 8% year over year on a constant currency basis.
+
+1
+
+“Our Q3 results reflect a focused business model, as the company’s execution resulted in improved demand capture and customer adoption. Our strong financial performance in Q3 highlights the consistent commitment to excellence we strive for, resulting in our key metrics landing above the high end of our guidance. This performance to date and the visibility we have into our Q4 pipeline gives us confidence in raising the midpoint of our ARR guidance for the full year,” said Jen DiRico, CFO.
+
+“Further, we remain committed to our capital allocation priorities, reinvesting in the business while identifying tuck-in acquisitions and opportunities to repurchase PTC stock. Specific to Q3, we identified what we viewed as a compressed valuation of our stock and acted accordingly by repurchasing more than two times what we previously targeted for the quarter,” concluded DiRico.
+
+Full Fiscal Year 2026 and Fourth Fiscal Quarter Guidance
+
+$ in millions, except per share amounts % rounded to the nearest half
+Previous FY’26 Guidance
+FY’26 Guidance3
+FY’26 YoY Growth Guidance
+
+Q4’26 Guidance5
+
+Constant currency ARR excluding divested businesses (FY’26 Plan FX rates)1
+7.5% to 9.5% growth
+9% to 9.5% growth
+9% to 9.5%
+
+9% to 9.5% growth
+
+Operating cash flow
+~$880
+~$880
+~1%4
+
+~$29
+
+Free cash flow2
+~$850
+~$850
+~(1)%4
+
+~$15
+
+Revenue
+$2,580 to $2,820
+$2,690 to $2,750
+(2)% to 0%4
+
+$630 to $690
+
+Earnings per share
+$7.21 to $9.70
+$8.46 to $9.18
+39% to 51%4
+
+$0.94 to $1.70
+
+Non-GAAP earnings per share2
+$6.65 to $8.90
+$7.87 to $8.42
+(1)% to 6%4
+
+$1.63 to $2.21
+
+1 Excludes Kepware and ThingWorx ARR from FY’25 given the divestiture of those businesses in Q2’26. On a constant currency basis, using our FY’26 Plan foreign exchange rates (rates as of September 30, 2025) for all periods.
+
+2 Refer to the GAAP to non-GAAP reconciliation tables below.
+
+3 FY’26 cash flow guidance includes approximately $50 million of divestiture-related costs and approximately $100 million of divestiture-related cash taxes, partially offset by approximately $70 million of divestiture-related net free cash flow contribution, all of which are not expected to recur in future years. Also, FY’26 free cash flow guidance includes approximately $20 million of capital expenditures, which are not expected to recur in future years, primarily related to moving a major R&D center to a new office. FY’26 GAAP EPS guidance includes a $463 million gain on the sale of our Kepware and ThingWorx businesses, partially offset by approximately $140 million of divestiture-related expenses and taxes.
+
+4 FY’26 includes Kepware and ThingWorx only until the divestiture on March 13, 2026; FY’25 includes Kepware and ThingWorx.
+
+5 Q4’26 cash flow guidance includes approximately $26 million of divestiture-related costs and approximately $92 million of divestiture-related cash taxes, all of which are not expected to recur in future years. Also, Q4’26 free cash flow guidance includes approximately $11 million of capital expenditures, which are not expected to recur in future years, primarily related to moving a major R&D center to a new office.
+
+Reconciliation of Operating Cash Flow Guidance to Free Cash Flow Guidance
+
+$ in millions
+FY’26 Guidance
+Q4’26 Guidance
+
+Operating cash flow
+~$880
+~$29
+
+Capital expenditures
+~($30)
+~($14)
+
+Free cash flow
+~$850
+~$15
+
+Reconciliation of EPS Guidance to Non-GAAP EPS Guidance
+
+FY’26 Guidance
+Q4’26 Guidance
+
+Earnings per share
+$8.46 to $9.18
+$0.94 to $1.70
+
+Stock-based compensation
+$2.25 to $1.99
+$0.68 to $0.40
+
+Amortization of acquired intangible assets
+~$0.69
+~$0.18
+
+Acquisition and transaction-related charges
+~$0.35
+~$0.00
+
+Impairment and other charges, net
+~$0.05
+~$0.06
+
+Non-operating credits, net
+~($4.01)
+~$0.00
+
+Income tax adjustments
+$0.08 to $0.17
+($0.23) to ($0.13)
+
+Non-GAAP Earnings per share
+$7.87 to $8.42
+$1.63 to $2.21
+
+2
+
+FY’26 financial guidance includes the following assumptions:
+
+•
+We provide ARR guidance on a constant currency basis, using our FY’26 Plan foreign exchange rates (rates as of September 30, 2025) for all periods.
+
+•
+We expect churn to remain low.
+
+•
+Related to free cash flow, we expect three divestiture-related items in FY’26 that are not expected to recur in future years:
+
+o
+approximately $50 million of divestiture-related costs ($10 million in Q1’26, $5 million in Q2’26, $9 million in Q3’26, and approximately $26 million expected in Q4’26),
+
+o
+approximately $100 million of divestiture-related cash taxes ($8 million in Q3’26 and approximately $92 million expected in Q4’26), and
+
+o
+approximately $70 million of divestiture-related net free cash flow contribution due to the timing and structure of the divestiture ($30 million in Q1’26, $30 million in Q2’26, and $10 million in Q3’26).
+
+•
+Capital expenditures are expected to be approximately $30 million, with $9 million in Q3’26 and approximately $11 million in Q4’26 that is not expected to recur in future years, primarily related to moving a major R&D center to a new office.
+
+•
+FY’26 GAAP operating expenses are expected to increase approximately 4%, primarily due to the divestiture-related expenses. Apart from the divestiture-related expenses, GAAP and non-GAAP operating expenses are expected to be relatively flat, as investments to drive future growth are offset by net proceeds from the divestiture-related Transition Services Agreement and lower operating expenses due to divested costs.
+
+•
+Cash interest payments are expected to be approximately $60 million to $65 million.
+
+•
+Cash tax payments are expected to be approximately $230 million to $240 million, of which approximately $100 million is related to the Kepware and ThingWorx divestiture and not expected to recur in future years.
+
+•
+Q4’26 GAAP and non-GAAP tax rates are expected to be approximately 20% to 25%.
+
+•
+GAAP P&L results are expected to include the items below, netting to credits of approximately $80 million to $110 million, as well as their related tax effects:
+
+o
+approximately $465 million of non-operating credits, primarily related to a gain on the sale of our Kepware and ThingWorx businesses, partially offset by
+
+o
+approximately $230 million to $260 million related to stock-based compensation,
+
+o
+approximately $80 million related to amortization of acquired intangible assets,
+
+o
+approximately $40 million related to acquisition and transaction-related charges, and
+
+o
+approximately $5 million related to impairment and other charges.
+
+•
+On March 17, 2026, we entered into an accelerated share repurchase agreement, under which we used $375 million of cash and received 2.7 million shares during Q2’26 and Q3’26.
+
+•
+In addition to the accelerated share repurchase agreement, during Q3’26 we repurchased 4.3 million additional shares of PTC stock in the open market for $525 million.
+
+•
+In total, we expect to repurchase approximately $1.625 billion of our shares in FY’26 and expect a decrease in fully diluted shares to approximately 116 million shares for FY'26, compared to 121 million shares in FY’25.
+
+3
+
+PTC’s Third Fiscal Quarter Results Conference Call
+
+PTC will host a conference call to discuss results at 5:00 pm ET on Wednesday, July 29, 2026. To participate in the live conference call, dial (888) 596-4144 or (646) 968-2525, provide the passcode 6413921, and press # or log in to the webcast, available on PTC’s Investor Relations website. A replay will also be available.
+
+4
+
+Important Information About Our Operating and Non-GAAP Financial Measures
+
+Non-GAAP Financial Measures
+
+We provide supplemental non-GAAP financial measures to our financial results. We use these non-GAAP financial measures, and we believe that they assist our investors, to make period-to-period comparisons of our operating performance because they provide a view of our operating results without items that are not, in our view, indicative of our operating results. These non-GAAP financial measures should not be construed as an alternative to GAAP results as the items excluded from the non-GAAP financial measures often have a material impact on our operating results, certain of those items are recurring, and others often recur. Management uses, and investors should consider, our non-GAAP financial measures only in conjunction with our GAAP results.
+
+Non-GAAP operating expense, non-GAAP operating margin, non-GAAP gross profit, non-GAAP gross margin, non-GAAP net income and non-GAAP EPS exclude the effect of the following items: stock-based compensation; amortization of acquired intangible assets; acquisition and transaction-related charges included in general and administrative expenses; impairment and other charges (credits), net; non-operating charges (credits), net shown in the reconciliation provided; and income tax adjustments. Additional information about the items we exclude from our non-GAAP financial measures and the reasons we exclude them can be found in “Non-GAAP Financial Measures” in our Annual Report on Form 10-K for the fiscal year ended September 30, 2025.
+
+Free Cash Flow: We provide information on free cash flow to enable investors to assess our ability to generate cash without incurring additional external financings and to evaluate our performance against our announced long-term goals and intent to return excess cash to shareholders via stock repurchases. Free cash flow is cash provided by (used in) operations net of capital expenditures. Free cash flow is not a measure of cash available for discretionary expenditures.
+
+Constant Currency (CC): We present CC information to provide a framework for assessing how our underlying business performed excluding the effects of foreign currency exchange rate fluctuations. To present CC information, FY’26 and comparative prior period results for entities reporting in currencies other than United States dollars are converted into United States dollars using the foreign exchange rate as of September 30, 2025, rather than the actual exchange rates in effect during that period.
+
+Operating Measure
+
+ARR: ARR (Annual Run Rate) represents the annualized value of our portfolio of active subscription software, SaaS, hosting, and support contracts as of the end of the reporting period. We calculate ARR as follows:
+
+•
+We consider a contract to be active when the product or service contractual term commences (the “start date”) until the right to use the product or service ends (the “expiration date”). Even if the contract with the customer is executed before the start date, the contract will not count toward ARR until the customer right to receive the benefit of the products or services has commenced.
+
+•
+For contracts that include annual values that change over time, we include in ARR only the annualized value of components of the contract that are considered active as of the date of the ARR calculation. We do not include any future committed increases in the contract value as of the date of the ARR calculation.
+
+•
+As ARR includes only contracts that are active at the end of the reporting period, ARR does not reflect assumptions or estimates regarding future contract renewals or non-renewals.
+
+•
+Active contracts are annualized by dividing the total active contract value by the contract duration in days (expiration date minus start date), then multiplying that by 365 days (or 366 days for leap years).
+
+5
+
+We believe ARR is a valuable operating measure to assess the health of a subscription business because it is aligned with the amount that we invoice the customer on an annual basis. We generally invoice customers annually for the current year of the contract. A customer with a one-year contract will typically be invoiced for the total value of the contract at the beginning of the contractual term, while a customer with a multi-year contract will be invoiced for each annual period at the beginning of each year of the contract.
+
+ARR increases by the annualized value of active contracts that commence in a reporting period and decreases by the annualized value of contracts that expire in the reporting period.
+
+As ARR is not annualized recurring revenue, it is not calculated based on recognized or unearned revenue and is not affected by variability in the timing of revenue under ASC 606, particularly for on-premises license subscriptions where a substantial portion of the total value of the contract is recognized as revenue at a point in time upon the later of when the software is made available, or the subscription term commences.
+
+ARR should be viewed independently of recognized and unearned revenue and is not intended to be combined with, or to replace, either of those items. Investors should consider our ARR operating measure only in conjunction with our GAAP financial results.
+
+Forward-Looking Statements
+
+Statements in this document that are not historic facts, including statements about our future operating, financial and growth expectations, and potential stock repurchases are forward-looking statements that involve risks and uncertainties that could cause actual results to differ materially from those projected. These risks include: the macroeconomic and/or global manufacturing climates may not improve or may deteriorate due to, among other factors, the effects of import tariffs, threats of additional and reciprocal import tariffs, global trade and geopolitical tensions and uncertainty, including the recent military conflict in Iran, volatile foreign exchange rates, high interest rates or increases in interest rates, inflation, and tightening of credit standards and availability, any of which could cause customers to delay or reduce purchases of new software, adopt competing software solutions, reduce the number of subscriptions they carry, or delay payments to us, which would adversely affect our ARR (Annual Run Rate) and/or financial results and cash flow and growth; our investments in our software solutions, including the integration of artificial intelligence (AI) capabilities into our software solutions, may not drive expansion of those solutions and/or generate the ARR and/or cash flow we expect if those capabilities are not made available when or as we expect, if customers are slower to adopt those solutions than we expect, or if customers adopt competing solutions; customers may not build the product data foundations essential for the AI-driven transformation of their business when or as we expect, which could adversely affect our ARR and/or financial results and cash flow and growth; our go-to-market realignment and related initiatives may not generate the ARR and/or financial results or cash flow when or as we expect; the proceeds we receive under the Transition Services Agreement entered into in connection with the divestiture of the Kepware and ThingWorx businesses may be lower than expected and/or may not offset our expenses and/or the cash flow impact of the divestiture to the extent expected; the divestiture and/or performance of the Transition Services Agreement may disrupt our business to a greater extent than we expect; other uses of cash or our credit facility limits could limit or preclude the return of excess cash to shareholders by way of share repurchases, or could change the amount and timing of any share repurchases; and foreign exchange rates may differ materially from those we expect. In addition, our assumptions concerning our future GAAP and non-GAAP effective income tax rates are based on estimates and other factors that could change, including changes to tax laws in the U.S. and other countries and the geographic mix of our revenue, expenses, and profits. Other risks and uncertainties that could cause actual results to differ materially from those projected are described from time to time in reports we file with the Securities and Exchange Commission, including our most recent Annual Report on Form 10-K, Quarterly Reports on Form 10-Q, and other filings with the U.S. Securities and Exchange Commission.
+
+6
+
+About PTC (NASDAQ: PTC)
+
+PTC (NASDAQ: PTC) is a global software company that enables industrial and manufacturing companies to digitally transform how they engineer, manufacture, and service the physical products that the world relies on. Headquartered in Boston, Massachusetts, PTC employs over 7,000 people and supports more than 30,000 customers globally. For more information, please visit www.ptc.com.
+
+PTC.com @PTC Blogs
+
+PTC Investor Relations Contact
+
+Michael Maguire, CFA
+VP, Investor Relations
+
+investor@ptc.com
+
+7
+
+PTC Inc.
+
+UNAUDITED CONSOLIDATED STATEMENTS OF INCOME
+
+(in thousands, except per share data)
+
+Three Months Ended
+
+Nine Months Ended
+
+June 30,
+
+June 30,
+
+June 30,
+
+June 30,
+
+2026
+
+2025
+
+2026
+
+2025
+
+Revenue:
+
+Recurring revenue
+$
+576,011
+
+$
+613,583
+
+$
+1,976,667
+
+$
+1,739,443
+
+Perpetual license
+
+691
+
+7,763
+
+13,263
+
+23,004
+
+Professional services
+
+23,347
+
+22,591
+
+70,247
+
+82,984
+
+Total revenue (1)
+
+600,049
+
+643,937
+
+2,060,177
+
+1,845,431
+
+Cost of revenue (2)
+
+109,584
+
+110,025
+
+340,948
+
+328,084
+
+Gross margin
+
+490,465
+
+533,912
+
+1,719,229
+
+1,517,347
+
+Operating expenses:
+
+Sales and marketing (2)
+
+136,287
+
+141,756
+
+417,271
+
+424,319
+
+Research and development (2)
+
+115,708
+
+116,647
+
+359,824
+
+343,186
+
+General and administrative (2)
+
+59,973
+
+54,145
+
+222,620
+
+162,457
+
+Amortization of acquired intangible assets
+
+11,991
+
+11,536
+
+36,075
+
+34,356
+
+Impairment and other charges, net
+
+-
+
+-
+
+-
+
+4,213
+
+Total operating expenses
+
+323,959
+
+324,084
+
+1,035,790
+
+968,531
+
+Operating income
+
+166,506
+
+209,828
+
+683,439
+
+548,816
+
+Other income (expense), net
+
+(14,066
+)
+
+(16,152
+)
+
+418,775
+
+(56,737
+)
+
+Income before income taxes
+
+152,440
+
+193,676
+
+1,102,214
+
+492,079
+
+Provision for income taxes
+
+33,660
+
+52,348
+
+226,193
+
+105,875
+
+Net income
+$
+118,780
+
+$
+141,328
+
+$
+876,021
+
+$
+386,204
+
+Earnings per share:
+
+Basic
+$
+1.04
+
+$
+1.18
+
+$
+7.46
+
+$
+3.22
+
+Weighted average shares outstanding
+
+114,677
+
+119,913
+
+117,401
+
+120,106
+
+Diluted
+$
+1.03
+
+$
+1.17
+
+$
+7.43
+
+$
+3.20
+
+Weighted average shares outstanding
+
+114,978
+
+120,461
+
+117,844
+
+120,815
+
+(1) See supplemental financial data for revenue by license, support and cloud services, and professional services.
+
+(2) See supplemental financial data for additional information about stock-based compensation.
+
+8
+
+PTC Inc.
+
+SUPPLEMENTAL FINANCIAL DATA FOR REVENUE AND STOCK-BASED COMPENSATION
+
+(in thousands, except per share data)
+
+Revenue by license, support and services is as follows:
+
+Three Months Ended
+
+Nine Months Ended
+
+June 30,
+
+June 30,
+
+June 30,
+
+June 30,
+
+2026
+
+2025
+
+2026
+
+2025
+
+License revenue (1)
+$
+205,824
+
+$
+251,479
+
+$
+838,210
+
+$
+678,628
+
+Support and cloud services revenue
+
+370,878
+
+369,867
+
+1,151,720
+
+1,083,819
+
+Professional services revenue
+
+23,347
+
+22,591
+
+70,247
+
+82,984
+
+Total revenue
+$
+600,049
+
+$
+643,937
+
+$
+2,060,177
+
+$
+1,845,431
+
+(1) License revenue includes the portion of subscription revenue allocated to license.
+
+The amounts in the income statement include stock-based compensation as follows:
+
+Three Months Ended
+
+Nine Months Ended
+
+June 30,
+
+June 30,
+
+June 30,
+
+June 30,
+
+2026
+
+2025
+
+2026
+
+2025
+
+Cost of revenue
+$
+5,603
+
+$
+5,291
+
+$
+18,736
+
+$
+16,711
+
+Sales and marketing
+
+16,143
+
+15,059
+
+51,373
+
+46,672
+
+Research and development
+
+15,043
+
+17,788
+
+49,115
+
+48,334
+
+General and administrative
+
+22,593
+
+15,894
+
+66,624
+
+49,678
+
+Total stock-based compensation
+$
+59,382
+
+$
+54,032
+
+$
+185,848
+
+$
+161,395
+
+9
+
+PTC Inc.
+
+NON-GAAP FINANCIAL MEASURES AND RECONCILIATIONS (UNAUDITED)
+
+(in thousands, except per share data)
+
+Three Months Ended
+
+Nine Months Ended
+
+June 30,
+
+June 30,
+
+June 30,
+
+June 30,
+
+2026
+
+2025
+
+2026
+
+2025
+
+GAAP gross margin
+$
+490,465
+
+$
+533,912
+
+$
+1,719,229
+
+$
+1,517,347
+
+Stock-based compensation
+
+5,603
+
+5,291
+
+18,736
+
+16,711
+
+Amortization of acquired intangible assets included in cost of revenue
+
+7,753
+
+8,178
+
+23,421
+
+24,609
+
+Non-GAAP gross margin
+$
+503,821
+
+$
+547,381
+
+$
+1,761,386
+
+$
+1,558,667
+
+GAAP operating income
+$
+166,506
+
+$
+209,828
+
+$
+683,439
+
+$
+548,816
+
+Stock-based compensation
+
+59,382
+
+54,032
+
+185,848
+
+161,395
+
+Amortization of acquired intangible assets
+
+19,744
+
+19,714
+
+59,496
+
+58,965
+
+Acquisition and transaction-related charges
+
+2,887
+
+1,597
+
+40,022
+
+2,422
+
+Impairment and other charges, net
+
+-
+
+-
+
+-
+
+4,213
+
+Non-GAAP operating income (1)
+$
+248,519
+
+$
+285,171
+
+$
+968,805
+
+$
+775,811
+
+GAAP net income
+$
+118,780
+
+$
+141,328
+
+$
+876,021
+
+$
+386,204
+
+Stock-based compensation
+
+59,382
+
+54,032
+
+185,848
+
+161,395
+
+Amortization of acquired intangible assets
+
+19,744
+
+19,714
+
+59,496
+
+58,965
+
+Acquisition and transaction-related charges
+
+2,887
+
+1,597
+
+40,022
+
+2,422
+
+Impairment and other charges, net
+
+-
+
+-
+
+-
+
+4,213
+
+Non-operating credits, net (2)
+
+-
+
+-
+
+(463,852
+)
+
+-
+
+Income tax adjustments (3)
+
+(19,353
+)
+
+(19,260
+)
+
+33,924
+
+(65,650
+)
+
+Non-GAAP net income
+$
+181,440
+
+$
+197,411
+
+$
+731,459
+
+$
+547,549
+
+GAAP diluted earnings per share
+$
+1.03
+
+$
+1.17
+
+$
+7.43
+
+$
+3.20
+
+Stock-based compensation
+
+0.52
+
+0.45
+
+1.58
+
+1.34
+
+Amortization of acquired intangibles
+
+0.17
+
+0.16
+
+0.50
+
+0.49
+
+Acquisition and transaction-related charges
+
+0.03
+
+0.01
+
+0.34
+
+0.02
+
+Impairment and other charges, net
+
+-
+
+-
+
+-
+
+0.03
+
+Non-operating credits, net (2)
+
+-
+
+-
+
+(3.94
+)
+
+-
+
+Income tax adjustments (3)
+
+(0.17
+)
+
+(0.16
+)
+
+0.29
+
+(0.54
+)
+
+Non-GAAP diluted earnings per share
+$
+1.58
+
+$
+1.64
+
+$
+6.21
+
+$
+4.53
+
+(1) Operating margin impact of non-GAAP adjustments:
+
+Three Months Ended
+
+Nine Months Ended
+
+June 30,
+
+June 30,
+
+June 30,
+
+June 30,
+
+2026
+
+2025
+
+2026
+
+2025
+
+GAAP operating margin
+
+27.7
+%
+
+32.6
+%
+
+33.2
+%
+
+29.7
+%
+
+Stock-based compensation
+
+9.9
+%
+
+8.4
+%
+
+9.0
+%
+
+8.7
+%
+
+Amortization of acquired intangibles
+
+3.3
+%
+
+3.1
+%
+
+2.9
+%
+
+3.2
+%
+
+Acquisition and transaction-related charges
+
+0.5
+%
+
+0.2
+%
+
+1.9
+%
+
+0.1
+%
+
+Impairment and other charges, net
+
+0.0
+%
+
+0.0
+%
+
+0.0
+%
+
+0.2
+%
+
+Non-GAAP operating margin
+
+41.4
+%
+
+44.3
+%
+
+47.0
+%
+
+42.0
+%
+
+(2) In Q2'26, we recognized gains of $462.6 million on the sale of our Kepware and ThingWorx businesses and $2.0 million related to the finalization of contingent consideration associated with the FY'22 sale of a portion of our PLM services business. In Q1'26, we recognized a $0.8 million financing charge related to a debt commitment agreement associated with our anticipated divestiture of the Kepware and ThingWorx businesses.
+
+(3) Income tax adjustments reflect the tax effects of non-GAAP adjustments which are calculated by applying the applicable tax rate by jurisdiction to the non-GAAP adjustments listed above. Additionally, in the first nine months of FY'25, adjustments exclude a $10.4 million benefit related to the tax impact of tax reserves related to prior years in foreign jurisdictions.
+
+10
+
+PTC Inc.
+
+UNAUDITED CONDENSED CONSOLIDATED BALANCE SHEETS
+
+(in thousands)
+
+June 30,
+
+September 30,
+
+2026
+
+2025
+
+ASSETS
+
+Cash and cash equivalents
+$
+351,454
+
+$
+184,415
+
+Accounts receivable, net
+
+824,107
+
+1,001,085
+
+Property and equipment, net
+
+62,839
+
+60,843
+
+Goodwill and acquired intangible assets, net
+
+4,164,102
+
+4,317,979
+
+Lease assets, net
+
+126,048
+
+114,974
+
+Other assets
+
+985,027
+
+937,876
+
+Total assets
+$
+6,513,577
+
+$
+6,617,172
+
+LIABILITIES AND STOCKHOLDERS' EQUITY
+
+Deferred revenue
+$
+712,527
+
+$
+827,065
+
+Debt, net of deferred issuance costs
+
+1,423,315
+
+1,197,434
+
+Lease obligations
+
+184,379
+
+172,433
+
+Other liabilities
+
+723,613
+
+594,011
+
+Stockholders' equity
+
+3,469,743
+
+3,826,229
+
+Total liabilities and stockholders' equity
+$
+6,513,577
+
+$
+6,617,172
+
+11
+
+PTC Inc.
+
+UNAUDITED CONDENSED CONSOLIDATED STATEMENTS OF CASH FLOWS
+
+(in thousands)
+
+Three Months Ended
+
+Nine Months Ended
+
+June 30,
+
+June 30,
+
+June 30,
+
+June 30,
+
+2026
+
+2025
+
+2026
+
+2025
+
+Cash flows from operating activities:
+
+Net income
+$
+118,780
+
+$
+141,328
+
+$
+876,021
+
+$
+386,204
+
+Stock-based compensation
+
+59,382
+
+54,032
+
+185,848
+
+161,395
+
+Depreciation and amortization
+
+24,190
+
+25,540
+
+74,180
+
+76,803
+
+Amortization of right-of-use lease assets
+
+7,995
+
+8,294
+
+25,723
+
+24,459
+
+Gain on divestiture of businesses
+
+-
+
+-
+
+(464,602
+)
+
+-
+
+Operating lease liability
+
+1,908
+
+(2,273
+)
+
+14,322
+
+(4,869
+)
+
+Accounts receivable
+
+22,766
+
+45,585
+
+158,180
+
+173,557
+
+Accounts payable and accruals
+
+160,776
+
+40,377
+
+204,585
+
+(10,329
+)
+
+Deferred revenue
+
+(56,016
+)
+
+(51,004
+)
+
+(104,664
+)
+
+(16,472
+)
+
+Income taxes
+
+7,196
+
+16,844
+
+116,084
+
+22,409
+
+Other
+
+(86,348
+)
+
+(34,795
+)
+
+(234,386
+)
+
+(49,491
+)
+
+Net cash provided by operating activities
+
+260,629
+
+243,928
+
+851,291
+
+763,666
+
+Capital expenditures
+
+(11,280
+)
+
+(1,887
+)
+
+(16,291
+)
+
+(7,462
+)
+
+Divestiture of businesses(1)
+
+-
+
+-
+
+523,306
+
+-
+
+Borrowings (payments) on debt, net(2)
+
+225,000
+
+(156,583
+)
+
+225,000
+
+(516,708
+)
+
+Repurchases of common stock
+
+(500,031
+)
+
+(74,987
+)
+
+(1,326,190
+)
+
+(224,987
+)
+
+Net proceeds associated with issuance of common stock
+
+-
+
+-
+
+13,162
+
+13,307
+
+Payments of withholding taxes in connection with vesting of stock-based awards
+
+(14,527
+)
+
+(18,890
+)
+
+(67,343
+)
+
+(71,761
+)
+
+Settlement of net investment hedges
+
+9,843
+
+(26,820
+)
+
+26,549
+
+(14,560
+)
+
+Contribution to solar energy equity investment
+
+(50,146
+)
+
+-
+
+(50,146
+)
+
+-
+
+Other financing & investing activities
+
+(3,573
+)
+
+(6,532
+)
+
+(4,580
+)
+
+(7,942
+)
+
+Foreign exchange impact on cash
+
+(3,573
+)
+
+5,923
+
+(7,719
+)
+
+(125
+)
+
+Net change in cash, cash equivalents, and restricted cash
+
+(87,658
+)
+
+(35,848
+)
+
+167,039
+
+(66,572
+)
+
+Cash, cash equivalents, and restricted cash, beginning of period
+
+439,685
+
+235,742
+
+184,988
+
+266,466
+
+Cash, cash equivalents, and restricted cash, end of period
+$
+352,027
+
+$
+199,894
+
+$
+352,027
+
+$
+199,894
+
+Supplemental cash flow information:
+
+Cash paid for interest
+$
+9,231
+
+$
+13,910
+
+$
+40,543
+
+$
+59,062
+
+(1) In Q2'26, we sold our ThingWorx and Kepware businesses.
+
+(2) In the first nine months of FY25, net repayments include borrowings on our credit facility revolver to fund the $500 million bond repayment in February.
+
+12
+
+PTC Inc.
+
+NON-GAAP FINANCIAL MEASURES AND RECONCILIATIONS (UNAUDITED)
+
+(in thousands)
+
+Three Months Ended
+
+Nine Months Ended
+
+June 30,
+
+June 30,
+
+June 30,
+
+June 30,
+
+2026
+
+2025
+
+2026
+
+2025
+
+Cash provided by operating activities
+$
+260,629
+
+$
+243,928
+
+$
+851,291
+
+$
+763,666
+
+Capital expenditures
+
+(11,280
+)
+
+(1,887
+)
+
+(16,291
+)
+
+(7,462
+)
+
+Free cash flow
+$
+249,349
+
+$
+242,041
+
+$
+835,000
+
+$
+756,204
+
+13
