@@ -1,27 +1,70 @@
 "use client";
 
-// The task page: one iteration end to end. The context as sections, the
-// tool transcript step by step, the proposal, the gate, what happened
-// next, the live progress, and the token counts next to the global
-// counter. Layout only.
+// The task page: one attempt end to end, in the mockup's system. What
+// the agent read (sections with tokens each), what it did (the tool
+// steps as a vertical timeline with verdict chips and reasons), the
+// proposal, the gate, what happened next, and the live progress. Same
+// data wiring as before, no new numbers.
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { CodeBlock } from "../../../components/CodeBlock.tsx";
-import { GateResult } from "../../../components/GateResult.tsx";
+import type { CSSProperties, ReactNode } from "react";
 import { ProgressList } from "../../../components/ProgressList.tsx";
-import { compact, hhmmss, oneLine } from "../../../lib/format.ts";
+import { agentLabel, compact, hhmm, hhmmss, oneLine } from "../../../lib/format.ts";
 import { usePoll } from "../../../lib/poll.ts";
-import { TONE_VAR, statusTone } from "../../../lib/status.ts";
 import { contextSections, inputMessages, stepLines } from "../../../lib/transcript.ts";
 import type { StagePayload, TaskPayload } from "../../../lib/types.ts";
 
 const TASK_POLL_MS = 3000;
 const STAGE_POLL_MS = 10_000;
-const ARG_CHARS = 300;
-const RESULT_CHARS = 600;
+const ARG_CHARS = 240;
+const RESULT_CHARS = 400;
+const MAX_ATTEMPTS = 5;
+const FONTS = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap";
 
-const h2: React.CSSProperties = { fontFamily: "var(--mono)", fontSize: 12, color: "var(--fg-dim)", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 6px" };
+type ChipTone = "solved" | "working" | "retry" | "passed" | "dead" | "plain";
+
+const CHIP: Record<ChipTone, { color: string; border: string; bg: string }> = {
+  solved: { color: "var(--gk-solved)", border: "var(--gk-solved-bd)", bg: "var(--gk-solved-bg)" },
+  working: { color: "var(--gk-working)", border: "#1c2350", bg: "#07091a" },
+  retry: { color: "var(--gk-retry)", border: "var(--gk-retry-bd)", bg: "var(--gk-retry-bg)" },
+  passed: { color: "var(--gk-passed)", border: "var(--gk-passed-bd)", bg: "var(--gk-passed-bg)" },
+  dead: { color: "var(--gk-dead)", border: "var(--gk-dead-bd)", bg: "var(--gk-dead-bg)" },
+  plain: { color: "var(--gk-dim)", border: "var(--gk-line-strong)", bg: "transparent" },
+};
+
+function Chip({ tone, children, pulse = false, style }: { tone: ChipTone; children: ReactNode; pulse?: boolean; style?: CSSProperties }) {
+  const c = CHIP[tone];
+  return (
+    <span className="gk-chip" style={{ color: c.color, borderColor: c.border, background: c.bg, ...style }}>
+      <span className={pulse ? "pulse" : undefined} style={{ width: 7, height: 7, borderRadius: "50%", background: c.color, flexShrink: 0 }} />
+      {children}
+    </span>
+  );
+}
+
+// The task's state in one chip: what the stage calls it.
+function taskChip(t: TaskPayload["task"], outcome: string | null): { tone: ChipTone; label: string; pulse: boolean } {
+  if (t.diedAt && t.status === "open") return { tone: "dead", label: "Agent stopped", pulse: false };
+  if (t.status === "merged") return { tone: "solved", label: "Solved", pulse: false };
+  if (t.status === "claimed") return t.lastWorker && t.diedAt ? { tone: "working", label: "Resumed", pulse: true } : { tone: "working", label: "Working", pulse: true };
+  if (t.status === "blocked") return { tone: "dead", label: "Blocked", pulse: false };
+  if (t.status === "parked") return { tone: "plain", label: "Parked", pulse: false };
+  if (outcome === "fail" || t.gate?.pass === false) return { tone: "retry", label: "Retrying", pulse: false };
+  return { tone: "plain", label: t.status, pulse: false };
+}
+
+function Card({ title, sub, children, style }: { title: string; sub?: ReactNode; children: ReactNode; style?: CSSProperties }) {
+  return (
+    <section className="gk-card" style={style} aria-label={title}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+        <span className="gk-title">{title}</span>
+        {sub ? <span className="gk-sub">{sub}</span> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
 
 export default function TaskPage() {
   const { id } = useParams<{ id: string }>();
@@ -33,146 +76,219 @@ export default function TaskPage() {
   const raw = run?.raw ?? {};
   const sections = [...contextSections(raw.system as string | null), ...inputMessages(raw.messages)];
   const contextTotal = sections.reduce((n, s) => n + s.tokens, 0);
+  const contextTokens = typeof raw.contextTokens === "number" ? raw.contextTokens : contextTotal || null;
   const steps = stepLines(raw.steps);
   const proposal = (t?.proposal ?? raw.proposal ?? null) as { rule?: unknown; program?: unknown } | null;
-  const briefing = raw.briefing as { text?: string; cited?: string[]; tokens?: { in: number; out: number } } | null | undefined;
-  const tone = t ? statusTone(t.status, t.attempt, t.hint) : "open";
-  const globalContext = stage.data?.metrics.totals?.contextLast20Avg ?? null;
+  const gate = t?.gate ?? (raw.gate as TaskPayload["task"]["gate"]) ?? null;
+  const outcome = typeof raw.outcome === "string" ? raw.outcome : null;
+  const chip = t ? taskChip(t, outcome) : null;
+  const agent = agentLabel(t?.worker ?? t?.lastWorker);
+  const libraryTokens = stage.data?.metrics.totals?.libraryTokens ?? null;
 
   return (
-    <main className="task" style={{ padding: 16, display: "flex", flexDirection: "column", gap: 20, maxWidth: 1400, margin: "0 auto" }}>
-      <header style={{ display: "flex", gap: 16, alignItems: "baseline", flexWrap: "wrap" }}>
-        <Link href="/" style={{ color: "var(--fg-dim)", fontFamily: "var(--mono)", fontSize: 12 }}>
-          stage
+    <main className="gk" style={{ padding: "30px 36px", maxWidth: 1480, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
+      <link rel="stylesheet" href={FONTS} />
+      <header style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+        <Link href="/" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em" }}>
+          goalkeeper
         </Link>
+        <span style={{ fontSize: 22, color: "#333" }}>/</span>
         {t ? (
-          <Link href={`/unit/${t.key}`} style={{ fontFamily: "var(--mono)", fontSize: 12, color: "var(--fg-dim)" }}>
-            puzzle {t.key}
+          <Link href={`/unit/${t.key}`} className="gk-mono" style={{ fontSize: 22, fontWeight: 500 }}>
+            {t.key}
+          </Link>
+        ) : (
+          <span className="gk-mono" style={{ fontSize: 22, color: "var(--gk-dim)" }}>
+            task
+          </span>
+        )}
+        {chip ? (
+          <Chip tone={chip.tone} pulse={chip.pulse} style={{ height: 28, fontSize: 13, padding: "0 12px" }}>
+            {chip.label}
+          </Chip>
+        ) : null}
+        {t ? (
+          <span style={{ fontSize: 16, color: "var(--gk-dimmer)" }}>
+            attempt {t.attempt} of {MAX_ATTEMPTS} · {agent}
+            {t.diedAt ? ` · stopped at ${hhmm(t.diedAt)}` : ""}
+          </span>
+        ) : null}
+        {poll.error ? <Chip tone="dead">{poll.error}</Chip> : null}
+        {poll.loading ? <span className="gk-label">loading</span> : null}
+        <span style={{ flex: 1 }} />
+        {t ? (
+          <Link href={`/unit/${t.key}`} className="gk-button" style={{ height: 40 }}>
+            Puzzle {t.key}
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#ededed" strokeWidth="1.6" aria-hidden>
+              <path d="M4 8h8M9 5l3 3-3 3" />
+            </svg>
           </Link>
         ) : null}
-        <h1 style={{ fontFamily: "var(--mono)", fontSize: 18, margin: 0 }}>task {id}</h1>
-        {t ? (
-          <span style={{ fontFamily: "var(--mono)", fontSize: 12 }}>
-            attempt {t.attempt}, {t.worker ?? t.lastWorker ?? "no worker"}, <span style={{ color: TONE_VAR[tone] }}>{t.status}</span>
-            {t.hint ? <span style={{ color: "var(--status-retrying)" }}>, planner: {t.hint}</span> : null}
-            {t.diedAt ? <span style={{ color: "var(--status-blocked)" }}>, worker died at {hhmmss(t.diedAt)}</span> : null}
-          </span>
-        ) : null}
-        {poll.error ? <span style={{ color: "var(--status-blocked)", fontSize: 12 }}>{poll.error}</span> : null}
-        {poll.loading ? <span style={{ color: "var(--fg-dim)", fontSize: 12 }}>loading</span> : null}
       </header>
 
-      <section aria-label="tokens" style={{ display: "flex", gap: 24, fontFamily: "var(--mono)", fontSize: 12, flexWrap: "wrap" }}>
-        <span>
-          context assembled <b>{compact(typeof raw.contextTokens === "number" ? raw.contextTokens : contextTotal || null)}</b> tokens
-        </span>
-        <span>
-          global counter (last 20 requests) <b>{compact(globalContext)}</b>
-        </span>
-        {run ? (
-          <span>
-            run in <b>{compact(run.tokens.in)}</b>, out <b>{compact(run.tokens.out)}</b>, ${run.tokens.cost.toFixed(4)}
-          </span>
-        ) : null}
-        {briefing?.tokens ? <span>briefing in {compact(briefing.tokens.in)}, out {compact(briefing.tokens.out)}</span> : null}
-        {stage.data?.metrics.totals ? <span style={{ color: "var(--fg-dim)" }}>library {compact(stage.data.metrics.totals.libraryTokens)} tokens</span> : null}
-        {run?.truncated ? <span style={{ color: "var(--fg-dim)" }}>raw record clipped for the wire</span> : null}
-      </section>
+      {t?.hint ? (
+        <p style={{ margin: 0, fontSize: 15, color: "var(--gk-retry)" }}>
+          <span style={{ color: "var(--gk-dimmer)" }}>From the planner: </span>
+          {t.hint}
+        </p>
+      ) : null}
 
-      <section aria-label="context">
-        <h2 style={h2}>what the worker saw: {sections.length} sections, about {compact(contextTotal)} tokens</h2>
-        {!run ? <span style={{ color: "var(--fg-dim)", fontSize: 12 }}>{t?.status === "claimed" ? "the run is still going; the record lands when it ends" : "no run record for this task"}</span> : null}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {sections.map((s, i) => (
-            <details key={i} open={i < 2} style={{ border: "1px solid var(--line)", borderRadius: 2, padding: "4px 8px" }}>
-              <summary style={{ cursor: "pointer", fontFamily: "var(--mono)", fontSize: 12 }}>
-                {s.label} <span style={{ color: "var(--fg-dim)" }}>{s.chars} chars, ~{s.tokens} tokens</span>
-              </summary>
-              <pre style={{ margin: "6px 0 2px", whiteSpace: "pre-wrap", wordBreak: "break-word", fontSize: 12, lineHeight: 1.4, fontFamily: "var(--sans)" }}>{s.text}</pre>
-            </details>
-          ))}
-        </div>
-      </section>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 2fr) minmax(0, 3fr)", gap: 24, alignItems: "start" }}>
+        <Card
+          title="What it read"
+          sub={
+            run ? (
+              <>
+                {contextTokens === null ? "-" : contextTokens.toLocaleString("en-US")} tokens · built fresh
+                {libraryTokens !== null ? ` · library ${compact(libraryTokens)}` : ""}
+              </>
+            ) : null
+          }
+        >
+          {!run ? (
+            <span className="gk-label">{t?.status === "claimed" ? "the run is still going; the record lands when it ends" : "no run record for this task"}</span>
+          ) : null}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {sections.map((s, i) => (
+              <details key={i} style={{ borderBottom: "1px solid var(--gk-line-soft)" }}>
+                <summary style={{ cursor: "pointer", listStyle: "none", display: "grid", gridTemplateColumns: "72px 1fr", gap: 14, alignItems: "baseline", padding: "8px 0" }}>
+                  <span className="gk-mono" style={{ fontSize: 16, color: s.tokens > 0 ? "var(--gk-fg)" : "var(--gk-dimmer)" }}>
+                    {s.tokens.toLocaleString("en-US")}
+                  </span>
+                  <span style={{ fontSize: 14, color: "var(--gk-dim)" }}>{s.label}</span>
+                </summary>
+                <pre className="gk-pre" style={{ margin: "0 0 10px", maxHeight: 360, fontFamily: "var(--gk-sans)", fontSize: 13, color: "var(--gk-dim)" }}>
+                  {s.text}
+                </pre>
+              </details>
+            ))}
+          </div>
+          {run?.truncated ? <span className="gk-label">raw record clipped for the wire</span> : null}
+        </Card>
 
-      <section aria-label="transcript">
-        <h2 style={h2}>transcript: {steps.length} steps</h2>
-        <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 8 }}>
-          {steps.map((s) => (
-            <li key={s.n} data-step={s.n} style={{ borderLeft: "2px solid var(--line)", paddingLeft: 10, fontSize: 12 }}>
-              <div style={{ fontFamily: "var(--mono)", color: "var(--fg-dim)" }}>
-                step {s.n}: {s.calls.map((c) => c.name).join(", ") || "text"} <span>({s.finishReason}, in {compact(s.usage.in)}, out {compact(s.usage.out)})</span>
-              </div>
-              {s.text ? <p style={{ margin: "4px 0", whiteSpace: "pre-wrap" }}>{s.text}</p> : null}
-              {s.calls.map((c, i) => (
-                <div key={`c${i}`} style={{ fontFamily: "var(--mono)", wordBreak: "break-word" }}>
-                  <span style={{ color: "var(--accent)" }}>{c.name}</span> {oneLine(c.input, ARG_CHARS)}
-                </div>
-              ))}
-              {s.results.map((r, i) => (
-                <div key={`r${i}`} style={{ fontFamily: "var(--mono)", wordBreak: "break-word", color: "var(--fg-dim)" }}>
-                  <span style={{ color: r.ok === null ? "var(--fg-dim)" : r.ok ? "var(--status-merged)" : "var(--status-retrying)" }}>
-                    {r.name} {r.ok === null ? "" : r.ok ? "pass" : "fail"}
-                  </span>{" "}
-                  {r.reasons.length ? (
-                    <ul style={{ margin: "2px 0", paddingLeft: 18, fontFamily: "var(--sans)", color: "var(--fg)" }}>
-                      {r.reasons.map((x, j) => (
-                        <li key={j}>{x}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    oneLine(r.output, RESULT_CHARS)
-                  )}
-                </div>
-              ))}
-            </li>
-          ))}
-        </ol>
-        {run && !steps.length ? <span style={{ color: "var(--fg-dim)", fontSize: 12 }}>no steps recorded</span> : null}
-      </section>
+        <Card title="What it did" sub={run ? `${steps.length} steps · ${compact(run.tokens.in)} in · ${compact(run.tokens.out)} out` : null}>
+          {run && !steps.length ? <span className="gk-label">no steps recorded</span> : null}
+          <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column" }}>
+            {steps.map((s, i) => {
+              const verdict = s.results.find((r) => r.ok !== null) ?? null;
+              const tone: ChipTone = verdict ? (verdict.ok ? "passed" : "retry") : s.calls.some((c) => c.name === "block") ? "dead" : "plain";
+              const last = i === steps.length - 1;
+              return (
+                <li key={s.n} data-step={s.n} style={{ display: "grid", gridTemplateColumns: "20px 1fr", gap: 14 }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <span style={{ width: 9, height: 9, borderRadius: "50%", marginTop: 8, background: CHIP[tone].color, boxShadow: `0 0 0 3px ${CHIP[tone].bg}`, flexShrink: 0 }} />
+                    {!last ? <span style={{ width: 1, flex: 1, background: "var(--gk-line)", marginTop: 4 }} /> : null}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingBottom: last ? 0 : 16, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                      <span className="gk-mono" style={{ fontSize: 14, color: "var(--gk-fg)" }}>
+                        {s.calls.map((c) => c.name).join(", ") || "thinking"}
+                      </span>
+                      {verdict ? <Chip tone={tone}>{verdict.ok ? "gate pass" : "gate fail"}</Chip> : null}
+                      <span className="gk-sub">step {s.n}</span>
+                    </div>
+                    {s.text ? (
+                      <p style={{ margin: 0, fontSize: 14, color: "var(--gk-dim)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{oneLine(s.text, 600)}</p>
+                    ) : null}
+                    {s.calls.map((c, j) => (
+                      <span key={`c${j}`} className="gk-mono" style={{ fontSize: 12, color: "var(--gk-dimmer)", wordBreak: "break-word" }}>
+                        {oneLine(c.input, ARG_CHARS)}
+                      </span>
+                    ))}
+                    {s.results.map((r, j) =>
+                      r.reasons.length ? (
+                        <ul key={`r${j}`} style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: "var(--gk-fg)", display: "flex", flexDirection: "column", gap: 2 }}>
+                          {r.reasons.map((x, k) => (
+                            <li key={k}>{x}</li>
+                          ))}
+                        </ul>
+                      ) : r.ok === null ? (
+                        <span key={`r${j}`} className="gk-mono" style={{ fontSize: 12, color: "var(--gk-dimmer)", wordBreak: "break-word" }}>
+                          {oneLine(r.output, RESULT_CHARS)}
+                        </span>
+                      ) : null,
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </Card>
+      </div>
 
-      <section aria-label="proposal" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)", gap: 24 }}>
-        <div style={{ minWidth: 0 }}>
-          <h2 style={h2}>proposal</h2>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 3fr) minmax(0, 2fr)", gap: 24, alignItems: "start" }}>
+        <Card title={gate?.pass ? "Rule" : "Proposal"} sub={proposal ? "the rule and the program it submitted" : null}>
           {proposal ? (
             <>
-              <p style={{ margin: "0 0 8px" }}>{typeof proposal.rule === "string" ? proposal.rule : <span style={{ color: "var(--fg-dim)" }}>no rule</span>}</p>
-              <CodeBlock code={typeof proposal.program === "string" ? proposal.program : null} maxHeight={420} />
+              <span style={{ fontSize: 20, lineHeight: 1.3, fontWeight: 500 }}>{typeof proposal.rule === "string" ? proposal.rule : <span style={{ color: "var(--gk-dimmer)" }}>no rule sentence</span>}</span>
+              <pre className="gk-pre" style={{ maxHeight: 460 }}>
+                {typeof proposal.program === "string" ? proposal.program : "no program"}
+              </pre>
             </>
           ) : (
-            <span style={{ color: "var(--fg-dim)", fontSize: 12 }}>{t?.blockReason ? `blocked: ${t.blockReason}` : "no proposal"}</span>
+            <span className="gk-label">{t?.blockReason ? `blocked: ${t.blockReason}` : t?.status === "claimed" ? "nothing submitted yet" : "no proposal"}</span>
           )}
-        </div>
-        <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 16 }}>
-          <div>
-            <h2 style={h2}>gate</h2>
-            <GateResult gate={t?.gate ?? (raw.gate as TaskPayload["task"]["gate"]) ?? null} blockReason={t?.blockReason ?? null} />
-          </div>
-          <div>
-            <h2 style={h2}>what happened next</h2>
-            <div style={{ fontFamily: "var(--mono)", fontSize: 12, display: "flex", flexDirection: "column", gap: 4 }}>
-              <span>
-                task status <span style={{ color: TONE_VAR[tone] }}>{t?.status ?? "-"}</span>
-                {t?.hint ? <span style={{ color: "var(--status-retrying)" }}> ({t.hint})</span> : null}
-              </span>
-              {next ? (
-                <span>
-                  next attempt {next.attempt} ({next.status}
-                  {next.hint ? `, ${next.hint}` : ""}) at {hhmmss(next.createdAt)}: <Link href={`/task/${next.id}`}>open</Link>
-                </span>
-              ) : (
-                <span style={{ color: "var(--fg-dim)" }}>no later attempt on this puzzle</span>
-              )}
-              {run ? <span style={{ color: "var(--fg-dim)" }}>run record {hhmmss(run.createdAt)}, outcome {String(raw.outcome ?? "-")}</span> : null}
-              {run?.enrichment ? <span style={{ fontFamily: "var(--sans)" }}>{run.enrichment.gist}</span> : null}
-            </div>
-          </div>
-        </div>
-      </section>
+        </Card>
 
-      <section aria-label="progress">
-        <h2 style={h2}>live progress ({t?.progress.length ?? 0} lines, step {t?.step ?? "-"})</h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <Card title="Gate" sub="deterministic, the same checks for every agent">
+            {!gate && t?.blockReason ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14 }}>
+                <Chip tone="dead">blocked</Chip>
+                <span>{t.blockReason}</span>
+              </div>
+            ) : !gate ? (
+              <span className="gk-label">no verdict yet</span>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <div>
+                  <Chip tone={gate.pass ? "solved" : "retry"}>{gate.pass ? "pass" : "fail"}</Chip>
+                </div>
+                {Object.entries(gate.checks ?? {}).map(([kind, c]) => (
+                  <div key={kind} style={{ display: "grid", gridTemplateColumns: "110px 1fr", gap: 12, alignItems: "baseline", padding: "6px 0", borderTop: "1px solid var(--gk-line-soft)" }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
+                      <span style={{ width: 8, height: 8, borderRadius: 2, background: c.pass ? "var(--gk-solved)" : "var(--gk-retry)" }} />
+                      <span className="gk-mono">{kind}</span>
+                    </span>
+                    <span style={{ fontSize: 14, color: c.pass ? "var(--gk-dimmer)" : "var(--gk-fg)" }}>{c.reasons.join("; ") || (c.pass ? "ok" : "failed")}</span>
+                  </div>
+                ))}
+                {!Object.keys(gate.checks ?? {}).length && gate.reasons.length ? <span style={{ fontSize: 14 }}>{gate.reasons.join("; ")}</span> : null}
+              </div>
+            )}
+          </Card>
+
+          <Card title="What happened next">
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 14 }}>
+              {run?.enrichment ? <span style={{ color: "var(--gk-dim)", lineHeight: 1.45 }}>{run.enrichment.gist}</span> : null}
+              {t?.status === "merged" ? <span style={{ color: "var(--gk-solved)" }}>Solved. Its rule is now in the library for every agent.</span> : null}
+              {t?.status === "claimed" ? <span style={{ color: "var(--gk-working)" }}>{agent} is still working on it.</span> : null}
+              {next ? (
+                <Link href={`/task/${next.id}`} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: 2, background: next.status === "merged" ? "var(--gk-solved)" : next.status === "claimed" ? "var(--gk-working)" : "var(--gk-retry)" }} />
+                  <span>
+                    attempt {next.attempt} started at {hhmm(next.createdAt)}
+                    {next.hint ? `, with what went wrong` : ""}
+                  </span>
+                  <span className="gk-sub">open</span>
+                </Link>
+              ) : t && t.status !== "claimed" && t.status !== "merged" ? (
+                <span style={{ color: "var(--gk-dimmer)" }}>no later attempt on this puzzle yet</span>
+              ) : null}
+              {run ? (
+                <span className="gk-sub">
+                  record written {hhmmss(run.createdAt)}
+                  {outcome ? ` · ${outcome}` : ""} · <Link href={`/library/${run.id}`}>library entry</Link>
+                </span>
+              ) : null}
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      <Card title="Live progress" sub={t ? `${t.progress.length} lines · step ${t.step ?? "-"}` : null}>
         <ProgressList lines={t?.progress ?? []} />
-      </section>
+      </Card>
     </main>
   );
 }

@@ -61,3 +61,11 @@ export function oneLine(v: unknown, max = 200): string {
   const s = typeof v === "string" ? v : JSON.stringify(v) ?? String(v);
   return clip(s.replace(/\s+/g, " "), max);
 }
+
+// Workers are agents on screen: "w-06" is "agent 6", "w-2196so" is
+// "agent 2196so". Null is "no agent".
+export function agentLabel(worker: string | null | undefined): string {
+  if (!worker) return "no agent";
+  const id = worker.replace(/^w-/, "").replace(/^0+(?=\d)/, "");
+  return `agent ${id}`;
+}

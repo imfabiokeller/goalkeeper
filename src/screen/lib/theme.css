@@ -131,12 +131,14 @@
 .gk-title {
   font-size: 15px;
   color: #e6e6e6;
+  white-space: nowrap;
 }
 
 .gk-sub {
   font-family: var(--gk-mono);
   font-size: 13px;
   color: var(--gk-dimmer);
+  text-align: right;
 }
 
 .gk-mono {
