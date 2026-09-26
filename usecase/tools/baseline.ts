@@ -10,8 +10,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { generateText, Output, type LanguageModel } from "ai";
-import { z } from "zod";
+import { generateText, type LanguageModel } from "ai";
 import { CHECK_KINDS, checks, score, type CheckKind, type Input, type State } from "../checks.ts";
 import { costUsd, workerModel, workerProviderOptions } from "../../src/shared/llm.ts";
 
@@ -22,15 +21,29 @@ export const MAX_OUTPUT_TOKENS = 8000;
 export const SYSTEM =
   "You solve ARC puzzles. A puzzle is a few example pairs (input grid, output grid) and one test input; the same hidden rule maps every input to its output. " +
   "Grids are rows of digits 0 to 9, one row per line. Sizes are given; the output size can differ from the input size. " +
-  "Reply with a JSON object with two fields. " +
-  '"rule": the rule in one sentence. ' +
-  '"program": JavaScript source in a fenced code block (```javascript ... ```) that defines function transform(grid) taking a 2D array of integers 0 to 9 and returning the output as a 2D array of integers 0 to 9. ' +
+  "Reply in exactly this format: one line starting with RULE: and the rule in one sentence, then one fenced code block (```javascript ... ```) " +
+  "with JavaScript source that defines function transform(grid) taking a 2D array of integers 0 to 9 and returning the output as a 2D array of integers 0 to 9. " +
+  "No text after the code block. " +
   "No imports, no I/O, no comments needed, under 8000 characters. Never copy an example output into the program: state the rule as code so it works on the test input too.";
 
-const Answer = z.object({
-  rule: z.string().describe("The rule in one sentence."),
-  program: z.string().describe("JavaScript defining function transform(grid), in a fenced code block."),
-});
+// The reply as text: a RULE: line and one fenced block. JSON mode is not
+// used because cheap models cannot reliably escape a long program inside
+// a JSON string. A JSON reply is still accepted.
+export function parseAnswer(text: string): { rule: string; program: string } {
+  const trimmed = text.trim();
+  if (trimmed.startsWith("{")) {
+    try {
+      const j = JSON.parse(trimmed) as { rule?: unknown; program?: unknown };
+      if (typeof j.rule === "string" && typeof j.program === "string") return { rule: j.rule, program: unfence(j.program) };
+    } catch {
+      // fall through to the text format
+    }
+  }
+  const rule = /^\s*RULE:\s*(.+)$/im.exec(text)?.[1]?.trim() ?? "";
+  const program = unfence(text);
+  if (!rule || !program) throw new Error("could not parse the reply: no RULE line or code block");
+  return { rule, program };
+}
 
 export type IndexEntry = { key: string; name: string; file: string; chars: number; [extra: string]: unknown };
 
@@ -96,7 +109,8 @@ export function pickKeys(all: string[], n: number): string[] {
 // followed the format, and left alone otherwise.
 export function unfence(program: string): string {
   const m = /```[a-zA-Z]*\s*\n([\s\S]*?)\n?```/.exec(program);
-  return (m ? m[1]! : program).trim();
+  if (m) return m[1]!.trim();
+  return /function\s+transform\s*\(/.test(program) ? program.trim() : "";
 }
 
 // ------------------------------------------------------------ one shot
@@ -138,14 +152,14 @@ export async function sampleOnce(entry: IndexEntry, text: string, model: Languag
     const result = await generateText({
       model,
       providerOptions: workerProviderOptions(),
-      output: Output.object({ schema: Answer, name: "answer" }),
       system: SYSTEM,
       prompt: text,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
     });
     const tokensIn = result.totalUsage.inputTokens ?? 0;
     const tokensOut = result.totalUsage.outputTokens ?? 0;
-    const proposal = { key: entry.key, rule: result.output.rule, program: unfence(result.output.program) };
+    const answer = parseAnswer(result.text);
+    const proposal = { key: entry.key, rule: answer.rule, program: answer.program };
     return { ...judge(proposal, checkInput(entry, text)), tokensIn, tokensOut, seconds: (Date.now() - t0) / 1000, rule: proposal.rule };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
