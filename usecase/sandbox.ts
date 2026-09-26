@@ -12,7 +12,7 @@ export type RunResult = { ok: true; output: unknown } | { ok: false; error: stri
 
 export const TIMEOUT_MS = 1000;
 export const MAX_OUTPUT_BYTES = 1024 * 1024;
-export const MAX_PROGRAM_CHARS = 4000;
+export const MAX_PROGRAM_CHARS = 8000;
 
 // The child: read stdin, lock the globals the program must not reach, run
 // the program with `new Function`, print one JSON line.

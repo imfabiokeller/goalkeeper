@@ -19,7 +19,7 @@
     },
     {
       "id": "c3",
-      "text": "The proposal has exactly the fields of the proposal shape, the program defines transform(grid) in under 4000 characters, and the key is not already merged.",
+      "text": "The proposal has exactly the fields of the proposal shape, the program defines transform(grid) in under 8000 characters, and the key is not already merged.",
       "check": {
         "kind": "schema"
       }
@@ -40,5 +40,5 @@
   ],
   "contracts": {},
   "history": [],
-  "proposalShape": "{\n  \"key\": \"<equals the task key, the ARC task id>\",\n  \"rule\": \"<one sentence: the hypothesis in words>\",\n  \"program\": \"function transform(grid) { ... return out; }  (JavaScript, no imports, no I/O, under 4000 characters; takes and returns a 2D array of integers 0 to 9)\"\n}"
+  "proposalShape": "{\n  \"key\": \"<equals the task key, the ARC task id>\",\n  \"rule\": \"<one sentence: the hypothesis in words>\",\n  \"program\": \"function transform(grid) { ... return out; }  (JavaScript, no imports, no I/O, under 8000 characters; takes and returns a 2D array of integers 0 to 9)\"\n}"
 }

@@ -61,13 +61,13 @@ Key: the ARC task id. Every puzzle is independent.
 
 `rule` is one sentence, the hypothesis in words; it is what the library
 indexes and what refutations are pinned as. `program` is JavaScript, no
-imports, no I/O, under 4000 characters, defines `transform(grid)` that
+imports, no I/O, under 8000 characters, defines `transform(grid)` that
 takes and returns a 2D array of integers 0 to 9.
 
 ## 4. Checks (`usecase/checks.ts`)
 
 - `schema`: exactly the three fields, `rule` non-empty, `program` under
-  4000 characters and defines `transform`, key matches, not already merged.
+  8000 characters and defines `transform`, key matches, not already merged.
 - `reproduces`: the program run on every example input equals the example
   output, cell for cell. Reasons name the pair and the first difference:
   `pair 2: expected 3x3, got 9x9`, `pair 1: cell (4,2) is 5, expected 0`.

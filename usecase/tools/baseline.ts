@@ -17,7 +17,7 @@ import { costUsd, workerModel, workerProviderOptions } from "../../src/shared/ll
 
 const usecase = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-export const MAX_OUTPUT_TOKENS = 4000;
+export const MAX_OUTPUT_TOKENS = 8000;
 
 export const SYSTEM =
   "You solve ARC puzzles. A puzzle is a few example pairs (input grid, output grid) and one test input; the same hidden rule maps every input to its output. " +
@@ -25,7 +25,7 @@ export const SYSTEM =
   "Reply with a JSON object with two fields. " +
   '"rule": the rule in one sentence. ' +
   '"program": JavaScript source in a fenced code block (```javascript ... ```) that defines function transform(grid) taking a 2D array of integers 0 to 9 and returning the output as a 2D array of integers 0 to 9. ' +
-  "No imports, no I/O, no comments needed, under 4000 characters. Never copy an example output into the program: state the rule as code so it works on the test input too.";
+  "No imports, no I/O, no comments needed, under 8000 characters. Never copy an example output into the program: state the rule as code so it works on the test input too.";
 
 const Answer = z.object({
   rule: z.string().describe("The rule in one sentence."),

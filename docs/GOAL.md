@@ -33,7 +33,7 @@ the hidden test output, which no worker ever sees.
 - c2 `general`: the program runs on the test input within one second and
   returns a valid grid, and contains no example output as a literal.
 - c3 `schema`: the proposal has exactly the fields of the proposal shape,
-  the program defines `transform(grid)` in under 4000 characters, and the
+  the program defines `transform(grid)` in under 8000 characters, and the
   key is not already merged.
 
 **Guidelines.**
