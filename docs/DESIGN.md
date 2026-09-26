@@ -28,7 +28,7 @@ process can die. goalkeeper applies that shift to agents.
 ## 3. Library and goal
 
 **Library (cold).** Raw, append-only, machine-written. Every worker run,
-gate result, planner turn, crowd request, human answer. Built the way
+gate result, planner turn, error. Built the way
 Cerebras built its internal knowledge base, on Atlas:
 
 1. No consolidation. The raw record is the document; nothing is rewritten.
@@ -52,14 +52,13 @@ Cerebras built its internal knowledge base, on Atlas:
 Why raw and not consolidated: write-time consolidation paraphrases away the
 exact values and rejected options that matter later.
 
-**Goal (hot).** Small, human-approved, versioned, pinned into every
-request: statement, criteria each with a deterministic check, guidelines,
-out of scope. It also shapes retrieval: the criterion's words become query
-terms.
+**Goal (hot).** Small, human-written, pinned into every request:
+statement, criteria each with a deterministic check, guidelines, out of
+scope. It also shapes retrieval: the criterion's words become query terms.
 
-**The rule.** Nothing moves from library to goal without a human. The
-planner may propose a diff; a human approves it. Drift is prevented by
-construction: the swarm cannot change its own instructions.
+**The rule.** Nothing moves from library to goal. The swarm learns into
+the library, never into its instructions. Drift is prevented by
+construction: no code path writes the goal after seed.
 
 ## 4. Goal as a first-class citizen
 
@@ -69,9 +68,8 @@ Statement (prose) -> criteria (each with a check kind and params) -> tasks
 - Nothing enters the queue without citing criteria in the current goal.
 - Nothing merges without passing their checks.
 - Every worker reads the goal fresh instead of remembering it.
-- State merged under an older goal version no longer counts as done, so it
-  is redone under the new one. That is the drift correction, a query.
-- Done is computed from `state`, never stated by a model.
+- Done is computed from `state`, never stated by a model; solved is
+  computed from the hidden score, never seen by a model.
 
 Two kinds of criteria: `all-units` (done when every unit passes) and
 `metric` (a measure over the whole state with a direction and a target;
@@ -108,9 +106,9 @@ code path as a first attempt: a new worker, a fresh context.
 A worker may call `try_submit(proposal)` any number of times: the gate
 runs on the draft and returns its reasons, nothing is recorded. That is
 the fastest learning loop, seconds, inside one run. A worker ends a run
-with `submit(proposal)` or `block(reason)`. It never
-asks a human. Blocked reasons pile up and become the planner's evidence for
-a proposed guideline.
+with `submit(proposal)` or `block(reason)`. It never asks a human. A
+blocked unit is reopened by the planner once the library has grown, with
+its block reason as a hint.
 
 ## 6. Pure state and the gate
 
@@ -127,11 +125,8 @@ changes are data, not code.
 
 ## 7. Human in the loop
 
-Two actions, both on the screen: approve or reject a proposed goal diff,
-and submit a crowd request. The planner proposes a diff when several tasks
-block for the same reason. Approval bumps the goal version and reopens the
-blocked tasks. Nothing on stage waits for a human; a pending proposal just
-sits in the inbox while everything else runs.
+One moment: before the run, a human writes the goal. During the run,
+nothing waits for a human and nothing accepts input from one.
 
 ## 8. What is deliberately not here
 
@@ -139,7 +134,8 @@ sits in the inbox while everything else runs.
 - No asks from workers. Submit or block.
 - No consolidation of memory into facts. Raw plus enrichment plus retrieval.
 - No agent-to-agent messaging. Agents share the database, nothing else.
-- No task approval by humans. Humans review the goal, not the work.
+- No task approval by humans. Humans write the goal, not the work.
+- No goal changes during the run. No proposals, no inbox.
 - No separate orchestrator, gate or ingest process. They are functions in
   the worker; one image, N copies.
 - No framework swarm as the coordination layer. The coordination is the

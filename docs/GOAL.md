@@ -1,8 +1,8 @@
 # The goal document
 
 The goal is one document in Atlas, seeded at version 1 from
-`usecase/lens.json` and changed afterwards only by approved diffs. Nothing
-in `src/` depends on its content; this file gives the shape and the
+`usecase/lens.json`, written once by a human and never changed during the
+run. Nothing in `src/` depends on its content; this file gives the shape and the
 version 1 for the decided use case (ARC, see [USE-CASE.md](USE-CASE.md)).
 
 ## Shape
@@ -11,12 +11,12 @@ version 1 for the decided use case (ARC, see [USE-CASE.md](USE-CASE.md)).
 Statement     two sentences, prose, human-written
 Criteria      at most three, each with a check kind the gate can run:
               { id, text, check: { kind, params } }
-Guidelines    a few lines of taste, appended to by approved proposals
+Guidelines    a few lines of taste
 Out of scope  what gets parked, with the reason shown on screen
 Proposal shape the exact JSON a worker must submit, pinned into every
               worker context
-Version       1 at seed, +1 per approved diff
-History       one entry per version: at, by, diff, questionId
+Version       1, stamped on every task
+History       the seed entry
 ```
 
 ## Version 1
@@ -45,7 +45,8 @@ the hidden test output, which no worker ever sees.
 - Reuse helpers from solved puzzles in the library (components, bounding
   box, symmetry, flood fill) instead of writing them again.
 - Never hardcode an example output. If the rule is unclear after three
-  hypotheses, block with the hypotheses tried.
+  hypotheses, block with the hypotheses tried; the puzzle is reopened
+  once the library has grown.
 
 **Out of scope.**
 

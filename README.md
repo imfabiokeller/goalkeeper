@@ -16,16 +16,16 @@ also the thing remembering why.
 goalkeeper separates the two:
 
 - **The library** (cold): everything, raw, append-only, machine-written.
-  Every worker run, gate result, planner turn, crowd request, human answer.
+  Every worker run, gate result, planner turn, error.
   Enriched at ingest so it can be found, read raw so nothing is lost. It
   grows without bound and nobody ever reads it whole.
-- **The goal** (hot): small, human-approved, versioned, always in context.
+- **The goal** (hot): small, human-written, always in context.
   The statement, the criteria each with a deterministic check, the
   guidelines, the out-of-scope list. It is pinned into every request and
   it shapes retrieval from the library.
-- **One rule between them:** nothing moves from the library to the goal
-  without a human. The swarm can learn anything into the library; it can
-  propose a change to its instructions; it cannot make one.
+- **One rule between them:** nothing moves from the library to the goal.
+  The swarm can learn anything into the library; it cannot change its
+  instructions.
 
 Every worker gets a context built for its task from the whole raw record,
 so nothing degrades. Every task is stamped with a goal version and verified
@@ -34,15 +34,15 @@ by a deterministic gate, so nothing drifts.
 ## The shape
 
 - MongoDB Atlas is the coordinator, the memory, the queue and the ledger.
-  Six collections: `goal`, `inputs`, `tasks`, `state`, `sources`,
-  `questions`.
+  Five collections: `goal`, `inputs`, `tasks`, `state`, `sources`.
 - Workers are stateless and disposable. Claim a task, assemble a context,
   run a tool loop, gate the proposal, write the result and the raw run,
   exit. Twenty run in parallel. A dead worker's task is requeued by
   heartbeat.
 - The planner is a function any idle worker runs under a lock: reap,
-  emit tasks for undone units, classify crowd requests, propose a
-  guideline when tasks block for the same reason. It cannot edit the goal.
+  emit tasks for undone units, score merged work against the hidden
+  answer, reopen blocked units once the library has grown. It cannot edit
+  the goal.
 - The gate is a registry of pure check functions. No model judges a model.
 - The work product is a JSON proposal per unit (pure state). Today the
   units are ARC puzzles and the proposal carries a program that the gate
@@ -50,7 +50,7 @@ by a deterministic gate, so nothing drifts.
   scored by the planner and never shown to a worker. The harness is
   work-agnostic; a coding worker is the same loop with a worktree and a
   test check.
-- Humans approve goal changes and submit requests. Nothing else.
+- Humans write the goal once. Nothing else.
 
 ## Docs
 
@@ -59,8 +59,7 @@ by a deterministic gate, so nothing drifts.
 - [docs/DESIGN.md](docs/DESIGN.md): the architecture and the reasoning.
 - [docs/DATABASE.md](docs/DATABASE.md): collections, indexes, the claim,
   the retrieval query, operations end to end.
-- [docs/PLANNER.md](docs/PLANNER.md): the planner steps, classification,
-  proposals, applyDiff.
+- [docs/PLANNER.md](docs/PLANNER.md): the planner steps.
 - [docs/GOAL.md](docs/GOAL.md): the goal document, version 1.
 - [docs/USE-CASE.md](docs/USE-CASE.md): the use case (ARC puzzles) and
   what any use case must provide.

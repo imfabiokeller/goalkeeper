@@ -16,10 +16,9 @@ changes them.
   `score()` only; no worker, context, prompt or library document may
   contain a test output. Model-written programs run only in
   `usecase/sandbox.ts`, never in the worker process.
-- No process keeps state. Nothing but `applyDiff()` after a human approval
-  writes the `goal` document. The gate is deterministic. The library
+- No process keeps state. Nothing writes the `goal` document after seed. The gate is deterministic. The library
   (`sources`) is raw and append-only. Workers never ask humans; they submit
-  or block. If a change breaks one of these, it is wrong, however
+  or block. No proposals, no inbox, no goal diffs, no crowd. If a change breaks one of these, it is wrong, however
   convenient.
 - The worker's agent loop is the Vercel AI SDK (`generateText` with tools
   and a step budget). No direct provider SDK calls. All models go through
@@ -54,7 +53,7 @@ src/
   gate/      gate.ts: pure, runs the checks named by the task's criteria (from usecase/checks.ts)
   context/   retrieve.ts ($rankFusion), assemble.ts (pinned plus passages into messages)
   worker/    loop.ts, claim.ts, run.ts (AI SDK tools), write.ts (source plus enrichment)
-  planner/   lock.ts, reaper.ts, emit.ts, classify.ts, propose.ts, applyDiff.ts, metrics.ts, plan.ts
+  planner/   lock.ts, reaper.ts, emit.ts, score.ts, reopen.ts, metrics.ts, plan.ts
   seed/      goal.json, inputs loader, dev fakes
   screen/    Next.js (after mockups)
 docs/

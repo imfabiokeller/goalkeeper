@@ -1,13 +1,13 @@
 # Database design (Atlas)
 
-One database, six collections plus two singleton documents. The database
+One database, five collections plus two singleton documents. The database
 is the coordinator: no process holds state, every process reads and writes
 here. `src/shared/types.ts` holds the Zod schema for every document below
 and is the source of truth; this file explains them.
 
 Every document that a goal version matters for carries `version`.
 
-## goal (one document, human-approved)
+## goal (one document, human-written, never changed during the run)
 
 ```js
 {
@@ -18,20 +18,18 @@ Every document that a goal version matters for carries `version`.
     { id: "c1", kind: "all-units", text: "<what the check verifies>", check: { kind: "<kind in usecase/checks.ts>", params: {} } },
     { id: "c2", kind: "all-units", text: "...", check: { kind: "...", params: {} } }
   ],
-  guidelines: ["<taste line>", "...", "<guideline added by an approved proposal>"],
+  guidelines: ["<taste line>", "..."],
   outOfScope: ["<what gets parked>", "..."],
   proposalShape: "<the exact JSON a proposal must have, pinned into every worker context>",
-  history: [
-    { version: 1, at: ISODate, by: "seed", diff: null },
-    { version: 2, at: ISODate, by: "fabio", diff: { op: "add-guideline", text: "<guideline>" }, questionId: ObjectId }
-  ]
+  history: [ { version: 1, at: ISODate, by: "seed", diff: null } ]
 }
 ```
 
-Written by `seed` (version 1, from `usecase/lens.json`) and by
-`applyDiff()` after a human approves a question. Nothing else writes it. Criteria of kind `metric` (a measure
-over the whole state with a direction and a target) are in the schema for
-later; today every criterion is `all-units`.
+Written by `seed` (version 1, from `usecase/lens.json`). Nothing else
+writes it. The version and history fields exist so a future run can
+change the goal through an approved diff; today there is no code path
+that does. Criteria of kind `metric` are in the schema for later; today
+every criterion is `all-units`.
 
 ## inputs (one per unit of work)
 
@@ -39,11 +37,11 @@ later; today every criterion is `all-units`.
 { _id: "<key>", key: "<key>", name: "<display name>",
   meta: { ... },                     // extra fields from inputs.json, passed to the checks as-is
   source: "https://...",             // where the input came from, optional
-  text: "...", chars: 30667, scheduled: true, scheduledBy: "seed" | "crowd:<sourceId>", createdAt }
+  text: "...", chars: 30667, scheduled: true, scheduledBy: "seed", createdAt }
 ```
 
-`scheduled: false` units are loaded but not emitted until the crowd asks
-for them. That is what makes "add unit X" real work.
+`scheduled` is true for every unit today (all 400 puzzles at seed); the
+flag stays so a later run can hold units back.
 
 ## tasks (the queue and its history)
 
@@ -54,15 +52,15 @@ for them. That is what makes "add unit X" real work.
   criteria: ["c1", "c2"],
   version: 2,                       // goal version the task runs under
   status: "open" | "claimed" | "merged" | "blocked" | "parked",
-  priority: 0 | 1,                  // 1 for crowd tasks
+  priority: 0 | 1,                  // 1 for "too specific" redo tasks
   attempt: 1,
   worker: null | "w-07",
   heartbeat: null | ISODate,
   proposal: null | { ... },         // set by the worker before gate
   gate: null | { pass: false, reasons: ["..."] },
   blockReason: null | "...",
-  hint: null | "...",               // previous proposal on redo after a version race
-  createdBy: "planner" | "crowd:<sourceId>",
+  hint: null | "...",               // planner hint: too specific, reopened, or a race redo
+  createdBy: "planner",
   createdAt, updatedAt
 }
 ```
@@ -99,28 +97,27 @@ Upsert with a precondition on `stateVersion` (or on absence). A lost race
 puts the task back to `open` with the proposal as `hint`. `score` is set
 by the planner's score step from `usecase/answers/`; a `0` reopens the
 key once with a hint, and the solve rate on screen is `score: 1` over
-keys attempted. A guideline approval does not invalidate merged state
-(the criteria did not change); a criteria change would, by re-seeding.
+keys attempted. Merged state is final for the run; a criteria change
+means re-seeding.
 
 ## sources (the library: raw, append-only)
 
 ```js
 {
   _id: ObjectId,
-  kind: "worker-run" | "gate" | "planner-turn" | "crowd-request" | "answer" | "error",
+  kind: "worker-run" | "gate" | "planner-turn" | "error",
   taskId: ObjectId | null, key: "<key>" | null, version: 2,
   raw: { messages: [...], steps: [...], proposal: {...}, gate: {...}, ... },   // never edited
   text: "...",                       // flattened raw for the text index
   enrichment: null | { gist: "...", entities: { keys: [...], fields: [...] }, labels: [...], embedding: [...] },
   tokens: { in: 12400, out: 800, cost: 0.012 },
-  handled: true | false,             // crowd-request only
   createdAt
 }
 ```
 
 Indexes: Atlas Vector Search `vec` on `enrichment.embedding`; Atlas Search
 `txt` on `text` and `enrichment.gist`; `{ key: 1, kind: 1, createdAt: -1 }`
-for pinned failures; `{ kind: 1, handled: 1 }` for the crowd queue.
+for pinned failures.
 
 Retrieval for a briefing (the Cerebras knowledge-base shape, see
 DESIGN.md section 3), one aggregation:
@@ -151,18 +148,6 @@ into the worker's context.
 Pinned, not retrieved: goal; input text; state for the key; last three
 `gate` sources with a failure on the key.
 
-## questions (proposed goal changes)
-
-```js
-{ _id, kind: "approval", question: "12 tasks are blocked for the same reason: <reason>. Adopt this guideline?",
-  proposedDiff: { op: "add-guideline", text: "<guideline>" },
-  evidence: [taskId, ...], status: "open" | "approved" | "rejected",
-  answeredBy: null | "fabio", answeredAt: null | ISODate, createdAt }
-```
-
-Created by `plan()`. Resolved by a human on `/inbox`. Approve calls
-`applyDiff()`.
-
 ## Singletons
 
 - `locks`: `{ _id: "planner", holder: "w-07", until: ISODate }`. Acquired
@@ -183,7 +168,6 @@ Created by `plan()`. Resolved by a human on `/inbox`. Approve calls
     checks: [{ kind: "grounded", criterion: "c1", fails: 9, passes: 31 }], // per check kind, worst first
     reasons: [{ text: "<first reason of the group>", count: 7, keys: ["<up to 3 example keys>"] }], // top 12 gate reasons
     blocked: [{ text, count, keys }],                                    // top 8 block reasons, same grouping
-    recentGuidelines: [{ version: 2, text: "<guideline>", resolved: 5 }], // last 3 approved diffs, tasks each reopened
     text: "Lessons from the record so far ..."                           // rendered digest, at most 2000 characters
   }
   ```
@@ -191,16 +175,14 @@ Created by `plan()`. Resolved by a human on `/inbox`. Approve calls
   Reasons are grouped the way `propose` groups block reasons (lowercase,
   alphanumeric, first 40 characters). Workers read `lessons.text` with one
   projected `findOne` and pin it into the context; `classify` and `propose`
-  put it in their prompts; the `planner-turn` source carries it in `raw`
+  the `planner-turn` source carries it in `raw`
   and `text` so it is in the library. Nothing here is a rule: the goal is
   the rule, and the raw record is the truth these counts come from.
 
 ## Live screen
 
-`db.watch()` over `tasks`, `state`, `sources`, `questions`, `goal` via a
-change stream, one server route streaming events. The screen writes only
-two things: a `crowd-request` source from `/request` and an approval from
-`/inbox`.
+The screen polls `tasks`, `state`, `sources` and `metrics` (Vercel
+functions cannot hold change streams open). The screen writes nothing.
 
 ## Operations, end to end
 
@@ -213,8 +195,5 @@ two things: a `crowd-request` source from `/request` and an approval from
    `worker-run` source with enrichment, exits the iteration.
 3a. The next `plan()` scores the new state with `usecase/answers/` and
    writes `state.score`; a `0` reopens the key once.
-4. A crowd request lands as a `crowd-request` source; the next `plan()`
-   classifies it: task, recheck, proposal, or parked with a reason.
-5. Blocked tasks pile up; `plan()` proposes a guideline as a question.
-6. A human approves on `/inbox`; `applyDiff()` bumps the goal to version
-   2 and reopens the blocked tasks; the next claims run under version 2.
+4. Blocked tasks pile up; every 20 merges `plan()` reopens the older
+   ones with their block reason as a hint.

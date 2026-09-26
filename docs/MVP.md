@@ -16,8 +16,9 @@ and the other doc gets fixed.
   (Next.js). The planner, the gate, the sandbox and the enrichment are
   functions inside the worker. No other process.
 - No asks from workers. A worker submits or blocks with a reason.
-- The goal changes only through an approved diff proposed by the planner.
-  One diff operation: `add-guideline`.
+- The goal is written once by a human at seed and never changes during
+  the run. No proposals, no inbox, no goal diffs. Workers learn only
+  through the library.
 - The gate is a registry of pure check functions. No model reviews work.
 - The hidden metric: `score()` from the use case, run by the planner on
   merged state, never by a worker. Written to `state.score`. The solve
@@ -31,11 +32,11 @@ and the other doc gets fixed.
 
 ```
                  ┌──────────────────── Atlas ────────────────────┐
- /request ─────▶ │ goal  inputs  tasks  state  sources  questions│ ◀── /inbox approve
+                 │   goal  inputs  tasks  state  sources         │
                  └──▲──────────────▲───────────────────▲─────────┘
                     │              │                   │
         worker ×N ──┘   (claim, run, gate, write; plan() under a lock when idle)
-        screen ────────────────────────────────────────┘   (read-only + two forms)
+        screen ────────────────────────────────────────┘   (read-only, polling)
 ```
 
 One worker iteration:
@@ -54,7 +55,8 @@ One worker iteration:
 5. Write: pass means `state` upsert with a version precondition and task
    `merged`. Fail means task `open` with attempt + 1 until
    `MAX_ATTEMPTS` (5), then `blocked` with the reasons. Block means
-   `blocked` with the reason. Always one `sources` document with the run.
+   `blocked` with the reason (reopened later when the library has grown).
+   Always one `sources` document with the run.
 6. Any throw: task back to `open`, a `sources` document with the error.
 
 `plan()` (one worker at a time, lock with a 30 s TTL):
@@ -62,23 +64,20 @@ One worker iteration:
 1. Reaper: claimed tasks with a heartbeat older than 30 s go back to open.
 2. Emit: for every scheduled input with no state and no open, claimed or
    blocked task, one task. Keep about three times the worker count open.
-   A guideline approval does not re-emit solved keys (the criteria did
-   not change); it reopens blocked ones through `applyDiff`.
 3. Score: merged state with `score: null`: run `score()`, write
    `state.score`. A `0` reopens the key once with the hint "passed the
    examples, wrong on the test: the rule is too specific" (ARC allows two
    attempts); a second `0` stays unsolved.
-4. Crowd: unhandled `crowd-request` sources, one model call each, into
-   task, recheck, proposal or parked.
-5. Propose: three or more blocked tasks with similar reasons and no
-   pending question, one model call, `request_approval(add-guideline)`.
-6. Reopen: every 20 new merges, blocked tasks older than the 20th merge
+4. Reopen: every 20 new merges, blocked tasks older than the 20th merge
    go back to open (the library grew; a puzzle nobody could solve at
    14:00 may be solvable now).
-7. Metrics: refresh the `metrics` document, including solve rate per
+5. Metrics: refresh the `metrics` document, including solve rate per
    bucket.
-8. Backfill: enrich sources missing `enrichment`.
-9. Write a `planner-turn` source.
+6. Backfill: enrich sources missing `enrichment`.
+7. Write a `planner-turn` source.
+
+No crowd, no audience interaction. All 400 puzzles are scheduled at
+seed.
 
 ## Plan from 14:00, in parallel
 
@@ -90,8 +89,8 @@ the code that needs them (stream U, first).
 |---|---|---|---|---|
 | U usecase | agent | `usecase/`, `src/shared/types.ts` (additive) | Fetch ARC eval, write `inputs/`, `inputs.json`, `answers/`, `lens.json`, `sandbox.ts`, `checks.ts` (schema, reproduces, general, score), 5 samples, `check-samples.ts`. Delete the earnings fixture. Add `score` to `State`. | `node usecase/check-samples.ts` passes; `npm test` passes with the new fixture |
 | W worker | agent | `src/worker/`, `src/context/` | `try_submit` tool calling the gate through `RunCtx.dryRun`; `MAX_ATTEMPTS` 5 before blocked; pin refuted rules from prior attempts into the context; enrichment prompt made domain-neutral (reads the goal statement, no earnings words). | worker tests pass with a mocked model; one real merge against Atlas |
-| P planner | agent | `src/planner/` | Score step (`score()` at merge, `state.score`, reopen once on 0); emit skips keys with state regardless of goal version; reopen-on-library-growth; metrics: solve rate per 15-minute bucket, solved/merged/attempted counts, median steps to merge. | planner tests pass; `npm run invariants` clean |
-| S screen | after mockups | `src/screen/` | Stage view, puzzle page, task page, inbox; request and goal if time. Polling against Atlas. | renders from the live database |
+| P planner | agent | `src/planner/` | Delete propose, classify, applyDiff, questions. Score step (`score()` at merge, `state.score`, reopen once on 0); emit skips keys with state; reopen-on-library-growth; metrics: solve rate per 15-minute bucket, solved/merged/attempted counts, median steps to merge. | planner tests pass; `npm run invariants` clean |
+| S screen | after mockups | `src/screen/` | Stage view, puzzle page, task page. Polling against Atlas. | renders from the live database |
 | D deploy and demo | Fabio | `compose.yaml`, `.env`, docs | Re-seed Atlas, 8 workers on the VPS by 15:00, 20 by 15:45, kill test, rehearse, record. | the moments in DEMO.md cannot fail |
 
 Order inside the afternoon:
@@ -105,15 +104,12 @@ Order inside the afternoon:
   merges; fix the prompt if the model ignores `try_submit`.
 - 15:00: P merges score and metrics. The curve has its first points.
 - 15:15: kill test on the VPS. Scale to 20.
-- 15:30: proposals and inbox live. First approval, version 2.
 - 16:00: screen on Vercel against the live database.
 - 16:30: freeze `src/` except the screen. Record the video. Rehearse twice.
 - 16:50: repo public, README's built-today list accurate. Submit.
 
-Cuts, in order, if behind: reopen-on-library-growth, crowd classification
-(the form still records), the request and goal pages, proposals and the
-inbox (blocked list stays). Never cut: claim, heartbeat, reaper, gate,
-sandbox, `try_submit`, hidden score, the curve.
+Cuts, in order, if behind: reopen-on-library-growth, the task page. Never cut: claim, heartbeat, reaper, gate, sandbox,
+`try_submit`, hidden score, the curve, the puzzle page.
 
 ## Acceptance criteria
 
@@ -137,8 +133,6 @@ P
   `answers/` anywhere else.
 - A `score: 0` reopens the key once with a hint; a second `score: 0` does
   not.
-- Approving a guideline reopens blocked tasks and emits nothing for solved
-  keys.
 - `metrics.solveRate` has one entry per 15-minute bucket.
 
 S
@@ -151,7 +145,6 @@ End to end
 - 14:30: one real merge locally against Atlas.
 - 15:15: kill five of twenty on the VPS, all five tasks merged by others
   within two minutes.
-- 15:30: proposal in the inbox, approve, version 2, blocked tasks reopen.
 - `npm run invariants` clean every 30 minutes from 15:00.
 
 ## How it runs

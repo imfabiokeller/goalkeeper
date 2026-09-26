@@ -31,9 +31,9 @@ task for a busy key, and the state write has a version precondition. A
 lost race is a redo, not a merge.
 
 **How do you know it did not drift?**
-Every task is stamped with the goal version and cites its criteria. The
-gate runs those criteria's checks. The planner cannot edit the goal; it can
-only propose a diff, and a human approves it.
+Every task cites its criteria and the gate runs those checks. No code
+path writes the goal after seed: the swarm learns into the library, never
+into its instructions.
 
 **Why no judge agent?**
 A model judging a model shares its biases. Our judge runs the program on
@@ -51,8 +51,8 @@ second limit and an output cap. The worker container is disposable.
 
 **Why don't workers ask questions?**
 A worker asking a human per puzzle does not scale. A worker blocks with
-the hypotheses it tried. The planner groups the reasons and proposes one
-guideline; one approval reopens every blocked puzzle.
+the hypotheses it tried; the planner reopens it once the library has
+grown, with those hypotheses as a hint.
 
 **Why pure state instead of code in a repo?**
 The proposal is JSON that carries a program. Same harness, no repo, no
@@ -67,8 +67,8 @@ database is the only coordinator, and the goal is enforced at merge time.
 **What did you build today, what did you reuse?**
 Built: the worker loop (claim, heartbeat, context assembly, AI SDK tool
 loop, gate, write), the check registry and the sandbox, the planner
-(reaper, emit, crowd classification, proposals, applyDiff, metrics, hidden
-scoring), enrichment and retrieval, the live screen. Reused: Atlas, the
+(reaper, emit, hidden scoring, reopen, metrics), enrichment and
+retrieval, the live screen. Reused: Atlas, the
 Vercel AI SDK, OpenRouter, Voyage, Next.js, Docker, the ARC data.
 
 **Where does this go after today?**

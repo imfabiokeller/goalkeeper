@@ -25,9 +25,7 @@ only the rules and the cuts.
 ## Cuts, in order, if behind
 
 1. Reopen-on-library-growth.
-2. Crowd classification (the form still records requests).
-3. Request and goal pages.
-4. Proposals and the inbox (the blocked list stays as the honest signal).
+2. The task page.
 
 Never: claim, heartbeat, reaper, gate, sandbox, `try_submit`, hidden
 score, the curve, raw sources, kill-and-resume.

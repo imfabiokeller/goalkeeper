@@ -43,7 +43,7 @@ not because the model changed.
 - `usecase/answers/<key>.json`: the test outputs. Read only by
   `score()`. Never loaded into `inputs`, never in a worker context, never
   in the library.
-- 400 loaded, 300 scheduled, 100 in reserve for the crowd.
+- All 400 loaded and scheduled.
 
 ## 2. Units of work
 
@@ -95,22 +95,13 @@ See [GOAL.md](GOAL.md) and `usecase/lens.json`.
 The goal (pinned), the puzzle text, the current state (none, or the
 program that passed the examples but not the test, with the message "too
 specific"), the last failures on this key including the rules already
-tried marked refuted, the lessons digest, and a briefing from the library:
+tried marked refuted, the planner's hint if any, the lessons digest, and a briefing from the library:
 programs and rules from similar solved puzzles, helpers other workers
 wrote.
 
 Tools: `read_input`, `read_state`, `search_library`, `try_submit(proposal)`
 (runs the gate, returns the reasons, records nothing), `submit`, `block`.
 Step budget 20.
-
-## What the crowd can request
-
-- A puzzle from the reserve: becomes a priority task.
-- A recheck of a solved puzzle ("that program is hardcoded"): priority
-  task, old state stays until the new one merges.
-- A guideline ("always check output size first"): proposal in the inbox.
-- Anything else ("use GPT", "solve ARC-2", "show me the answer"): parked
-  with the reason.
 
 ## The generic brief (what any use case must provide)
 
