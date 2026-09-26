@@ -1,9 +1,12 @@
-// Library retrieval for a briefing: one $rankFusion aggregation over
-// `sources` (vector, text and recent pipelines, docs/DATABASE.md). When
-// the Atlas Search indexes are missing, the embedding provider is not
-// configured, or the aggregation throws for any reason, it degrades to
-// plain queries so a worker always gets something and never fails on
-// retrieval.
+// Library retrieval, the Cerebras knowledge-base shape (docs/DESIGN.md
+// section 3): one $rankFusion aggregation over `sources` (vector, text and
+// recent pipelines), the top 30 reranked by $rerank down to 8, and each
+// hit context-expanded with its flattened raw record (`text`, capped).
+// $rerank is an Atlas preview feature: if the aggregation fails with it,
+// the same pipeline runs without it and keeps the fusion's top 8. When the
+// search indexes are missing, the embedding provider is not configured,
+// or the aggregation throws for any other reason, it degrades to plain
+// queries so a worker always gets something and never fails on retrieval.
 
 import type { Document } from "mongodb";
 import type { Collections } from "../shared/db.ts";
@@ -15,19 +18,24 @@ export type Passage = {
   kind: SourceKind;
   key: string | null;
   gist: string | null;
-  excerpt: string;
+  excerpt: string; // the flattened raw record, capped (context expansion)
   score: number;
   createdAt: Date;
 };
 
 export type RetrieveOptions = {
-  limit?: number; // default 10
+  limit?: number; // default 8
   excludeKey?: string; // the task's own key: its sources are pinned, not retrieved
   embed?: (text: string) => Promise<number[]>; // injectable for tests
-  excerptChars?: number; // default 600
+  excerptChars?: number; // default 1500
 };
 
-export type RetrieveResult = { passages: Passage[]; degraded: boolean };
+export type RetrieveResult = { passages: Passage[]; degraded: boolean; reranked: boolean };
+
+export const RETRIEVE_LIMIT = 8;
+export const FUSION_LIMIT = 30;
+export const EXPANSION_CHARS = 1500;
+export const RERANK_MODEL = "voyage-rerank-2.5";
 
 const STOP = new Set(
   "a an and are as at be by for from in is it its of on or that the this to with every each never any all".split(" "),
@@ -60,54 +68,59 @@ function toPassage(doc: Source & { score?: number }, excerptChars: number, score
   };
 }
 
+export function fusionPipeline(query: string, queryVector: number[], opts: { excludeKey?: string; limit: number; rerank: boolean }): Document[] {
+  return [
+    {
+      $rankFusion: {
+        input: {
+          pipelines: {
+            vector: [
+              { $vectorSearch: { index: "vec", path: "enrichment.embedding", queryVector, numCandidates: 200, limit: 30 } },
+            ],
+            text: [{ $search: { index: "txt", text: { query, path: ["text", "enrichment.gist"] } } }, { $limit: 30 }],
+            recent: [{ $match: { kind: { $in: ["gate", "worker-run"] } } }, { $sort: { createdAt: -1 } }, { $limit: 30 }],
+          },
+        },
+        combination: { weights: { vector: 1, text: 1, recent: 0.5 } },
+      },
+    },
+    ...(opts.excludeKey ? [{ $match: { key: { $ne: opts.excludeKey } } }] : []),
+    { $limit: opts.rerank ? FUSION_LIMIT : opts.limit },
+    ...(opts.rerank
+      ? [{ $rerank: { model: RERANK_MODEL, query, path: ["enrichment.gist", "text"], limit: opts.limit } }]
+      : []),
+    { $set: { score: { $meta: "score" } } },
+  ];
+}
+
 export async function retrieve(c: Collections, query: string, opts: RetrieveOptions = {}): Promise<RetrieveResult> {
-  const limit = opts.limit ?? 10;
-  const excerptChars = opts.excerptChars ?? 600;
+  const limit = opts.limit ?? RETRIEVE_LIMIT;
+  const excerptChars = opts.excerptChars ?? EXPANSION_CHARS;
   const embed = opts.embed ?? embedText;
 
+  let queryVector: number[];
   try {
-    const queryVector = await embed(query);
-    const pipeline: Document[] = [
-      {
-        $rankFusion: {
-          input: {
-            pipelines: {
-              vector: [
-                {
-                  $vectorSearch: {
-                    index: "vec",
-                    path: "enrichment.embedding",
-                    queryVector,
-                    numCandidates: 200,
-                    limit: 30,
-                  },
-                },
-              ],
-              text: [
-                { $search: { index: "txt", text: { query, path: ["text", "enrichment.gist"] } } },
-                { $limit: 30 },
-              ],
-              recent: [
-                { $match: { kind: { $in: ["gate", "worker-run"] } } },
-                { $sort: { createdAt: -1 } },
-                { $limit: 30 },
-              ],
-            },
-          },
-          combination: { weights: { vector: 1, text: 1, recent: 0.5 } },
-        },
-      },
-      ...(opts.excludeKey ? [{ $match: { key: { $ne: opts.excludeKey } } }] : []),
-      { $limit: limit },
-      { $set: { score: { $meta: "score" } } },
-    ];
-    const docs = (await c.sources.aggregate(pipeline).toArray()) as Array<Source & { score?: number }>;
-    return {
-      degraded: false,
-      passages: docs.map((d, i) => toPassage(d, excerptChars, typeof d.score === "number" ? d.score : 1 / (i + 1))),
-    };
+    queryVector = await embed(query);
   } catch {
-    return { degraded: true, passages: await fallback(c, query, limit, excerptChars, opts.excludeKey) };
+    return { degraded: true, reranked: false, passages: await fallback(c, query, limit, excerptChars, opts.excludeKey) };
+  }
+
+  const run = async (rerank: boolean) => {
+    const pipeline = fusionPipeline(query, queryVector, { excludeKey: opts.excludeKey, limit, rerank });
+    return (await c.sources.aggregate(pipeline).toArray()) as Array<Source & { score?: number }>;
+  };
+  const shape = (docs: Array<Source & { score?: number }>) =>
+    docs.map((d, i) => toPassage(d, excerptChars, typeof d.score === "number" ? d.score : 1 / (i + 1)));
+
+  try {
+    return { degraded: false, reranked: true, passages: shape(await run(true)) };
+  } catch {
+    // $rerank unavailable (preview feature): keep the fusion's top hits.
+  }
+  try {
+    return { degraded: false, reranked: false, passages: shape(await run(false)) };
+  } catch {
+    return { degraded: true, reranked: false, passages: await fallback(c, query, limit, excerptChars, opts.excludeKey) };
   }
 }
 

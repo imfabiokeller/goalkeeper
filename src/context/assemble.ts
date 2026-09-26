@@ -1,15 +1,20 @@
 // Context assembly: pure. Pinned material (goal, task, state, last
-// failures) plus retrieved passages into a system prompt and the opening
-// messages of the run. Every part is capped so the whole stays under 20k
-// tokens for the largest fixture input (60k characters).
+// failures) plus the library briefing (grounded sentences and the records
+// it cites, context-expanded) into a system prompt and the opening
+// messages of the run. Without a briefing the top expanded hits go in
+// directly. Every part is capped so the whole stays under 20k tokens for
+// the largest fixture input (60k characters).
 
 import type { ModelMessage } from "ai";
 import type { Passage } from "./retrieve.ts";
+import type { Briefing } from "./synthesize.ts";
 import type { Goal, Input, Source, State, Task } from "../shared/types.ts";
 
 export const PAGE_CHARS = 6000;
-export const MAX_PASSAGES = 10;
-export const EXCERPT_CHARS = 600;
+export const MAX_PASSAGES = 4; // raw hits shown when there is no briefing
+export const MAX_CITED = 8; // records a briefing can bring along
+export const EXCERPT_CHARS = 1500; // context expansion per record
+export const BRIEFING_CHARS = 4000;
 export const GIST_CHARS = 300;
 export const MAX_FAILURES = 3;
 export const MAX_REASON_CHARS = 400;
@@ -25,7 +30,8 @@ export type AssembleArgs = {
   input: Pick<Input, "key" | "company" | "text"> & Partial<Pick<Input, "ticker" | "filedAt" | "chars">>;
   state: Pick<State, "data" | "stateVersion" | "version"> | null;
   failures: Array<Pick<Source, "raw" | "createdAt">>;
-  passages: Passage[];
+  passages: Passage[]; // the retrieved, expanded hits
+  briefing?: Briefing | null; // synthesized from the hits; null or absent means show the hits
   page?: number; // 0-based page of the input to pin, default 0
 };
 
@@ -113,18 +119,26 @@ export function assemble(args: AssembleArgs): Assembled {
     );
   }
 
-  const shown = passages.slice(0, MAX_PASSAGES);
-  if (shown.length) {
+  const record = (p: Passage) => {
+    const head = `[${p.id}] ${p.kind}${p.key ? ` on ${p.key}` : ""}`;
+    const gist = p.gist ? `\ngist: ${clip(p.gist, GIST_CHARS)}` : "";
+    return `${head}${gist}\nrecord: ${clip(p.excerpt.replace(/\s+/g, " "), EXCERPT_CHARS)}`;
+  };
+  const briefing = args.briefing && args.briefing.text ? args.briefing : null;
+  if (briefing) {
+    const cited = briefing.cited.slice(0, MAX_CITED);
     parts.push(
-      "# Library passages (precedents from other units, retrieved; may or may not apply)\n" +
-        shown
-          .map((p, i) => {
-            const head = `[${i + 1}] ${p.kind}${p.key ? ` on ${p.key}` : ""}`;
-            const gist = p.gist ? `\ngist: ${clip(p.gist, GIST_CHARS)}` : "";
-            return `${head}${gist}\nexcerpt: ${clip(p.excerpt.replace(/\s+/g, " "), EXCERPT_CHARS)}`;
-          })
-          .join("\n\n"),
+      "# Library briefing (what earlier runs on other units show; every sentence cites its records)\n" +
+        clip(briefing.text, BRIEFING_CHARS) +
+        (cited.length ? "\n\n## Cited records\n" + cited.map(record).join("\n\n") : ""),
     );
+  } else {
+    const shown = passages.slice(0, MAX_PASSAGES);
+    if (shown.length) {
+      parts.push(
+        "# Library records (precedents from other units, retrieved; may or may not apply)\n" + shown.map(record).join("\n\n"),
+      );
+    }
   }
 
   const pg = inputPage(input.text, page * PAGE_CHARS);

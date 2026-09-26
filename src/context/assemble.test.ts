@@ -24,21 +24,52 @@ const baseTask = { key: "aapl-2026-07-30", criteria: ["c1", "c2", "c3"], attempt
 const baseInput = { key: "aapl-2026-07-30", company: "Apple Inc.", ticker: "AAPL", filedAt: "2026-07-30", text: "Apple reports third quarter results. Revenue $109.4 billion." };
 
 describe("assemble", () => {
-  it("stays under 20k tokens with a 60k input and 10 long passages", () => {
-    const text = "Lorem ipsum dolor sit amet ".repeat(3000).slice(0, 60_000);
-    const out = assemble({
-      goal,
-      task: { ...baseTask, hint: "h".repeat(50_000) },
-      input: { ...baseInput, text },
-      state: { data: { big: "s".repeat(50_000) }, stateVersion: 1, version: 1 },
-      failures: Array.from({ length: 5 }, (_, i) => ({
-        createdAt: new Date(),
-        raw: { reasons: Array.from({ length: 30 }, (_, j) => `reason ${i}.${j} ` + "r".repeat(2000)) },
-      })),
-      passages: Array.from({ length: 10 }, (_, i) => longPassage(i)),
-    });
+  const heavy = {
+    goal,
+    task: { ...baseTask, hint: "h".repeat(50_000) },
+    input: { ...baseInput, text: "Lorem ipsum dolor sit amet ".repeat(3000).slice(0, 60_000) },
+    state: { data: { big: "s".repeat(50_000) }, stateVersion: 1, version: 1 },
+    failures: Array.from({ length: 5 }, (_, i) => ({
+      createdAt: new Date(),
+      raw: { reasons: Array.from({ length: 30 }, (_, j) => `reason ${i}.${j} ` + "r".repeat(2000)) },
+    })),
+    passages: Array.from({ length: 10 }, (_, i) => longPassage(i)),
+  };
+
+  it("stays under 20k tokens with a 60k input and 10 long passages, no briefing", () => {
+    const out = assemble(heavy);
     expect(out.contextTokens).toBeLessThan(20_000);
     expect(out.system.length).toBeLessThan(80_000);
+  });
+
+  it("stays under 20k tokens with a long briefing citing 10 long records", () => {
+    const out = assemble({
+      ...heavy,
+      briefing: { text: "Long sentence [p0]. ".repeat(2000), cited: heavy.passages, tokens: { in: 1, out: 1 } },
+    });
+    expect(out.contextTokens).toBeLessThan(20_000);
+  });
+
+  it("shows the briefing and only its cited records when there is one, else the top hits", () => {
+    const passages = Array.from({ length: 6 }, (_, i) => ({ ...longPassage(i), gist: `gist ${i}`, excerpt: `record ${i}` }));
+    const withBriefing = assemble({
+      ...heavy,
+      input: baseInput,
+      passages,
+      briefing: { text: "Banks report net revenue [p1].", cited: [passages[1]], tokens: { in: 1, out: 1 } },
+    });
+    expect(withBriefing.system).toContain("# Library briefing");
+    expect(withBriefing.system).toContain("Banks report net revenue [p1].");
+    expect(withBriefing.system).toContain("[p1] worker-run on other-1");
+    expect(withBriefing.system).toContain("record 1");
+    expect(withBriefing.system).not.toContain("record 0");
+    expect(withBriefing.system).not.toContain("# Library records");
+
+    const without = assemble({ ...heavy, input: baseInput, passages, briefing: null });
+    expect(without.system).toContain("# Library records");
+    expect(without.system).toContain("record 0");
+    expect(without.system).toContain("record 3");
+    expect(without.system).not.toContain("record 4"); // top 4 only
   });
 
   it("has every section and pins the first page of the input", () => {
@@ -60,6 +91,7 @@ describe("assemble", () => {
     expect(out.system).toContain("revenue 1 not in quote");
     expect(out.system).toContain("banks report net revenue");
     expect(out.system).toContain("JPMorgan net revenue");
+    expect(out.system).toContain("[p0] worker-run on other-0");
     expect(out.system).toContain(`call read_input with offset ${PAGE_CHARS}`);
     expect(out.system).toContain("A".repeat(PAGE_CHARS));
     expect(out.system).not.toContain("BBBB");

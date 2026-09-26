@@ -42,9 +42,9 @@ beforeEach(async () => {
 // ------------------------------------------------------------ helpers
 
 const noEnrich = async () => null;
-const noRetrieve = async () => ({ passages: [], degraded: true });
-// Never call real providers: no planner, no enrichment, no retrieval.
-const base: IterationOptions = { enrich: noEnrich, plan: null, retrieve: noRetrieve, heartbeatMs: 20 };
+const noRetrieve = async () => ({ passages: [], degraded: true, reranked: false });
+// Never call real providers: no planner, no enrichment, no retrieval, no briefing.
+const base: IterationOptions = { enrich: noEnrich, plan: null, retrieve: noRetrieve, synthesize: null, heartbeatMs: 20 };
 
 async function seedInput(key: string) {
   await c.inputs.insertOne({
@@ -278,6 +278,34 @@ describe("worker iteration", () => {
     expect(task?.worker).toBeNull();
     const err = await c.sources.findOne({ kind: "error" });
     expect(err?.text).toContain("no input for key missing-input");
+  });
+
+  it("puts the briefing and its cited records into the context and the run source", async () => {
+    await seedInput("aapl-2026-07-30");
+    await seedTask("aapl-2026-07-30");
+    const hit = {
+      id: "src-jpm",
+      kind: "gate" as const,
+      key: "jpm-2026-07-15",
+      gist: "bank revenue",
+      excerpt: "JPMorgan reports net revenue; the gate accepted it as revenue",
+      score: 1,
+      createdAt: new Date(),
+    };
+    const outcome = await iteration(c, "w-1", {
+      ...base,
+      model: submitModel(),
+      retrieve: async () => ({ passages: [hit], degraded: false, reranked: true }),
+      synthesize: async ({ hits }) => ({ text: "Banks report net revenue [src-jpm].", cited: hits, tokens: { in: 300, out: 40 } }),
+    });
+    expect(outcome).toBe("merged");
+    const run = await c.sources.findOne({ kind: "worker-run" });
+    expect(run?.raw.system).toContain("Banks report net revenue [src-jpm].");
+    expect(run?.raw.system).toContain("JPMorgan reports net revenue");
+    expect(run?.raw.briefing).toMatchObject({ cited: ["src-jpm"], tokens: { in: 300, out: 40 } });
+    expect(run?.raw.reranked).toBe(true);
+    expect(run?.tokens.in).toBe(1500);
+    expect(run?.tokens.out).toBe(120);
   });
 
   it("idle when nothing is open", async () => {

@@ -7,16 +7,18 @@
 import type { LanguageModel } from "ai";
 import { assemble } from "../context/assemble.ts";
 import { retrieve, type Passage, type RetrieveResult } from "../context/retrieve.ts";
+import { synthesize, type Briefing, type SynthesizeArgs } from "../context/synthesize.ts";
 import { gate as realGate } from "../gate/gate.ts";
 import type { Collections } from "../shared/db.ts";
-import type { CheckInput, CheckState, GateResult, Goal, Input, Source, State, Task } from "../shared/types.ts";
+import type { CheckInput, CheckState, Enrichment, GateResult, Goal, Input, Source, State, Task } from "../shared/types.ts";
 import { claim, heartbeat } from "./claim.ts";
 import { runTask, type RunResult } from "./run.ts";
-import { enrich as realEnrich, writeErrorSource, writeGateSource, writeRun, type EnrichFn } from "./write.ts";
+import { enrich as realEnrich, enrichSource, writeErrorSource, writeGateSource, writeRun, type EnrichFn } from "./write.ts";
 
 export type GateFn = (goal: Goal, task: Pick<Task, "key" | "criteria">, proposal: unknown, input: CheckInput, state: CheckState) => GateResult;
-export type PlanFn = (c: Collections, holder: string, opts: { enrich: EnrichFn }) => Promise<unknown>;
+export type PlanFn = (c: Collections, holder: string, opts: { enrich: (source: Source) => Promise<Enrichment> }) => Promise<unknown>;
 export type RetrieveFn = (c: Collections, query: string, opts: { excludeKey: string }) => Promise<RetrieveResult>;
+export type SynthesizeFn = (args: SynthesizeArgs) => Promise<Briefing | null>;
 
 export type IterationOptions = {
   model?: LanguageModel;
@@ -24,6 +26,7 @@ export type IterationOptions = {
   enrich?: EnrichFn;
   plan?: PlanFn | null; // null: never plan (tests); undefined: the planner module if present
   retrieve?: RetrieveFn;
+  synthesize?: SynthesizeFn | null; // null: no briefing, show the raw hits (tests)
   deadlineMs?: number; // default 4 minutes
   heartbeatMs?: number; // default 15 s
   maxSteps?: number;
@@ -63,8 +66,9 @@ export function checkState(task: Pick<Task, "key">, state: State | null): CheckS
 async function tryPlan(c: Collections, workerId: string, opts: IterationOptions): Promise<void> {
   const plan = opts.plan === undefined ? await loadPlan() : opts.plan;
   if (!plan) return;
+  const enrichFn = opts.enrich ?? realEnrich;
   try {
-    await plan(c, workerId, { enrich: opts.enrich ?? realEnrich });
+    await plan(c, workerId, { enrich: (source) => enrichSource(source, enrichFn) });
   } catch (err) {
     await writeErrorSource(c, { task: null, worker: workerId, error: err, where: "plan" }).catch(() => undefined);
   }
@@ -122,8 +126,10 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
     .filter(Boolean)
     .join(" ");
   const retrieved = await retrieveFn(c, `${criteriaText}\n${input.text.slice(0, 300)}`, { excludeKey: task.key });
+  const synthesizeFn = opts.synthesize === undefined ? synthesize : opts.synthesize;
+  const briefing = synthesizeFn ? await synthesizeFn({ goal, task, hits: retrieved.passages }) : null;
 
-  const ctx = assemble({ goal, task, input, state, failures, passages: retrieved.passages });
+  const ctx = assemble({ goal, task, input, state, failures, passages: retrieved.passages, briefing });
 
   const abort = AbortSignal.timeout(opts.deadlineMs ?? DEADLINE_MS);
   const run: RunResult = await runTask({
@@ -212,6 +218,8 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
     usage: run.usage,
     contextTokens: ctx.contextTokens,
     retrievalDegraded: retrieved.degraded,
+    reranked: retrieved.reranked,
+    briefing,
     worker: workerId,
     enrich: enrichFn,
   });

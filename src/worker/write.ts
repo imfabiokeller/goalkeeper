@@ -8,7 +8,8 @@ import { z } from "zod";
 import { ObjectId } from "mongodb";
 import type { Collections } from "../shared/db.ts";
 import { costUsd, embedText, enrichModel } from "../shared/llm.ts";
-import type { Enrichment, GateResult, Task } from "../shared/types.ts";
+import type { Enrichment, GateResult, Source, Task } from "../shared/types.ts";
+import type { Briefing } from "../context/synthesize.ts";
 import type { RunOutcome, StepRecord } from "./run.ts";
 
 export type EnrichFn = (text: string) => Promise<Enrichment | null>;
@@ -46,6 +47,14 @@ export async function enrich(text: string, opts: EnrichOptions = {}): Promise<En
   } catch {
     return null;
   }
+}
+
+// The planner backfill's shape: enrich a whole source, throw when it
+// cannot, so the planner records the failure instead of looping silently.
+export async function enrichSource(source: Pick<Source, "_id" | "text">, fn: EnrichFn = enrich): Promise<Enrichment> {
+  const enrichment = await fn(source.text);
+  if (!enrichment) throw new Error(`enrichment failed for source ${String(source._id)}`);
+  return enrichment;
 }
 
 function clip(s: string, max: number): string {
@@ -115,6 +124,8 @@ export type WriteRunArgs = {
   usage: { in: number; out: number };
   contextTokens?: number;
   retrievalDegraded?: boolean;
+  reranked?: boolean;
+  briefing?: Briefing | null;
   worker: string;
   enrich?: EnrichFn;
 };
@@ -128,6 +139,7 @@ export async function writeRun(c: Collections, args: WriteRunArgs): Promise<Obje
     messages: args.responseMessages,
   });
   const enrichment = await (args.enrich ?? enrich)(text);
+  const briefingTokens = args.briefing?.tokens ?? { in: 0, out: 0 };
   const raw: Record<string, unknown> = {
     worker: args.worker,
     system: args.system,
@@ -137,6 +149,8 @@ export async function writeRun(c: Collections, args: WriteRunArgs): Promise<Obje
     gate: args.gate,
     contextTokens: args.contextTokens ?? null,
     retrievalDegraded: args.retrievalDegraded ?? false,
+    reranked: args.reranked ?? false,
+    briefing: args.briefing ? { text: args.briefing.text, cited: args.briefing.cited.map((p) => p.id), tokens: args.briefing.tokens } : null,
   };
   if (args.outcome.type === "submit") raw.proposal = args.outcome.proposal;
   else if (args.outcome.type === "block") raw.blockReason = args.outcome.reason;
@@ -151,7 +165,11 @@ export async function writeRun(c: Collections, args: WriteRunArgs): Promise<Obje
     raw,
     text,
     enrichment,
-    tokens: { in: args.usage.in, out: args.usage.out, cost: costUsd("worker", args.usage.in, args.usage.out) },
+    tokens: {
+      in: args.usage.in + briefingTokens.in,
+      out: args.usage.out + briefingTokens.out,
+      cost: costUsd("worker", args.usage.in, args.usage.out) + costUsd("enrich", briefingTokens.in, briefingTokens.out),
+    },
     createdAt: new Date(),
   });
   return r.insertedId;
