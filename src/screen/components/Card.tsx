@@ -4,7 +4,7 @@
 // chip), example / expected / agent's try for the shown pair, pair dots
 // and the note, the lessons panel, the footer line and step.
 
-import { ATTEMPTS_MAX, agentName, controlLine, footerLine, noteColor, noteLine, pairVerdicts, precedentKind, shownPair, stepLabel, type ControlResult } from "../lib/cards.ts";
+import { ATTEMPTS_MAX, agentName, attemptNumber, controlLine, footerLine, noteColor, noteLine, pairVerdicts, precedentKind, shownPair, stepLabel, type ControlResult } from "../lib/cards.ts";
 import type { Precedent, StageCard, UnitPayload } from "../lib/types.ts";
 import { Arrow, Cells, Dot, NoGrid, Thumb } from "./Cells.tsx";
 import { Chip, TONES } from "./Chip.tsx";
@@ -19,7 +19,9 @@ export function lessonsTitle(card: StageCard, precedents: Precedent[]): { title:
   return { title: "Lessons pulled from the library", note: "from other agents", arriving: false };
 }
 
-export function Card({ card, unit, control, onOpen, flash }: { card: StageCard; unit: UnitPayload | null; control: ControlResult | undefined; onOpen: () => void; flash: "solved" | "retry" | null }) {
+export function Card({ card: raw, unit, control, onOpen, flash }: { card: StageCard; unit: UnitPayload | null; control: ControlResult | undefined; onOpen: () => void; flash: "solved" | "retry" | null }) {
+  // The attempt on screen counts gate verdicts, not claims.
+  const card: StageCard = { ...raw, attempt: attemptNumber(unit?.tasks, raw.attempt) };
   const t = TONES[card.status];
   const pairs = unit ? pairVerdicts(unit.train, unit.latest?.actual) : [];
   const show = pairs[shownPair(pairs)] ?? null;
@@ -64,8 +66,7 @@ export function Card({ card, unit, control, onOpen, flash }: { card: StageCard; 
         <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
           <span style={{ fontFamily: "var(--mono)", fontSize: 16 }}>{card.key}</span>
           <span style={{ fontSize: 13, color: "var(--fg-dimmer)" }}>
-            attempt <span style={{ color: card.status === "retrying" ? "#d9b45a" : "#8f8f8f" }}>{card.attempt}</span>
-            {card.attempt <= ATTEMPTS_MAX ? ` of ${ATTEMPTS_MAX}` : ""}
+            attempt <span style={{ color: card.status === "retrying" ? "#d9b45a" : "#8f8f8f" }}>{card.attempt}</span> of {ATTEMPTS_MAX}
           </span>
         </div>
         <Chip status={card.status} />

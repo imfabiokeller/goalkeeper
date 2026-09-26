@@ -6,7 +6,7 @@
 // Used by the stage overlay (?open=key) and the standalone /unit/[key].
 
 import Link from "next/link";
-import { agentName, controlOutcome, controlTries, pairVerdicts, precedentKind, shortGist, type ControlResult } from "../lib/cards.ts";
+import { agentName, attemptNumber, controlOutcome, controlTries, pairVerdicts, precedentKind, shortGist, type ControlResult } from "../lib/cards.ts";
 import { compact, hhmm } from "../lib/format.ts";
 import { contextSections } from "../lib/transcript.ts";
 import type { CardStatus, StageCard, TaskPayload, UnitPayload, UnitTask } from "../lib/types.ts";
@@ -49,7 +49,7 @@ export function Expanded({ card, unit, control, task, onClose, contextAvg }: { c
   }
   const status = card?.status ?? unitCardStatus(unit);
   const last = unit.tasks.at(-1) ?? null;
-  const attempt = card?.attempt ?? last?.attempt ?? 1;
+  const attempt = attemptNumber(unit.tasks, card?.attempt ?? last?.attempt ?? 1);
   const worker = card?.worker ?? last?.worker ?? null;
   const pairs = pairVerdicts(unit.train, unit.latest?.actual);
   const rule = unit.state?.rule ?? unit.latest?.rule ?? null;
@@ -90,8 +90,7 @@ export function Expanded({ card, unit, control, task, onClose, contextAvg }: { c
           <span style={{ fontFamily: "var(--mono)", fontSize: 30, fontWeight: 500 }}>{unit.key}</span>
           <Chip status={status} size="lg" />
           <span style={{ fontSize: 16, color: "var(--fg-dimmer)" }}>
-            attempt {attempt}
-            {attempt <= 5 ? " of 5" : ""}
+            attempt {attempt} of 5
           </span>
         </div>
         {onClose ? (

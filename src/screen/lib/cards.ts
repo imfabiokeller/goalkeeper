@@ -15,6 +15,15 @@ export function agentName(worker: string | null | undefined): string {
 }
 
 export const ATTEMPTS_MAX = 5;
+
+// The attempt shown: 1 plus the failed gate verdicts on the key so far
+// (task.attempt counts every claim, deaths and errors included), never
+// above ATTEMPTS_MAX. Without the unit yet, the task's own count, capped.
+export function attemptNumber(tasks: Array<{ gate: { pass: boolean } | null }> | null | undefined, fallback: number): number {
+  if (!tasks) return Math.min(ATTEMPTS_MAX, Math.max(1, fallback));
+  const failed = tasks.filter((t) => t.gate && !t.gate.pass).length;
+  return Math.min(ATTEMPTS_MAX, 1 + failed);
+}
 export const STEPS_MAX = 20;
 
 export type PairState = "match" | "differ" | "none";

@@ -6,6 +6,10 @@ import { curvePoints } from "../lib/curve.ts";
 import { compact, pct } from "../lib/format.ts";
 import type { StagePayload } from "../lib/types.ts";
 
+// The "was" rate comes from the first bucket with this many merged, so
+// an opening bucket where nothing had finished yet never reads "was 0%".
+export const WAS_MIN_MERGED = 5;
+
 export type HeroProps = {
   solveRate: StagePayload["metrics"]["solveRate"];
   perMinute: StagePayload["metrics"]["perMinute"];
@@ -46,8 +50,12 @@ export function Hero({ solveRate, perMinute, libraryTokens, controlRate, width =
   const xOf = (i: number) => padL + (pts.length > 1 ? (i / (pts.length - 1)) * w : w / 2);
   const line = pts.map((p, i) => `${xOf(i).toFixed(1)},${yOf(p.rate ?? 0).toFixed(1)}`).join(" ");
   const last = pts.at(-1) ?? null;
-  const firstRate = pts[0]?.rate ?? null;
   const rate = last?.rate ?? null;
+  // "was": the first bucket with at least WAS_MIN_MERGED merged, so an
+  // opening bucket where nothing had finished yet does not read "was 0%".
+  // Only shown when a later bucket exists to compare against.
+  const wasIdx = pts.findIndex((p) => p.merged >= WAS_MIN_MERGED);
+  const wasRate = wasIdx !== -1 && wasIdx < pts.length - 1 ? (pts[wasIdx]?.rate ?? null) : null;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -66,11 +74,20 @@ export function Hero({ solveRate, perMinute, libraryTokens, controlRate, width =
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <span style={{ fontFamily: "var(--mono)", fontSize: 26, lineHeight: 1, color: "#6fbf8e" }}>{pct(rate)}</span>
-        <span style={{ fontSize: 13, color: "var(--fg-dimmer)" }}>solved{firstRate !== null && pts.length > 1 ? ` · was ${pct(firstRate)}` : ""}</span>
+        <span style={{ fontSize: 13, color: "var(--fg-dimmer)" }}>solved{wasRate !== null ? ` · was ${pct(wasRate)}` : ""}</span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 2, paddingLeft: 14, borderLeft: "1px solid #262626" }}>
-        <span style={{ fontFamily: "var(--mono)", fontSize: 26, lineHeight: 1, color: "#8f8f8f" }}>{controlRate !== null ? pct(controlRate) : "-"}</span>
-        <span style={{ fontSize: 13, color: "var(--fg-dimmer)" }}>control · one shot, no library</span>
+        {controlRate !== null ? (
+          <>
+            <span style={{ fontFamily: "var(--mono)", fontSize: 26, lineHeight: 1, color: "#8f8f8f" }}>{pct(controlRate)}</span>
+            <span style={{ fontSize: 13, color: "var(--fg-dimmer)" }}>control · one shot, no library</span>
+          </>
+        ) : (
+          <>
+            <span style={{ fontSize: 15, lineHeight: 1.2, color: "#8f8f8f" }}>control · running</span>
+            <span style={{ fontSize: 13, color: "var(--fg-dimmer)" }}>one shot, no library</span>
+          </>
+        )}
       </div>
     </div>
   );

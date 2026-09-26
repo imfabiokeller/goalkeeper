@@ -11,10 +11,14 @@ import { Card } from "../components/Card.tsx";
 import { Expanded } from "../components/Expanded.tsx";
 import { Hero } from "../components/Hero.tsx";
 import type { ControlResult } from "../lib/cards.ts";
-import { compact, hhmm } from "../lib/format.ts";
+import { compact } from "../lib/format.ts";
 import { usePoll } from "../lib/poll.ts";
 import type { StageCard, StagePayload, TaskPayload, UnitPayload } from "../lib/types.ts";
 import { useMany } from "../lib/useMany.ts";
+import { useScale } from "../lib/useScale.ts";
+
+const ART_W = 1920;
+const ART_H = 1080;
 
 type BaselineTotals = { solveRate?: number; solveRateAt2?: number | null; n?: number; model?: string } | null;
 
@@ -114,6 +118,7 @@ function Stage() {
     return () => clearTimeout(t);
   }, [toast]);
 
+  const fit = useScale(ART_W, ART_H);
   const totals = s?.metrics.totals ?? null;
   const solved = s?.counts.solved ?? 0;
   const alive = s?.workers.alive ?? 0;
@@ -122,7 +127,8 @@ function Stage() {
   const controlRate = typeof baseline.data?.solveRate === "number" ? baseline.data.solveRate : null;
 
   return (
-    <main style={{ position: "relative", width: 1920, height: 1080, padding: "36px 48px", display: "flex", flexDirection: "column", gap: 24, background: "#000", color: "var(--fg)", overflow: "hidden", margin: "0 auto" }}>
+    <div style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#000" }}>
+    <main style={{ position: "absolute", left: fit.left, top: fit.top, transformOrigin: "top left", transform: `scale(${fit.scale})`, width: ART_W, height: ART_H, padding: "36px 48px", display: "flex", flexDirection: "column", gap: 24, background: "#000", color: "var(--fg)", overflow: "hidden" }}>
       <header style={{ height: 60, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 40 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 18, minWidth: 0 }}>
           <svg width="24" height="24" viewBox="0 0 22 22" fill="none" stroke="#ededed" strokeWidth="1.6">
@@ -132,7 +138,6 @@ function Stage() {
           <span style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em" }}>goalkeeper</span>
           <span style={{ fontSize: 22, color: "#333" }}>/</span>
           <span style={{ fontSize: 20, color: "var(--fg-dim)", whiteSpace: "nowrap" }}>Solve {s?.counts.units ?? 400} ARC puzzles</span>
-          <span style={{ fontSize: 13, color: "var(--accent)", border: "1px solid var(--accent-line)", borderRadius: 999, padding: "5px 12px", whiteSpace: "nowrap" }}>goal written by a human · {hhmm(s?.goal?.writtenAt)}</span>
           {stage.error ? <span style={{ fontSize: 12, color: "var(--status-blocked)" }}>stale: {stage.error}</span> : null}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 28, flexShrink: 0 }}>
@@ -188,6 +193,7 @@ function Stage() {
         </div>
       ) : null}
     </main>
+    </div>
   );
 }
 
