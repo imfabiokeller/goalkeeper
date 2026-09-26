@@ -20,6 +20,22 @@ export default async function DevPage({ searchParams }: { searchParams: Promise<
     <main style={{ padding: 16, fontFamily: "var(--mono)", fontSize: 13 }}>
       <h1>/dev</h1>
       <pre>{JSON.stringify({ at: stage.at, counts: stage.counts, workers: { target: stage.workers.target, alive: stage.workers.alive, rows: stage.workers.rows.length }, feed: stage.feed.length, metricsAt: stage.metrics.at, totals: stage.metrics.totals, solveRateBuckets: stage.metrics.solveRate.length, goalVersion: stage.goal?.version ?? null }, null, 2)}</pre>
+      <h2>workers</h2>
+      <pre>
+        {stage.workers.rows.length
+          ? stage.workers.rows
+              .map((r) => {
+                const last = r.progress.at(-1);
+                const lastLine = last
+                  ? `${last.tool}${last.ok === null ? "" : last.ok ? " ok" : " fail"}${last.rule ? ` "${last.rule}"` : ""}${last.reasons[0] ? ` (${last.reasons[0]})` : ""}`
+                  : "no progress yet";
+                return `${r.alive ? "live" : r.diedAt ? "dead" : "stale"} ${r.worker} ${r.key} a${r.attempt} step ${r.step ?? "-"} hb ${r.heartbeatAge}s | ${lastLine}`;
+              })
+              .join("\n")
+          : "no worker rows"}
+      </pre>
+      <h2>feed</h2>
+      <pre>{stage.feed.map((l) => `${l.at.slice(11, 19)} ${l.kind} ${l.outcome} ${l.key ?? "-"} ${l.worker ?? "-"}${l.reason ? ` (${l.reason})` : ""}`).join("\n")}</pre>
       <p>
         <a href="/api/stage">/api/stage</a>
         {key ? (

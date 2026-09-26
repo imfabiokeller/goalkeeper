@@ -3,6 +3,7 @@
 
 import { ObjectId } from "mongodb";
 import type { Collections } from "../../shared/db.ts";
+import { progressLines } from "./stage.ts";
 import { trimRaw } from "./trim.ts";
 import type { SourcePayload, TaskPayload } from "./types.ts";
 
@@ -41,6 +42,10 @@ export async function buildTask(c: Collections, id: string): Promise<TaskPayload
       hint: task.hint,
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
+      step: typeof task.step === "number" ? task.step : null,
+      progress: progressLines(task.progress),
+      lastWorker: task.lastWorker ?? null,
+      diedAt: task.diedAt ? task.diedAt.toISOString() : null,
     },
     run:
       run && trimmed

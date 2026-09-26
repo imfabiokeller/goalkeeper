@@ -7,6 +7,7 @@ import { ObjectId } from "mongodb";
 import type { Collections } from "../../shared/db.ts";
 import type { Task } from "../../shared/types.ts";
 import { runProgram } from "../../../usecase/sandbox.ts";
+import { lastSubmitRule, progressLines } from "./stage.ts";
 import type { ActualOutput, Grid, Precedent, UnitPayload, UnitTask } from "./types.ts";
 
 type RunRow = {
@@ -21,7 +22,7 @@ type RunRow = {
   cited: string[] | null;
 };
 
-type TaskRow = Pick<Task, "_id" | "attempt" | "worker" | "status" | "priority" | "gate" | "blockReason" | "hint" | "createdAt" | "updatedAt"> & {
+type TaskRow = Pick<Task, "_id" | "attempt" | "worker" | "status" | "priority" | "gate" | "blockReason" | "hint" | "createdAt" | "updatedAt" | "step" | "progress"> & {
   proposal?: { rule?: unknown; program?: unknown } | null;
 };
 
@@ -84,7 +85,7 @@ export async function buildUnit(c: Collections, key: string): Promise<UnitPayloa
         { key },
         {
           sort: { createdAt: 1 },
-          projection: { attempt: 1, worker: 1, status: 1, priority: 1, gate: 1, blockReason: 1, hint: 1, createdAt: 1, updatedAt: 1, "proposal.rule": 1, "proposal.program": 1 },
+          projection: { attempt: 1, worker: 1, status: 1, priority: 1, gate: 1, blockReason: 1, hint: 1, createdAt: 1, updatedAt: 1, step: 1, progress: 1, "proposal.rule": 1, "proposal.program": 1 },
         },
       )
       .toArray() as unknown as Promise<TaskRow[]>,
@@ -132,7 +133,9 @@ export async function buildUnit(c: Collections, key: string): Promise<UnitPayloa
       seconds: run ? Math.max(0, Math.round((run.createdAt.getTime() - t.createdAt.getTime()) / 1000)) : null,
       sourceId: run ? run._id.toHexString() : null,
       outcome: run?.outcome ?? null,
-      rule: str(t.proposal?.rule) ?? run?.rule ?? null,
+      rule: str(t.proposal?.rule) ?? run?.rule ?? lastSubmitRule(t.progress),
+      step: typeof t.step === "number" ? t.step : null,
+      progress: progressLines(t.progress),
     };
   });
 
@@ -145,7 +148,8 @@ export async function buildUnit(c: Collections, key: string): Promise<UnitPayloa
   if (last) {
     const run = runByTask.get(last._id.toHexString());
     const program = str(last.proposal?.program) ?? run?.program ?? str(data?.program);
-    const rule = str(last.proposal?.rule) ?? run?.rule ?? str(data?.rule);
+    // A live attempt has no proposal and no run yet; its latest try_submit line carries the draft's rule.
+    const rule = str(last.proposal?.rule) ?? run?.rule ?? (run ? null : lastSubmitRule(last.progress)) ?? str(data?.rule);
     const cacheKey = `${last._id.toHexString()}:${run?._id.toHexString() ?? "task"}`;
 
     let ids: string[] = [];

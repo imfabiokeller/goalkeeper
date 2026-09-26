@@ -6,6 +6,17 @@ import type { Metrics, TaskStatus } from "../../shared/types.ts";
 
 export type UnitStatus = "solved" | "merged" | TaskStatus;
 
+// One live progress line off task.progress, dates as ISO strings and the
+// optional fields filled in so the UI never branches on undefined.
+export type ProgressLine = {
+  at: string;
+  step: number;
+  tool: string; // tool name, "text" for a step without a call, "reaper" for a requeue
+  ok: boolean | null; // try_submit and submit only: the gate verdict
+  reasons: string[]; // first few reasons, clipped by the worker
+  rule: string | null; // the draft's rule sentence, when the proposal had one
+};
+
 export type StageUnit = {
   key: string;
   status: UnitStatus;
@@ -13,6 +24,7 @@ export type StageUnit = {
   reason: string | null; // first reason of the last gate failure on the key, or the block reason
   rule: string | null; // state.data.rule when merged
   hint: string | null; // planner hint on the latest task
+  step: number | null; // latest task's live step
   updatedAt: string | null;
 };
 
@@ -21,9 +33,11 @@ export type StageWorker = {
   key: string;
   taskId: string;
   attempt: number;
-  step: number | null; // tasks carry no step today; null until the worker writes one
-  heartbeatAge: number; // seconds since the last heartbeat
-  alive: boolean; // false between 30 and 90 s of silence; older rows are dropped
+  step: number | null; // task.step, tool steps finished in the current attempt
+  progress: ProgressLine[]; // the last PROGRESS_LAST entries of task.progress, oldest first
+  heartbeatAge: number; // seconds since the last heartbeat; on a dead row, seconds since diedAt
+  alive: boolean; // false between 30 and 90 s of silence and on dead rows
+  diedAt: string | null; // dead row: the reaper requeued the task then and worker is its lastWorker
 };
 
 export type FeedLine = {
@@ -89,7 +103,9 @@ export type UnitTask = {
   seconds: number | null; // worker-run createdAt minus task createdAt, when the run is linked
   sourceId: string | null; // the worker-run source
   outcome: string | null; // submit, block, fail from the run
-  rule: string | null; // the proposal's rule on this attempt
+  rule: string | null; // the proposal's rule on this attempt, else the last try_submit's rule from progress
+  step: number | null; // live step, reset by the claim
+  progress: ProgressLine[]; // full task.progress (up to PROGRESS_ENTRIES), oldest first
 };
 
 export type Precedent = { id: string; kind: string; key: string | null; gist: string | null; score: number | null };
@@ -132,6 +148,10 @@ export type TaskPayload = {
     hint: string | null;
     createdAt: string;
     updatedAt: string;
+    step: number | null;
+    progress: ProgressLine[];
+    lastWorker: string | null;
+    diedAt: string | null;
   };
   run: {
     id: string;

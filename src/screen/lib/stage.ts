@@ -2,15 +2,43 @@
 // documents. Unit status is derived here, not stored anywhere.
 
 import type { Collections } from "../../shared/db.ts";
-import type { Task, TaskStatus } from "../../shared/types.ts";
-import type { FeedLine, StagePayload, StageUnit, StageWorker } from "./types.ts";
+import type { ProgressEntry, Task, TaskStatus } from "../../shared/types.ts";
+import type { FeedLine, ProgressLine, StagePayload, StageUnit, StageWorker } from "./types.ts";
 
 export const PER_MINUTE_LAST = 60;
 export const FEED_LINES = 15;
 export const DEAD_AFTER_S = 30;
 export const DROP_AFTER_S = 90;
+export const PROGRESS_LAST = 8; // progress entries per worker row
+export const DEAD_ROW_MS = 30_000; // a dead worker's row stays this long from diedAt
 
 const iso = (d: Date | null | undefined): string | null => (d instanceof Date ? d.toISOString() : null);
+
+// task.progress on the wire: ISO dates, optional fields filled in, at most
+// the last `last` entries (oldest first, like the task keeps them).
+export function progressLines(entries: ProgressEntry[] | null | undefined, last = Infinity): ProgressLine[] {
+  if (!Array.isArray(entries)) return [];
+  const tail = Number.isFinite(last) ? entries.slice(-Math.max(0, last)) : entries;
+  return tail.map((e) => ({
+    at: e.at instanceof Date ? e.at.toISOString() : String(e.at),
+    step: e.step,
+    tool: e.tool,
+    ok: typeof e.ok === "boolean" ? e.ok : null,
+    reasons: Array.isArray(e.reasons) ? e.reasons : [],
+    rule: typeof e.rule === "string" && e.rule.trim() ? e.rule : null,
+  }));
+}
+
+// The rule of the last try_submit or submit line, for a live attempt that
+// has no proposal and no run source yet.
+export function lastSubmitRule(entries: ProgressEntry[] | null | undefined): string | null {
+  if (!Array.isArray(entries)) return null;
+  for (let i = entries.length - 1; i >= 0; i--) {
+    const e = entries[i]!;
+    if ((e.tool === "try_submit" || e.tool === "submit") && typeof e.rule === "string" && e.rule.trim()) return e.rule;
+  }
+  return null;
+}
 
 type LatestTask = {
   _id: string; // key
@@ -18,11 +46,69 @@ type LatestTask = {
   attempt: number;
   hint: string | null;
   blockReason: string | null;
+  step: number | null;
   updatedAt: Date;
   reasons: Array<string | null>; // first gate reason per task, newest first
 };
 
-type ClaimedTask = Pick<Task, "_id" | "key" | "worker" | "heartbeat" | "attempt">;
+export type ClaimedTask = Pick<Task, "_id" | "key" | "worker" | "heartbeat" | "attempt" | "step" | "progress">;
+
+// A task the reaper requeued recently, whatever its status now: another
+// worker may already hold it (a live row on the same key) while the dead
+// row is still shown.
+export type DeadTask = Pick<Task, "_id" | "key" | "attempt" | "lastWorker" | "diedAt" | "step" | "progress">;
+
+// Worker rows: one per claimed task with a fresh enough heartbeat, plus a
+// dead row per task whose reaper death is within DEAD_ROW_MS.
+export function workerRows(claimed: ClaimedTask[], dead: DeadTask[], now: Date): StageWorker[] {
+  const rows: StageWorker[] = [];
+  for (const t of claimed) {
+    if (!t.worker || !t.heartbeat) continue;
+    const age = Math.max(0, Math.round((now.getTime() - t.heartbeat.getTime()) / 1000));
+    if (age > DROP_AFTER_S) continue;
+    rows.push({
+      worker: t.worker,
+      key: t.key,
+      taskId: t._id.toHexString(),
+      attempt: t.attempt,
+      step: typeof t.step === "number" ? t.step : null,
+      progress: progressLines(t.progress, PROGRESS_LAST),
+      heartbeatAge: age,
+      alive: age <= DEAD_AFTER_S,
+      diedAt: null,
+    });
+  }
+  for (const t of dead) {
+    if (!t.lastWorker || !(t.diedAt instanceof Date)) continue;
+    const sinceMs = now.getTime() - t.diedAt.getTime();
+    if (sinceMs < 0 || sinceMs > DEAD_ROW_MS) continue;
+    rows.push({
+      worker: t.lastWorker,
+      key: t.key,
+      taskId: t._id.toHexString(),
+      attempt: Math.max(1, t.attempt - 1), // the attempt that died; the reaper already bumped it
+      step: typeof t.step === "number" ? t.step : null,
+      progress: progressLines(t.progress, PROGRESS_LAST),
+      heartbeatAge: Math.round(sinceMs / 1000),
+      alive: false,
+      diedAt: t.diedAt.toISOString(),
+    });
+  }
+  rows.sort((a, b) => a.worker.localeCompare(b.worker) || (a.diedAt ? 1 : 0) - (b.diedAt ? 1 : 0));
+  return rows;
+}
+
+// One "requeued" feed line per recent reaper death, attributed to the
+// worker that died. Dated at diedAt so it sorts where the kill happened.
+export function deadLines(dead: DeadTask[], now: Date): FeedLine[] {
+  return dead.flatMap((t) => {
+    if (!(t.diedAt instanceof Date)) return [];
+    const sinceMs = now.getTime() - t.diedAt.getTime();
+    if (sinceMs < 0 || sinceMs > DEAD_ROW_MS) return [];
+    const id = t._id.toHexString();
+    return [{ at: t.diedAt.toISOString(), kind: "task" as const, key: t.key, outcome: "requeued", reason: null, taskId: id, worker: t.lastWorker ?? null, id }];
+  });
+}
 
 type FeedSource = {
   _id: { toHexString(): string };
@@ -41,7 +127,7 @@ type FeedSource = {
   };
 };
 
-type FeedTask = Pick<Task, "_id" | "key" | "status" | "attempt" | "worker" | "hint" | "blockReason" | "updatedAt"> & {
+type FeedTask = Pick<Task, "_id" | "key" | "status" | "attempt" | "worker" | "hint" | "blockReason" | "updatedAt" | "lastWorker"> & {
   gate: { pass?: boolean; reasons?: string[] } | null;
 };
 
@@ -90,15 +176,17 @@ export function taskOutcome(t: Pick<FeedTask, "status" | "attempt" | "hint" | "g
 }
 
 function taskLine(t: FeedTask): FeedLine {
+  const outcome = taskOutcome(t);
   return {
     at: t.updatedAt.toISOString(),
     kind: "task",
     key: t.key,
-    outcome: taskOutcome(t),
+    outcome,
     // A claimed task still carries the previous attempt's gate; that reason belongs to the retry line, not to the claim.
     reason: t.status === "claimed" ? null : (t.blockReason ?? first(t.gate?.reasons) ?? null),
     taskId: t._id.toHexString(),
-    worker: t.worker,
+    // The reaper clears worker on a requeue; the line names the worker that died.
+    worker: outcome === "requeued" ? (t.lastWorker ?? t.worker) : t.worker,
     id: t._id.toHexString(),
   };
 }
@@ -110,7 +198,8 @@ export function unitStatus(score: 0 | 1 | null | undefined, hasState: boolean, l
 }
 
 export async function buildStage(c: Collections, now = new Date()): Promise<StagePayload> {
-  const [metrics, goal, inputs, states, latestTasks, claimed, feedSources, feedTasks] = await Promise.all([
+  const deadSince = new Date(now.getTime() - DEAD_ROW_MS);
+  const [metrics, goal, inputs, states, latestTasks, claimed, dead, feedSources, feedTasks] = await Promise.all([
     c.metrics.findOne(
       { _id: "metrics" },
       { projection: { at: 1, totals: 1, solveRate: 1, perMinute: { $slice: -PER_MINUTE_LAST }, "lessons.text": 1 } },
@@ -131,6 +220,7 @@ export async function buildStage(c: Collections, now = new Date()): Promise<Stag
             attempt: { $first: "$attempt" },
             hint: { $first: "$hint" },
             blockReason: { $first: "$blockReason" },
+            step: { $first: { $ifNull: ["$step", null] } },
             updatedAt: { $first: "$updatedAt" },
             reasons: { $push: { $arrayElemAt: [{ $ifNull: ["$gate.reasons", []] }, 0] } },
           },
@@ -138,8 +228,11 @@ export async function buildStage(c: Collections, now = new Date()): Promise<Stag
       ])
       .toArray(),
     c.tasks
-      .find({ status: "claimed" }, { projection: { key: 1, worker: 1, heartbeat: 1, attempt: 1 } })
+      .find({ status: "claimed" }, { projection: { key: 1, worker: 1, heartbeat: 1, attempt: 1, step: 1, progress: { $slice: -PROGRESS_LAST } } })
       .toArray() as Promise<ClaimedTask[]>,
+    c.tasks
+      .find({ diedAt: { $gte: deadSince } }, { projection: { key: 1, attempt: 1, lastWorker: 1, diedAt: 1, step: 1, progress: { $slice: -PROGRESS_LAST } } })
+      .toArray() as Promise<DeadTask[]>,
     c.sources
       .find(
         { kind: { $in: ["worker-run", "gate", "error"] } },
@@ -169,7 +262,7 @@ export async function buildStage(c: Collections, now = new Date()): Promise<Stag
         {
           sort: { updatedAt: -1 },
           limit: FEED_LINES,
-          projection: { key: 1, status: 1, attempt: 1, worker: 1, hint: 1, blockReason: 1, updatedAt: 1, "gate.pass": 1, "gate.reasons": { $slice: 1 } },
+          projection: { key: 1, status: 1, attempt: 1, worker: 1, lastWorker: 1, hint: 1, blockReason: 1, updatedAt: 1, "gate.pass": 1, "gate.reasons": { $slice: 1 } },
         },
       )
       .toArray() as unknown as Promise<FeedTask[]>,
@@ -190,6 +283,7 @@ export async function buildStage(c: Collections, now = new Date()): Promise<Stag
       reason: lt?.blockReason ?? lastReason,
       rule: typeof rule === "string" ? rule : null,
       hint: lt?.hint ?? null,
+      step: typeof lt?.step === "number" ? lt.step : null,
       updatedAt: iso(lt?.updatedAt),
     };
   });
@@ -197,16 +291,15 @@ export async function buildStage(c: Collections, now = new Date()): Promise<Stag
   const counts: StagePayload["counts"] = { units: units.length, solved: 0, merged: 0, open: 0, claimed: 0, blocked: 0, parked: 0 };
   for (const u of units) counts[u.status] += 1;
 
-  const rows: StageWorker[] = [];
-  for (const t of claimed) {
-    if (!t.worker || !t.heartbeat) continue;
-    const age = Math.max(0, Math.round((now.getTime() - t.heartbeat.getTime()) / 1000));
-    if (age > DROP_AFTER_S) continue;
-    rows.push({ worker: t.worker, key: t.key, taskId: t._id.toHexString(), attempt: t.attempt, step: null, heartbeatAge: age, alive: age <= DEAD_AFTER_S });
-  }
-  rows.sort((a, b) => a.worker.localeCompare(b.worker));
+  const rows = workerRows(claimed, dead, now);
 
-  const feed = [...feedSources.map(sourceLine), ...feedTasks.map(taskLine)]
+  // A reaped task that is still open also shows up as a "requeued" task
+  // line (its updatedAt is the death); the dead line is the same event, so
+  // the task line yields to it.
+  const requeued = deadLines(dead, now);
+  const deadIds = new Set(requeued.map((l) => l.id));
+  const taskLines = feedTasks.map(taskLine).filter((l) => !(l.outcome === "requeued" && deadIds.has(l.id)));
+  const feed = [...feedSources.map(sourceLine), ...taskLines, ...requeued]
     .sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0))
     .slice(0, FEED_LINES * 2);
 
