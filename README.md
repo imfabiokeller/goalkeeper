@@ -24,12 +24,11 @@ The **library** holds everything the swarm produces: every worker run,
 every gate verdict, every planner turn, every error. We store the raw
 record and never rewrite it. At ingest a cheap model adds a one-line
 digest, entities and an embedding, so the record can be found later. It
-grew from nothing to 18.7 million tokens during the afternoon, and no
-worker ever reads it whole.
+grows for as long as the run lasts, and no worker ever reads it whole.
 
-The **goal** is small. A human wrote it once at 14:23 (a statement, three
+The **goal** is small. A human writes it once (a statement, up to three
 criteria with a deterministic check each, a few guidelines) and no code
-path writes it after that. It is pinned into every request.
+path writes it after the seed. It is pinned into every request.
 
 The rule: nothing moves from the library into the goal. Workers can learn
 anything into the library. They cannot change their instructions.
@@ -39,22 +38,22 @@ a puzzle from the queue with one atomic update, assembles a context for
 that puzzle (the goal, the rules already refuted on this puzzle, a digest
 of what is failing across the fleet, and a few precedents pulled from the
 library with `$rankFusion` over text, vector and recency, then reranked),
-runs DeepSeek V4 Flash with three tools, and hands in a program. The gate
+runs a cheap open-weight model with three tools, and hands in a program. The gate
 runs that program on the puzzle's example pairs. If it passes, the run
 and the result go into the library, raw. If it fails, the refuted rule is
-pinned into the next attempt. The context a worker reads stayed around
-4k tokens all day.
+pinned into the next attempt. The context a worker reads stays a few
+thousand tokens however large the library gets.
 
-The **planner** is a function, not a process. Before each claim a worker
+The **planner** is a function that any worker can run. Before each claim a worker
 checks whether the last planner turn is older than a minute, takes a lock
 if it can, and runs one turn: requeue claims whose heartbeat stopped,
 emit tasks for puzzles nobody has touched, score merged programs against
 the hidden test answer, and reopen blocked puzzles once twenty more
 solves have landed in the library. Queries only. No model calls.
 
-Two things a worker never sees. The hidden test answer, which only the
-planner's `score()` reads. And any other worker. They coordinate through
-the library alone, the way ants coordinate through a trail.
+A worker never sees the hidden test answer, which only the planner's
+`score()` reads, and it never talks to another worker. Workers coordinate
+through the library alone.
 
 ## Run it
 
