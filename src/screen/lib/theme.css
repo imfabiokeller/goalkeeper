@@ -87,8 +87,10 @@
   }
 }
 
+/* No fill mode: the card stays visible after the flash, since the stage
+   keeps recent solved cards in their slot until newer work replaces them. */
 .solvedflash {
-  animation: gksolved 5s ease-in-out 1 both;
+  animation: gksolved 5s ease-in-out 1;
 }
 
 @keyframes gkretry {
