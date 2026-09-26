@@ -21,6 +21,61 @@ type Bucket = {
 };
 
 const MINUTE = 60_000;
+export const SOLVE_BUCKET_MS = 15 * MINUTE;
+export const STEPS_WINDOW = 50;
+
+type SolveBucket = NonNullable<Metrics["solveRate"]>[number];
+
+// The solve-rate curve: one cumulative row per 15-minute bucket from the
+// first task to now. attempted counts keys with a task created by the end
+// of the bucket, merged keys with state merged by then, solved keys whose
+// state scored 1 by then. Two aggregations: first task per key, and the
+// state timestamps.
+export async function solveRate(c: Collections, now: Date): Promise<{ buckets: SolveBucket[]; attempted: number; solved: number }> {
+  const firsts = await c.tasks
+    .aggregate<{ _id: string; at: Date }>([{ $group: { _id: "$key", at: { $min: "$createdAt" } } }])
+    .map((k) => k.at.getTime())
+    .toArray();
+  const states = await c.state
+    .find({}, { projection: { mergedAt: 1, score: 1, scoredAt: 1 } })
+    .map((s) => ({ merged: s.mergedAt.getTime(), solved: s.score === 1 ? (s.scoredAt ?? s.mergedAt).getTime() : null }))
+    .toArray();
+  const solvedAts = states.flatMap((s) => (s.solved === null ? [] : [s.solved]));
+  const totals = { attempted: firsts.length, solved: solvedAts.length };
+  if (!firsts.length) return { buckets: [], ...totals };
+
+  const start = Math.floor(Math.min(...firsts) / SOLVE_BUCKET_MS) * SOLVE_BUCKET_MS;
+  const buckets: SolveBucket[] = [];
+  const upTo = (times: number[], end: number) => times.filter((t) => t < end).length;
+  for (let b = start; b <= now.getTime(); b += SOLVE_BUCKET_MS) {
+    const end = b + SOLVE_BUCKET_MS;
+    buckets.push({
+      bucket: new Date(b),
+      attempted: upTo(firsts, end),
+      merged: upTo(states.map((s) => s.merged), end),
+      solved: upTo(solvedAts, end),
+    });
+  }
+  return { buckets, ...totals };
+}
+
+// Median number of model steps over the last merged worker runs (raw.steps
+// as write.ts records it). null until a run merged.
+export async function stepsMedian(c: Collections, window = STEPS_WINDOW): Promise<number | null> {
+  const steps = await c.sources
+    .aggregate<{ n: number }>([
+      { $match: { kind: "worker-run", "raw.gate.pass": true } },
+      { $sort: { createdAt: -1 } },
+      { $limit: window },
+      { $project: { _id: 0, n: { $size: { $ifNull: ["$raw.steps", []] } } } },
+      { $sort: { n: 1 } },
+    ])
+    .map((s) => s.n)
+    .toArray();
+  if (!steps.length) return null;
+  const mid = Math.floor(steps.length / 2);
+  return steps.length % 2 ? steps[mid] : (steps[mid - 1] + steps[mid]) / 2;
+}
 
 export async function refreshMetrics(c: Collections, now = new Date()): Promise<Metrics> {
   const since = new Date(Math.floor(now.getTime() / MINUTE) * MINUTE - (WINDOW_MINUTES - 1) * MINUTE);
@@ -114,7 +169,7 @@ export async function refreshMetrics(c: Collections, now = new Date()): Promise<
     });
   }
 
-  const [merged, blocked, open, librarySources, library, last20, goal, scheduled] = await Promise.all([
+  const [merged, blocked, open, librarySources, library, last20, goal, scheduled, solve, median] = await Promise.all([
     c.tasks.countDocuments({ status: "merged" }),
     c.tasks.countDocuments({ status: "blocked" }),
     c.tasks.countDocuments({ status: "open" }),
@@ -130,6 +185,8 @@ export async function refreshMetrics(c: Collections, now = new Date()): Promise<
       .toArray(),
     c.goal.findOne({ _id: "goal" }),
     c.inputs.countDocuments({ scheduled: true }),
+    solveRate(c, now),
+    stepsMedian(c),
   ]);
 
   const done = goal ? await c.state.countDocuments({ version: goal.version }) : 0;
@@ -141,6 +198,7 @@ export async function refreshMetrics(c: Collections, now = new Date()): Promise<
     _id: "metrics",
     at: now,
     perMinute,
+    solveRate: solve.buckets,
     totals: {
       merged,
       blocked,
@@ -148,6 +206,9 @@ export async function refreshMetrics(c: Collections, now = new Date()): Promise<
       libraryTokens: library?.tokens ?? 0,
       librarySources,
       contextLast20Avg: last20.length ? last20.reduce((a, b) => a + b, 0) / last20.length : null,
+      solved: solve.solved,
+      attempted: solve.attempted,
+      stepsMedian: median,
     },
     perCriterion,
     versions: (goal?.history ?? []).map((h) => ({ version: h.version, at: h.at })),

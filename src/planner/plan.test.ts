@@ -102,6 +102,41 @@ describe("metrics", () => {
     expect(await c.metrics.findOne({ _id: "metrics" })).not.toBeNull();
     await refreshMetrics(c, now); // upsert twice is fine
   });
+
+  it("solve rate: one cumulative row per 15-minute bucket, plus solved, attempted and the steps median", async (c) => {
+    await c.goal.insertOne(goalFixture());
+    const now = new Date("2026-09-26T15:05:00Z");
+    const t = (iso: string) => new Date(`2026-09-26T${iso}Z`);
+    await c.tasks.insertMany([
+      taskFixture("a", { status: "merged", createdAt: t("14:20:00") }),
+      taskFixture("a", { status: "merged", createdAt: t("14:50:00") }), // second attempt: same key, counted once
+      taskFixture("b", { status: "merged", createdAt: t("14:35:00") }),
+      taskFixture("c", { status: "blocked", blockReason: "x", createdAt: t("14:50:00") }),
+    ]);
+    await c.state.insertMany([
+      stateFixture("a", { mergedAt: t("14:25:00"), score: 1, scoredAt: t("14:31:00") }),
+      stateFixture("b", { mergedAt: t("14:40:00"), score: 0, scoredAt: t("14:41:00") }),
+    ]);
+    const run = (steps: number, pass: boolean, at: string) =>
+      crowdFixture("run", { kind: "worker-run", raw: { steps: Array.from({ length: steps }, () => ({})), gate: { pass } }, createdAt: t(at) });
+    await c.sources.insertMany([run(3, true, "14:25:00"), run(9, true, "14:40:00"), run(5, true, "14:41:00"), run(20, false, "14:50:00")]);
+
+    const m = await refreshMetrics(c, now);
+    expect(m.solveRate?.map((b) => [b.bucket.toISOString().slice(11, 16), b.attempted, b.merged, b.solved])).toEqual([
+      ["14:15", 1, 1, 0],
+      ["14:30", 2, 2, 1],
+      ["14:45", 3, 2, 1],
+      ["15:00", 3, 2, 1],
+    ]);
+    expect(m.totals).toMatchObject({ solved: 1, attempted: 3, stepsMedian: 5 });
+
+    // No tasks yet: an empty curve, nulls where nothing merged.
+    await c.tasks.deleteMany({});
+    await c.sources.deleteMany({});
+    const empty = await refreshMetrics(c, now);
+    expect(empty.solveRate).toEqual([]);
+    expect(empty.totals).toMatchObject({ solved: 1, attempted: 0, stepsMedian: null });
+  });
 });
 
 describe("invariants", () => {
