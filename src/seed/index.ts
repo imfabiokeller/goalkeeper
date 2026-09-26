@@ -1,4 +1,4 @@
-// npm run seed -- --db live | --db dev
+// npm run seed -- --db live | --db dev  (live: MONGODB_DB, dev: MONGODB_DB_dev)
 //
 // live: the goal at version 1 (only if absent) and every input from
 //       usecase/, the first 200 scheduled. Idempotent.
@@ -82,9 +82,11 @@ if (values.db !== "live" && values.db !== "dev") {
   console.error("usage: npm run seed -- --db live | --db dev");
   process.exit(2);
 }
-// The --db value is the database name and overrides MONGODB_DB.
-process.env.MONGODB_DB = values.db;
-console.log(`seeding database ${values.db}`);
+// live seeds MONGODB_DB itself; dev seeds a sibling database with a _dev
+// suffix so the screen can be built against fakes without touching the run.
+const base = process.env.MONGODB_DB ?? "goalkeeper";
+process.env.MONGODB_DB = values.db === "live" ? base : `${base}_dev`;
+console.log(`seeding ${values.db} into database ${process.env.MONGODB_DB}`);
 
 const { c, db } = await connect();
 try {
