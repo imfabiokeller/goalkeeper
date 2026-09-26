@@ -30,6 +30,12 @@ export const SYSTEM =
 // The reply as text: a RULE: line and one fenced block. JSON mode is not
 // used because cheap models cannot reliably escape a long program inside
 // a JSON string. A JSON reply is still accepted.
+function firstSentence(text: string): string {
+  const t = text.replace(/```[\s\S]*?```/g, " ").replace(/\s+/g, " ").trim();
+  const m = /^(.{10,200}?[.!?])(\s|$)/.exec(t);
+  return (m ? m[1] : t.slice(0, 160)) || "no rule stated";
+}
+
 export function parseAnswer(text: string): { rule: string; program: string } {
   const trimmed = text.trim();
   if (trimmed.startsWith("{")) {
@@ -40,9 +46,16 @@ export function parseAnswer(text: string): { rule: string; program: string } {
       // fall through to the text format
     }
   }
-  const rule = /^\s*RULE:\s*(.+)$/im.exec(text)?.[1]?.trim() ?? "";
-  const program = unfence(text);
-  if (!rule || !program) throw new Error("could not parse the reply: no RULE line or code block");
+  // Lenient on purpose: the control must not lose on formatting. Any
+  // RULE line or the first sentence counts as the rule; the program is the
+  // fenced block, else the text from the first "transform" definition on.
+  const rule = /^\s*(?:\*\*)?RULE:?(?:\*\*)?\s*(.+)$/im.exec(text)?.[1]?.trim() || firstSentence(text);
+  let program = unfence(text);
+  if (!program) {
+    const m = /(function\s+transform\s*\(|(?:const|let|var)\s+transform\s*=|transform\s*=\s*(?:function|\())/.exec(text);
+    if (m) program = text.slice(m.index).trim();
+  }
+  if (!program) throw new Error("could not parse the reply: no code block and no transform definition");
   return { rule, program };
 }
 
