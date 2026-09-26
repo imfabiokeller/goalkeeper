@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Library — timeline</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+button,input{font:inherit}
+input::placeholder{color:#6b6b6b}
+a{color:#ededed}a:hover{color:#ffffff}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1320px; box-sizing: border-box; padding: 32px 48px; display: flex; flex-direction: column; gap: 22px; background: #000000; color: #ededed; font-family: 'Geist', system-ui, sans-serif; overflow: hidden">
+
+<div style="height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 18px">
+<svg width="24" height="24" viewBox="0 0 22 22" fill="none" stroke="#ededed" stroke-width="1.6"><circle cx="11" cy="11" r="9"></circle><path d="M6 11h10"></path></svg>
+<a href="Stage-Cards.dc.html" style="font-size: 22px; font-weight: 600; text-decoration: none">goalkeeper</a>
+<span style="font-size: 22px; color: #333">/</span>
+<span style="font-size: 20px; color: #a1a1a1">Library</span>
+<span style="font-size: 13px; color: #9d8cf5; border: 1px solid #2a2450; border-radius: 999px; padding: 5px 12px">goal · written by a human · 10:30 · locked</span>
+</div>
+<a href="Stage-Cards.dc.html" style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border: 1px solid #333; border-radius: 10px; text-decoration: none; font-size: 15px"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#ededed" stroke-width="1.6"><path d="M12 8H4M7 5L4 8l3 3"></path></svg>Puzzles</a>
+</div>
+
+<div style="height: 150px; flex-shrink: 0; display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 20px">
+<div style="border: 1px solid #1f1f1f; border-radius: 14px; background: #0a0a0a; padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 7px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 14px; color: #a1a1a1">library</span><span style="font-family: 'Geist Mono', monospace; font-size: 24px; line-height: 1">412.8M</span></div>
+<div style="height: 12px; border-radius: 4px; background: #6a6a70"></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 7px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 14px; color: #a1a1a1">what one agent reads</span><span style="font-family: 'Geist Mono', monospace; font-size: 24px; line-height: 1">15k</span></div>
+<div style="height: 12px; border-radius: 4px; background: #141414"><div style="width: 3px; height: 12px; border-radius: 2px; background: #ededed"></div></div>
+</div>
+</div>
+<div style="border: 1px solid #1f1f1f; border-radius: 14px; background: #0a0a0a; padding: 16px 22px 10px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<div style="display: flex; align-items: baseline; gap: 10px"><span style="font-family: 'Geist Mono', monospace; font-size: 24px; line-height: 1; color: #6fbf8e">44%</span><span style="font-size: 14px; color: #a1a1a1">solved</span><span style="font-family: 'Geist Mono', monospace; font-size: 17px; color: #8f8f8f; margin-left: 8px">18%</span><span style="font-size: 13px; color: #8f8f8f">baseline, no library</span></div>
+<span style="font-size: 12px; color: #8f8f8f">vs library tokens</span>
+</div>
+<div style="position: relative; flex: 1; border-bottom: 1px solid #333">
+<svg width="580" height="72" viewBox="0 0 580 72" style="position: absolute; left: 0; bottom: 0; overflow: visible">
+<polyline points="{{mBase}}" fill="none" stroke="#8f8f8f" stroke-width="1.8" stroke-dasharray="5 4"></polyline>
+<polyline points="{{mOurs}}" fill="none" stroke="#6fbf8e" stroke-width="2.5" stroke-linejoin="round"></polyline>
+</svg>
+</div>
+<div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; font-size: 11px; color: #6b6b6b"><span>0</span><span>100M</span><span>200M</span><span>300M</span><span>400M</span></div>
+</div>
+<div style="border: 1px solid #1f1f1f; border-radius: 14px; background: #0a0a0a; padding: 16px 22px 10px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<div style="display: flex; align-items: baseline; gap: 10px"><span style="font-family: 'Geist Mono', monospace; font-size: 24px; line-height: 1">21k</span><span style="font-size: 14px; color: #a1a1a1">tokens per solve</span><span style="font-family: 'Geist Mono', monospace; font-size: 15px; color: #8f8f8f; margin-left: 8px">was 48k</span></div>
+<span style="font-size: 12px; color: #8f8f8f">cheaper as it learns</span>
+</div>
+<div style="position: relative; flex: 1; border-bottom: 1px solid #333">
+<svg width="470" height="72" viewBox="0 0 470 72" style="position: absolute; left: 0; bottom: 0; overflow: visible">
+<polyline points="{{tps}}" fill="none" stroke="#ededed" stroke-width="2.5" stroke-linejoin="round"></polyline>
+</svg>
+</div>
+<div style="display: flex; justify-content: space-between; font-family: 'Geist Mono', monospace; font-size: 11px; color: #6b6b6b"><span>11:00</span><span>13:00</span><span>15:00</span><span>17:00</span></div>
+</div>
+</div>
+
+<div style="height: 330px; flex-shrink: 0; border: 1px solid #1f1f1f; border-radius: 14px; background: #0a0a0a; padding: 18px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<span style="font-size: 15px; color: #a1a1a1">every solve, when it happened · click one</span>
+<div style="display: flex; gap: 18px; font-size: 13px; color: #a1a1a1">
+<span style="display: flex; align-items: center; gap: 7px"><span style="width: 18px; height: 2px; background: #6fbf8e"></span>its lesson helped solve</span>
+<span style="display: flex; align-items: center; gap: 7px"><span style="width: 18px; height: 2px; background: #6b6b6b"></span>used, not solved yet</span>
+</div>
+</div>
+<div style="flex: 1; display: flex; gap: 32px; min-height: 0">
+<div style="position: relative; width: 1500px; height: 266px; flex-shrink: 0">
+<div style="position: absolute; left: 0; right: 0; top: 236px; height: 1px; background: #333"></div>
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="7"><span style="position: absolute; left: {{h.x}}px; top: 244px; transform: translateX(-50%); font-family: 'Geist Mono', monospace; font-size: 12px; color: #8f8f8f">{{h.t}}</span></sc-for>
+<sc-for list="{{tiles}}" as="t" hint-placeholder-count="176">
+<button type="button" onClick="{{t.pick}}" aria-label="{{t.key}}" style="position: absolute; left: {{t.x}}px; top: {{t.y}}px; width: 16px; height: 16px; padding: 0; border: 0; border-radius: 3px; background: #10141a; box-shadow: {{t.ring}}; opacity: {{t.op}}; cursor: pointer">
+<span style="position: absolute; left: 2px; top: 2px; width: 2px; height: 2px; box-shadow: {{t.px}}"></span>
+</button>
+</sc-for>
+<svg width="1500" height="236" viewBox="0 0 1500 236" style="position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible">
+<sc-for list="{{arcs}}" as="a" hint-placeholder-count="4"><path d="{{a.d}}" fill="none" stroke="{{a.c}}" stroke-width="2" stroke-opacity="0.85"></path></sc-for>
+</svg>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; justify-content: flex-end; padding-bottom: 30px">
+<div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: 'Geist Mono', monospace; font-size: 22px">224</span><span style="font-size: 13px; color: #8f8f8f">not solved yet</span></div>
+<div style="display: grid; grid-template-columns: repeat(16, 8px); gap: 2px">
+<sc-for list="{{open}}" as="o" hint-placeholder-count="224"><div style="width: 8px; height: 8px; border-radius: 2px; background: {{o}}"></div></sc-for>
+</div>
+</div>
+</div>
+</div>
+
+<div style="flex: 1; min-height: 0; display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px">
+
+<div style="border: 1px solid #1f1f1f; border-radius: 14px; background: #0a0a0a; padding: 22px 26px; display: flex; flex-direction: column; gap: 18px; min-width: 0">
+<div style="display: flex; align-items: center; gap: 18px">
+<div style="position: relative; width: 60px; height: 60px; flex-shrink: 0; border-radius: 8px; background: #10141a"><span style="position: absolute; left: 6px; top: 6px; width: 8px; height: 8px; box-shadow: {{c.bigPx}}"></span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<div style="display: flex; align-items: baseline; gap: 12px"><span style="font-family: 'Geist Mono', monospace; font-size: 22px">{{c.key}}</span><span style="font-size: 14px; color: #6fbf8e">solved {{c.at}} · {{c.who}}</span></div>
+<span style="font-size: 17px; color: #ededed; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">“{{c.rule}}”</span>
+</div>
+<div style="margin-left: auto; display: flex; gap: 24px; flex-shrink: 0">
+<div style="display: flex; flex-direction: column; gap: 2px; align-items: flex-end"><span style="font-family: 'Geist Mono', monospace; font-size: 24px; line-height: 1">{{c.total}}</span><span style="font-size: 12px; color: #8f8f8f">tokens to solve</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px; align-items: flex-end"><span style="font-family: 'Geist Mono', monospace; font-size: 24px; line-height: 1">{{c.nAtt}}</span><span style="font-size: 12px; color: #8f8f8f">attempts</span></div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; color: #8f8f8f">where the tokens went</span>
+<sc-for list="{{c.attempts}}" as="a" hint-placeholder-count="2">
+<div style="display: grid; grid-template-columns: 150px 1fr 110px; gap: 16px; align-items: center; padding: 10px 14px; border: 1px solid {{a.bd}}; border-radius: 10px; background: #050505">
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px">attempt {{a.n}} · {{a.who}}</span><span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #8f8f8f">{{a.at}}</span></div>
+<div style="display: flex; align-items: center; gap: 8px">
+<sc-for list="{{a.stages}}" as="s" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 1px; padding: 6px 10px; border-radius: 8px; background: #111111"><span style="font-family: 'Geist Mono', monospace; font-size: 15px; line-height: 1">{{s.v}}</span><span style="font-size: 11px; color: #8f8f8f">{{s.k}}</span></div>
+<svg width="12" height="10" viewBox="0 0 12 10" fill="none" stroke="#444" stroke-width="1.4"><path d="M1 5h8M6 2l3 3-3 3"></path></svg>
+</div>
+</sc-for>
+<span style="font-size: 13px; color: {{a.oc}}">{{a.out}}</span>
+</div>
+<span style="font-family: 'Geist Mono', monospace; font-size: 15px; text-align: right">{{a.total}}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1; min-height: 0">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; color: #8f8f8f">it read · from earlier puzzles</span>
+<sc-for list="{{c.read}}" as="l" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; background: #050505; border: 1px solid #161616">
+<span style="width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; background: {{l.c}}"></span>
+<span style="font-size: 13px; color: {{l.tc}}; text-decoration: {{l.deco}}; text-decoration-color: #6b5a2a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{l.gist}}</span>
+<span style="margin-left: auto; font-family: 'Geist Mono', monospace; font-size: 12px; color: #8f8f8f; flex-shrink: 0">{{l.at}}</span>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; color: #8f8f8f">its lesson was read by · later puzzles</span>
+<sc-for list="{{c.used}}" as="u" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; background: #050505; border: 1px solid #161616">
+<span style="font-family: 'Geist Mono', monospace; font-size: 13px">{{u.key}}</span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #8f8f8f">{{u.at}}</span>
+<span style="margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: {{u.oc}}"><span style="width: 7px; height: 7px; border-radius: 2px; background: {{u.c}}"></span>{{u.out}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+
+<div style="border: 1px solid #1f1f1f; border-radius: 14px; background: #0a0a0a; padding: 22px 26px; display: flex; flex-direction: column; gap: 14px; min-width: 0">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 17px">The whole library</span><span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #8f8f8f">48,211 records · append-only</span></div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<sc-for list="{{kinds}}" as="k" hint-placeholder-count="5">
+<button type="button" onClick="{{k.go}}" style="height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid {{k.bd}}; background: {{k.bg}}; color: #ededed; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer"><span style="width: 7px; height: 7px; border-radius: 2px; background: {{k.c}}"></span>{{k.t}}<span style="font-family: 'Geist Mono', monospace; color: #8f8f8f">{{k.n}}</span></button>
+</sc-for>
+</div>
+<label style="height: 38px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid #262626; border-radius: 8px; background: #050505">
+<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#8f8f8f" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"></circle><path d="M10.5 10.5L14 14"></path></svg>
+<input type="search" placeholder="search rules, puzzles, agents" style="flex: 1; background: transparent; border: 0; outline: none; color: #ededed; font-size: 14px">
+</label>
+<div style="display: grid; grid-template-columns: 52px 20px 86px 1fr 56px; gap: 10px; font-size: 12px; color: #6b6b6b; padding: 0 4px"><span>time</span><span></span><span>puzzle</span><span>record</span><span style="text-align: right">tokens</span></div>
+<div style="display: flex; flex-direction: column">
+<sc-for list="{{rows}}" as="w" hint-placeholder-count="12">
+<button type="button" onClick="{{w.go}}" style="display: grid; grid-template-columns: 52px 20px 86px 1fr 56px; gap: 10px; align-items: center; height: 36px; padding: 0 4px; border: 0; border-bottom: 1px solid #141414; background: transparent; color: #ededed; text-align: left; cursor: pointer">
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #8f8f8f">{{w.t}}</span>
+<span style="width: 7px; height: 7px; border-radius: 2px; background: {{w.c}}"></span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #a1a1a1">{{w.key}}</span>
+<span style="font-size: 13px; color: {{w.tc}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{w.text}}</span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #8f8f8f; text-align: right">{{w.tok}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1320}}'>
+class Component extends DCLogic {
+  mk(seed) { let s = seed >>> 0; return function () { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+  renderVals() {
+    const ARC = ['#07070d', '#5a5fe0', '#ec5a78', '#3fd0a4', '#f6c453', '#7c7f99', '#c65ae0', '#f58b4c', '#72d8f5', '#8a2f60'];
+    const K = { worked: '#4a8f67', dead: '#c29a3a', gate: '#6b6b6b', run: '#3a3a3a' };
+    const r = this.mk(51);
+    const hex = () => { let s = ''; for (let i = 0; i < 8; i++) s += '0123456789abcdef'[Math.floor(r() * 16)]; return s; };
+    const pix = (seed, cell) => { const q = this.mk(seed), cols = [1 + Math.floor(q() * 9), 1 + Math.floor(q() * 9)], o = []; for (let y = 0; y < 6; y++) for (let x = 0; x < 6; x++) if (q() < 0.36) o.push((x * cell) + 'px ' + (y * cell) + 'px 0 0 ' + ARC[cols[Math.floor(q() * 2)]]); return o.join(', ') || 'none'; };
+    const B = 39, PW = 1500, colW = PW / B, BASE = 236;
+    const w = []; let ws = 0; for (let b = 0; b < B; b++) { const v = 0.25 + (b / (B - 1)) * 1.6 + r() * 0.5; w.push(v); ws += v; }
+    const counts = w.map(v => Math.floor(v / ws * 176)); let tot = counts.reduce((a, b) => a + b, 0); let bi = B - 1; while (tot < 176) { counts[bi]++; tot++; bi = bi === 20 ? B - 1 : bi - 1; }
+    const T = b => { const m = 630 + b * 10; return Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0'); };
+    const P = [];
+    counts.forEach((n, b) => { for (let k = 0; k < n; k++) { const i = P.length; P.push({ key: hex(), b: b, x: Math.round(b * colW + 1 + (k % 2) * 18), y: BASE - 18 - Math.floor(k / 2) * 18, seed: 7000 + i }); } });
+    const find = (b, k) => { let c = 0; for (let i = 0; i < P.length; i++) { if (P[i].b === b) { if (c === k) return i; c++; } } return 0; };
+    const S = find(3, 0); P[S].key = '9e41c2a7';
+    const selIdx = this.state && this.state.sel !== undefined ? this.state.sel : S;
+    const RULES = ['Fill closed boxes with their border color.', 'Mirror each row around the center column.', 'Swap two colors everywhere.', 'Drop colored cells until they hit something.', 'Keep only the largest object.', 'Copy the top row pattern down the grid.', 'Recolor each object by its size.', 'Extend every line until it hits a wall.'];
+    const targetsOf = i => {
+      if (i === S) return [[find(20, 1), true], [find(25, 0), true], [find(31, 2), true], [find(35, 1), false]];
+      const q = this.mk(300 + i), n = 1 + Math.floor(q() * 4), o = [];
+      for (let k = 0; k < n; k++) { const later = P.filter(p => p.b > P[i].b); if (!later.length) break; const tgt = P.indexOf(later[Math.floor(q() * later.length)]); o.push([tgt, q() < 0.7]); }
+      return o;
+    };
+    const tg = targetsOf(selIdx), tgSet = {}; tg.forEach(t => { tgSet[t[0]] = t[1] ? 'g' : 'n'; });
+    const tiles = P.map((p, i) => ({
+      key: p.key, x: p.x, y: p.y, px: pix(p.seed, 2),
+      ring: i === selIdx ? '0 0 0 2px #ededed' : tgSet[i] === 'g' ? '0 0 0 2px #6fbf8e' : tgSet[i] === 'n' ? '0 0 0 2px #6b6b6b' : 'inset 0 0 0 1px #1d3527',
+      op: i === selIdx || tgSet[i] ? 1 : 0.75, pick: () => this.setState({ sel: i })
+    }));
+    const sp = P[selIdx];
+    const arcs = tg.map(t => { const d = P[t[0]]; const x0 = sp.x + 8, y0 = sp.y, x1 = d.x + 8, y1 = d.y; const top = Math.max(6, Math.min(y0, y1) - 30 - (x1 - x0) * 0.12); return { d: 'M' + x0 + ' ' + y0 + ' C ' + x0 + ' ' + top.toFixed(0) + ', ' + x1 + ' ' + top.toFixed(0) + ', ' + x1 + ' ' + y1, c: t[1] ? '#6fbf8e' : '#6b6b6b' }; });
+    const hours = ['10:30', '11:30', '12:30', '13:30', '14:30', '15:30', '16:30'].map((t, i) => ({ t: t, x: Math.round(i * 6 * colW) }));
+    const ro = this.mk(8), open = []; for (let i = 0; i < 224; i++) open.push(ro() < 0.4 ? '#3a3120' : '#1a1a1e');
+    const isS = selIdx === S, q = this.mk(600 + selIdx);
+    const kfmt = v => (v / 1000).toFixed(1) + 'k';
+    const mkAtt = (n, who, at, read, write, test, ok, why) => ({ n: n, who: who, at: at, stages: [{ v: kfmt(read), k: 'read' }, { v: kfmt(write), k: 'think + write' }, { v: kfmt(test), k: 'test' }], out: ok ? 'solved' : why, oc: ok ? '#6fbf8e' : '#d9b45a', bd: ok ? '#1d3527' : '#2e2612', total: kfmt(read + write + test), sum: read + write + test });
+    let attempts;
+    if (isS) attempts = [mkAtt(1, 'agent 5', '10:41', 9800, 4100, 2300, false, 'pair 2 · 3 cells off'), mkAtt(2, 'agent 3', '10:58', 11200, 3200, 900, true)];
+    else { const n = 1 + Math.floor(q() * 2); attempts = []; for (let k = 1; k <= n; k++) attempts.push(mkAtt(k, 'agent ' + (1 + Math.floor(q() * 8)), T(Math.max(0, sp.b - (n - k))), 9000 + Math.floor(q() * 5000), 2000 + Math.floor(q() * 3000), 500 + Math.floor(q() * 2000), k === n, 'pair ' + (1 + Math.floor(q() * 3)) + ' · ' + (1 + Math.floor(q() * 5)) + ' cells off')); }
+    const total = attempts.reduce((a, x) => a + x.sum, 0);
+    const read = isS ? [
+      { gist: 'its own attempt 1: fill every enclosed black area', at: '10:41', c: K.dead, tc: '#a1a1a1', deco: 'line-through' },
+      { gist: 'Flood-fill regions with the color of their border.', at: '10:36', c: K.worked, tc: '#ededed', deco: 'none' }
+    ] : [
+      { gist: RULES[(selIdx + 1) % 8], at: T(Math.max(0, sp.b - 6)), c: K.worked, tc: '#ededed', deco: 'none' },
+      { gist: RULES[(selIdx + 3) % 8].replace('.', ' only in the corners.'), at: T(Math.max(0, sp.b - 3)), c: K.dead, tc: '#a1a1a1', deco: 'line-through' },
+      { gist: RULES[(selIdx + 5) % 8], at: T(Math.max(0, sp.b - 1)), c: K.worked, tc: '#ededed', deco: 'none' }
+    ];
+    const used = tg.map(t => ({ key: P[t[0]].key, at: T(P[t[0]].b), out: t[1] ? 'solved' : 'still trying', oc: t[1] ? '#6fbf8e' : '#a1a1a1', c: t[1] ? '#4a8f67' : '#5b7cfa' }));
+    const kind = this.state && this.state.kind ? this.state.kind : 'all';
+    const ROWS = [
+      ['16:59', 'worked', 'a90e4d12', 'Mirror each row around the center column.', '2.1k'],
+      ['16:58', 'gate', '5c02ee8b', 'gate: pair 2 · 4 cells differ', '0.3k'],
+      ['16:58', 'dead', '5c02ee8b', 'Stop falling cells at the first grey row.', '0.6k'],
+      ['16:58', 'run', '5c02ee8b', 'agent 3 · 14 steps · 3 test runs', '16.4k'],
+      ['16:57', 'worked', 'c8d17a30', 'Turn every green cell yellow.', '1.8k'],
+      ['16:56', 'run', 'c8d17a30', 'agent 8 · 15 steps · 1 test run', '14.9k'],
+      ['16:55', 'gate', '7c66bfe3', 'gate: all 3 pairs match', '0.2k'],
+      ['16:54', 'dead', 'e41b9c07', 'Flip only the top half.', '0.5k'],
+      ['16:53', 'run', 'e41b9c07', 'agent 1 · 9 steps · 2 test runs', '12.1k'],
+      ['16:52', 'worked', '6f18a2d4', 'Recolor every blue cell red.', '1.2k'],
+      ['16:51', 'gate', '68d01813', 'gate: pair 1 · 9 cells differ', '0.3k'],
+      ['16:50', 'dead', '68d01813', 'Transpose the grid.', '0.4k'],
+      ['16:49', 'run', '2c9e5b18', 'agent 6 · 11 steps · 2 test runs', '13.3k'],
+      ['16:48', 'worked', '2c9e5b18', 'Swap two colors everywhere.', '1.6k']
+    ];
+    const rows = ROWS.filter(x => kind === 'all' || x[1] === kind).slice(0, 12).map(x => ({ t: x[0], c: K[x[1]], key: x[2], text: x[3], tok: x[4], tc: x[1] === 'worked' ? '#ededed' : x[1] === 'dead' ? '#cdbd9c' : '#a1a1a1', go: () => { const hit = P.findIndex(p => p.key === x[2]); if (hit >= 0) this.setState({ sel: hit }); } }));
+    const KINDS = [['all', 'all', '48,211', '#ededed'], ['worked', 'rules that worked', '2,140', K.worked], ['dead', 'dead ends', '5,318', K.dead], ['gate', 'gate verdicts', '12,560', K.gate], ['run', 'raw runs', '28,193', K.run]];
+    const mx = v => v / 450 * 580, my = v => 72 - v / 50 * 72, tok = [0.5, 40, 95, 160, 230, 300, 370, 412.8];
+    return {
+      mOurs: [15, 20, 24, 29, 33, 37, 41, 44].map((v, i) => mx(tok[i]).toFixed(1) + ',' + my(v).toFixed(1)).join(' '),
+      mBase: [17, 18, 17, 18, 17, 18, 18, 18].map((v, i) => mx(tok[i]).toFixed(1) + ',' + my(v).toFixed(1)).join(' '),
+      tps: [48, 41, 36, 31, 27, 24, 21].map((v, i) => (i * 470 / 6).toFixed(1) + ',' + (72 - (v - 10) / 45 * 72).toFixed(1)).join(' '),
+      tiles: tiles, arcs: arcs, hours: hours, open: open,
+      c: { key: sp.key, at: T(sp.b), who: isS ? 'agent 3' : attempts[attempts.length - 1].who, rule: isS ? RULES[0] : RULES[selIdx % 8], total: kfmt(total), nAtt: attempts.length, attempts: attempts, read: read, used: used, bigPx: pix(sp.seed, 8) },
+      kinds: KINDS.map(k => ({ t: k[1], n: k[2], c: k[3], bd: kind === k[0] ? '#555' : '#262626', bg: kind === k[0] ? '#161616' : 'transparent', go: () => this.setState({ kind: k[0] }) })),
+      rows: rows
+    };
+  }
+}
+</script>
+</body>
+</html>
