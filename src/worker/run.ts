@@ -122,18 +122,6 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
     }),
   };
 
-<<<<<<< Updated upstream
-  const result = await generateText({
-    model: ctx.model ?? workerModel(),
-    system: ctx.system,
-    messages: ctx.messages,
-    tools,
-    stopWhen: [stepCountIs(ctx.maxSteps ?? MAX_STEPS), hasToolCall("submit"), hasToolCall("block")],
-    maxOutputTokens: 8000, // a proposal plus its working, never the model's default ceiling
-    providerOptions: workerProviderOptions(),
-    abortSignal: ctx.abortSignal,
-  });
-=======
   const maxSteps = ctx.maxSteps ?? MAX_STEPS;
   const steps: StepRecord[] = [];
   const responseMessages: ModelMessage[] = [];
@@ -153,7 +141,7 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
       messages: [...ctx.messages, ...responseMessages],
       tools,
       stopWhen: [stepCountIs(maxSteps - steps.length), hasToolCall("submit"), hasToolCall("block")],
-      maxOutputTokens: 4000, // a proposal plus its working, never the model's default ceiling
+      maxOutputTokens: 8000, // a proposal plus its working, never the model's default ceiling
       providerOptions: workerProviderOptions(),
       abortSignal: ctx.abortSignal,
     });
@@ -171,7 +159,6 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
     nudges += 1;
     responseMessages.push({ role: "user", content: NUDGE });
   }
->>>>>>> Stashed changes
 
   return {
     outcome: outcome ?? { type: "fail", reason: "no submit or block within the step budget" },

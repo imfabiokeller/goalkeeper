@@ -18,7 +18,8 @@
     "screen": "next dev src/screen -p 3000",
     "screen:build": "next build src/screen",
     "screen:start": "next start src/screen -p 3000",
-    "screen:typecheck": "tsc -p src/screen/tsconfig.json --noEmit"
+    "screen:typecheck": "tsc -p src/screen/tsconfig.json --noEmit",
+    "status": "node --env-file=.env src/planner/status.ts"
   },
   "dependencies": {
     "@openrouter/ai-sdk-provider": "^3.1.0",
