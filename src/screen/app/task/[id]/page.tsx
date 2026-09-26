@@ -66,6 +66,30 @@ function Card({ title, sub, children, style }: { title: string; sub?: ReactNode;
   );
 }
 
+// One plain line per step: what the agent did, not the payload.
+function stepTitle(s: { calls: Array<{ name: string; input: unknown }>; results: Array<{ output: unknown }> }): string {
+  const c = s.calls[0];
+  if (!c) return "thinking";
+  const input = (c.input ?? {}) as Record<string, unknown>;
+  if (c.name === "read_input") {
+    const off = Number(input.offset ?? 0) || 0;
+    return off ? `read the puzzle from character ${off.toLocaleString("en-US")}` : "read the puzzle";
+  }
+  if (c.name === "search_library") {
+    const out = s.results[0]?.output as { passages?: unknown[] } | undefined;
+    const n = Array.isArray(out?.passages) ? out.passages.length : null;
+    return `searched the library for "${String(input.query ?? "").slice(0, 80)}"${n !== null ? ` · ${n} records` : ""}`;
+  }
+  if (c.name === "read_state") return "read the current state";
+  if (c.name === "try_submit") {
+    const rule = (input.proposal as { rule?: unknown } | undefined)?.rule;
+    return typeof rule === "string" ? `tested a draft: "${rule.slice(0, 120)}"` : "tested a draft";
+  }
+  if (c.name === "submit") return "handed it in";
+  if (c.name === "block") return `gave up: ${String(input.reason ?? "").slice(0, 120)}`;
+  return c.name;
+}
+
 export default function TaskPage() {
   const { id } = useParams<{ id: string }>();
   const poll = usePoll<TaskPayload>(`/api/task/${id}`, TASK_POLL_MS);
@@ -181,33 +205,39 @@ export default function TaskPage() {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingBottom: last ? 0 : 16, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                      <span className="gk-mono" style={{ fontSize: 14, color: "var(--gk-fg)" }}>
-                        {s.calls.map((c) => c.name).join(", ") || "thinking"}
-                      </span>
-                      {verdict ? <Chip tone={tone}>{verdict.ok ? "gate pass" : "gate fail"}</Chip> : null}
+                      <span style={{ fontSize: 15, color: "var(--gk-fg)" }}>{stepTitle(s)}</span>
+                      {verdict ? <Chip tone={tone}>{verdict.ok ? "passed every pair" : "not yet"}</Chip> : null}
                       <span className="gk-sub">step {s.n}</span>
                     </div>
                     {s.text ? (
-                      <p style={{ margin: 0, fontSize: 14, color: "var(--gk-dim)", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{oneLine(s.text, 600)}</p>
+                      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "var(--gk-dim)", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden", wordBreak: "break-word" }}>{oneLine(s.text, 400)}</p>
                     ) : null}
-                    {s.calls.map((c, j) => (
-                      <span key={`c${j}`} className="gk-mono" style={{ fontSize: 12, color: "var(--gk-dimmer)", wordBreak: "break-word" }}>
-                        {oneLine(c.input, ARG_CHARS)}
-                      </span>
-                    ))}
                     {s.results.map((r, j) =>
                       r.reasons.length ? (
                         <ul key={`r${j}`} style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: "var(--gk-fg)", display: "flex", flexDirection: "column", gap: 2 }}>
-                          {r.reasons.map((x, k) => (
+                          {r.reasons.slice(0, 3).map((x, k) => (
                             <li key={k}>{x}</li>
                           ))}
                         </ul>
-                      ) : r.ok === null ? (
-                        <span key={`r${j}`} className="gk-mono" style={{ fontSize: 12, color: "var(--gk-dimmer)", wordBreak: "break-word" }}>
-                          {oneLine(r.output, RESULT_CHARS)}
-                        </span>
                       ) : null,
                     )}
+                    {s.calls.length ? (
+                      <details style={{ fontSize: 12 }}>
+                        <summary style={{ cursor: "pointer", color: "var(--gk-dimmer)" }}>raw</summary>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 6 }}>
+                          {s.calls.map((c, j) => (
+                            <span key={`c${j}`} className="gk-mono" style={{ color: "var(--gk-dimmer)", wordBreak: "break-word" }}>
+                              {c.name}({oneLine(c.input, ARG_CHARS)})
+                            </span>
+                          ))}
+                          {s.results.map((r, j) => (
+                            <span key={`o${j}`} className="gk-mono" style={{ color: "var(--gk-dimmer)", wordBreak: "break-word" }}>
+                              {oneLine(r.output, RESULT_CHARS)}
+                            </span>
+                          ))}
+                        </div>
+                      </details>
+                    ) : null}
                   </div>
                 </li>
               );

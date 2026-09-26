@@ -12,6 +12,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { ARC_PALETTE } from "../../lib/arc.tsx";
+import { useScale } from "../../lib/useScale.ts";
 import type { BaselinePayload } from "../../lib/baseline.ts";
 import { bucketFinished } from "../../lib/curve.ts";
 import { agentLabel, compact, hhmm, pct } from "../../lib/format.ts";
@@ -541,8 +542,10 @@ export default function LibraryPage() {
   const solvedKeys = useMemo(() => new Set((d?.solves ?? []).map((s) => s.key)), [d?.solves]);
   const readsFrac = d?.contextAvg && d.tokens ? Math.max(0.004, d.contextAvg / d.tokens) : 0;
 
+  const fit = useScale(1920, 1080);
   return (
-    <main className="gk" style={{ padding: "32px 48px", minHeight: "100vh", height: "100vh", boxSizing: "border-box", display: "flex", flexDirection: "column", gap: 22, overflow: "hidden" }}>
+    <div style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#000" }}>
+    <main className="gk" style={{ position: "absolute", left: fit.left, top: fit.top, transformOrigin: "top left", transform: `scale(${fit.scale})`, width: 1920, height: 1080, padding: "32px 48px", boxSizing: "border-box", display: "flex", flexDirection: "column", gap: 22, overflow: "hidden" }}>
       <link rel="stylesheet" href={FONTS} />
       <header style={{ height: 44, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
@@ -595,5 +598,6 @@ export default function LibraryPage() {
         <WholeLibrary d={d} solvedKeys={solvedKeys} onPick={pick} filter={filter} setFilter={setFilter} />
       </div>
     </main>
+    </div>
   );
 }
