@@ -11,6 +11,7 @@ import type { Goal, Task } from "../shared/types.ts";
 import { checkInput, checkState, iteration, MAX_ATTEMPTS, type IterationOptions } from "./loop.ts";
 import { claim, heartbeat } from "./claim.ts";
 import { retrieve } from "../context/retrieve.ts";
+import { flattenRun, proposalLines } from "./write.ts";
 
 const lens = JSON.parse(readFileSync(new URL("../../usecase/lens.json", import.meta.url), "utf8"));
 const goal: Goal = goalFromLens(lens);
@@ -404,6 +405,32 @@ describe("worker iteration", () => {
     expect(await heartbeat(c, hot, "w-1")).toBe(true);
     expect(await heartbeat(c, hot, "w-2")).toBe(false);
     expect(await heartbeat(c, old, "w-1")).toBe(false);
+  });
+});
+
+describe("source text", () => {
+  it("carries the proposal's rule and program verbatim for the text index", () => {
+    const proposal = { key: "k", rule: "Fill every enclosed region with the border color.", program: "function transform(grid) {\n  return grid;\n}" };
+    expect(proposalLines(proposal)).toEqual([
+      "rule: Fill every enclosed region with the border color.",
+      "program:\nfunction transform(grid) {\n  return grid;\n}",
+    ]);
+    expect(proposalLines({ key: "k", revenue: 1 })).toEqual([]);
+    expect(proposalLines(null)).toEqual([]);
+
+    const text = flattenRun({ key: "k", outcome: { type: "submit", proposal }, gate: { pass: true, reasons: [], checks: {} }, steps: [], messages: [] });
+    expect(text).toContain("rule: Fill every enclosed region with the border color.");
+    expect(text).toContain("program:\nfunction transform(grid) {\n  return grid;\n}");
+    expect(text).toContain("gate: pass");
+  });
+
+  it("the gate source text carries the refuted rule verbatim", async () => {
+    await seedInput("aapl-2026-07-30");
+    await seedTask("aapl-2026-07-30");
+    const model = submitModel({ revenue: 999999000000, rule: "Revenue is the first number on the page." });
+    expect(await iteration(c, "w-1", { ...base, model })).toBe("reopened");
+    const gate = await c.sources.findOne({ kind: "gate" });
+    expect(gate?.text).toContain("rule: Revenue is the first number on the page.");
   });
 });
 

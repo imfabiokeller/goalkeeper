@@ -20,12 +20,12 @@ export type EnrichOptions = {
 };
 
 const EnrichmentShape = z.object({
-  gist: z.string().describe("One or two sentences: what happened and what the next worker should learn from it."),
+  gist: z.string().describe("One or two sentences: what was tried, what the gate said, and what a worker on a different unit can reuse."),
   entities: z.object({
-    keys: z.array(z.string()).describe("Unit keys mentioned, like aapl-2026-07-30"),
-    fields: z.array(z.string()).describe("Proposal fields mentioned, like revenue or dilutedEps"),
+    keys: z.array(z.string()).describe("Unit keys the record mentions (the key field of a task or proposal)."),
+    fields: z.array(z.string()).describe("Proposal field names the record mentions."),
   }),
-  labels: z.array(z.string()).describe("Short tags: pass, fail, blocked, table-scale, non-gaap, bank, fiscal-year, ..."),
+  labels: z.array(z.string()).describe("Short tags: the outcome (pass, fail, blocked), the check kinds that failed, and the techniques or patterns involved."),
 });
 
 const ENRICH_CHARS = 12_000;
@@ -40,7 +40,9 @@ export async function enrich(text: string, opts: EnrichOptions = {}): Promise<En
       output: Output.object({ schema: EnrichmentShape, name: "enrichment" }),
       maxOutputTokens: 800,
       system:
-        "You index records of an extraction pipeline for retrieval. Summarize the record for a future worker on a different unit: what was tried, what the gate said, what generalizes.",
+        "You index records of a shared work log for retrieval. A record is one worker run, one gate verdict or one error on one unit of work. " +
+        "Describe it for a future worker on a different unit: what was tried, what the gate said, what generalizes. " +
+        "Keep the gist concrete enough to be found by the words of a similar unit.",
       prompt: text.slice(0, ENRICH_CHARS),
     });
     const embedding = await (opts.embed ?? embedText)(`${output.gist}\n${text}`);
@@ -81,6 +83,18 @@ function messageText(m: ModelMessage): string {
   return `${m.role}: ${parts.filter(Boolean).join("\n")}`;
 }
 
+// The proposal's `rule` and `program` fields verbatim, when present as
+// strings, so the text index finds programs by the words of their rule
+// (JSON escaping in the proposal line would hide them).
+export function proposalLines(proposal: unknown): string[] {
+  if (!proposal || typeof proposal !== "object") return [];
+  const p = proposal as Record<string, unknown>;
+  const lines: string[] = [];
+  if (typeof p.rule === "string" && p.rule) lines.push(`rule: ${p.rule}`);
+  if (typeof p.program === "string" && p.program) lines.push(`program:\n${p.program}`);
+  return lines;
+}
+
 // The flattened text of a run: outcome first, then gate, then the steps,
 // then the conversation. The text index and the enrichment read this.
 export function flattenRun(args: {
@@ -93,7 +107,7 @@ export function flattenRun(args: {
   const lines: string[] = [`key: ${args.key}`];
   switch (args.outcome.type) {
     case "submit":
-      lines.push(`outcome: submit`, `proposal: ${JSON.stringify(args.outcome.proposal)}`);
+      lines.push(`outcome: submit`, ...proposalLines(args.outcome.proposal), `proposal: ${JSON.stringify(args.outcome.proposal)}`);
       break;
     case "block":
       lines.push(`outcome: block`, `reason: ${args.outcome.reason}`);
@@ -184,6 +198,7 @@ export async function writeGateSource(
     `key: ${args.task.key}`,
     `gate: ${args.gate.pass ? "pass" : "fail"} on attempt ${args.task.attempt}`,
     ...args.gate.reasons.map((r) => `reason: ${r}`),
+    ...proposalLines(args.proposal),
     `proposal: ${JSON.stringify(args.proposal)}`,
   ].join("\n");
   const enrichment = await (args.enrich ?? enrich)(text);
