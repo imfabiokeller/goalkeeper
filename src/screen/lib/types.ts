@@ -51,8 +51,28 @@ export type FeedLine = {
   id: string; // source id or task id, for links
 };
 
+// One card on the stage: a claimed task, or one that finished recently.
+export type CardStatus = "working" | "resumed" | "solved" | "merged" | "retrying" | "stopped" | "blocked";
+
+export type StageCard = {
+  key: string;
+  taskId: string;
+  status: CardStatus;
+  attempt: number;
+  worker: string | null; // the worker holding it, or the one that last did
+  lastWorker: string | null; // on a resumed or stopped card: the worker that died
+  diedAt: string | null;
+  step: number | null;
+  lastTool: string | null; // the last progress line's tool, for the footer verb
+  reason: string | null; // first gate reason or block reason
+  hint: string | null;
+  rule: string | null; // the merged rule, or the last draft's rule
+  updatedAt: string;
+};
+
 export type StagePayload = {
   at: string; // server time when the payload was built
+  cards?: StageCard[];
   metrics: {
     at: string | null;
     totals: Metrics["totals"] | null;
@@ -108,7 +128,17 @@ export type UnitTask = {
   progress: ProgressLine[]; // full task.progress (up to PROGRESS_ENTRIES), oldest first
 };
 
-export type Precedent = { id: string; kind: string; key: string | null; gist: string | null; score: number | null };
+export type Precedent = {
+  id: string;
+  kind: string;
+  key: string | null;
+  gist: string | null;
+  score: number | null;
+  thumb?: Grid | null; // first train input of the precedent's key
+  worker?: string | null; // who wrote the entry
+  at?: string | null; // when
+  pass?: boolean | null; // a worker-run or gate entry: did its gate pass
+};
 
 export type ActualOutput = { ok: true; output: Grid } | { ok: false; error: string } | null;
 

@@ -15,7 +15,15 @@ body {
 }
 
 a {
-  color: inherit;
+  color: var(--fg);
+}
+
+a:hover {
+  color: #ffffff;
+}
+
+button {
+  font: inherit;
 }
 
 code,

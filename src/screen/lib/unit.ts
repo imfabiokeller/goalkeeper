@@ -20,6 +20,7 @@ type RunRow = {
   program: string | null;
   steps: number;
   cited: string[] | null;
+  worker: string | null;
 };
 
 type TaskRow = Pick<Task, "_id" | "attempt" | "worker" | "status" | "priority" | "gate" | "blockReason" | "hint" | "createdAt" | "updatedAt" | "step" | "progress"> & {
@@ -103,6 +104,7 @@ export async function buildUnit(c: Collections, key: string): Promise<UnitPayloa
             program: "$raw.proposal.program",
             steps: { $size: { $ifNull: ["$raw.steps", []] } },
             cited: "$raw.briefing.cited",
+            worker: "$raw.worker",
           },
         },
       ])
@@ -120,7 +122,8 @@ export async function buildUnit(c: Collections, key: string): Promise<UnitPayloa
     return {
       id: t._id.toHexString(),
       attempt: t.attempt,
-      worker: t.worker,
+      // The merge clears task.worker; the run remembers who wrote it.
+      worker: t.worker ?? run?.worker ?? null,
       status: t.status,
       priority: t.priority,
       gate: t.gate,
@@ -162,14 +165,44 @@ export async function buildUnit(c: Collections, key: string): Promise<UnitPayloa
       }
     }
     const precedentDocs = ids.length
-      ? await c.sources
-          .find({ _id: { $in: ids.map((id) => new ObjectId(id)) } }, { projection: { kind: 1, key: 1, "enrichment.gist": 1 } })
-          .toArray()
+      ? ((await c.sources
+          .find(
+            { _id: { $in: ids.map((id) => new ObjectId(id)) } },
+            { projection: { kind: 1, key: 1, createdAt: 1, "enrichment.gist": 1, "raw.worker": 1, "raw.gate.pass": 1, "raw.outcome": 1 } },
+          )
+          .toArray()) as unknown as Array<{
+          _id: ObjectId;
+          kind: string;
+          key: string | null;
+          createdAt: Date;
+          enrichment?: { gist?: string } | null;
+          raw?: { worker?: string; gate?: { pass?: boolean } | null; outcome?: string };
+        }>)
       : [];
+    // Thumbnails: the first example input of each precedent's puzzle.
+    const precedentKeys = [...new Set(precedentDocs.flatMap((d) => (d.key && d.key !== key ? [d.key] : [])))];
+    const thumbDocs = precedentKeys.length
+      ? await c.inputs.find({ _id: { $in: precedentKeys } }, { projection: { key: 1, "meta.train": { $slice: 1 } } }).toArray()
+      : [];
+    const thumbByKey = new Map(thumbDocs.map((d) => [d.key, pairs(d.meta?.train)[0]?.input ?? null]));
     const byId = new Map(precedentDocs.map((d) => [d._id.toHexString(), d]));
     const precedents: Precedent[] = ids.flatMap((id) => {
       const d = byId.get(id);
-      return d ? [{ id, kind: d.kind, key: d.key, gist: d.enrichment?.gist ?? null, score: null }] : [];
+      if (!d) return [];
+      const pass = typeof d.raw?.gate?.pass === "boolean" ? d.raw.gate.pass : d.raw?.outcome === "block" ? false : null;
+      return [
+        {
+          id,
+          kind: d.kind,
+          key: d.key,
+          gist: d.enrichment?.gist ?? null,
+          score: null,
+          thumb: d.key ? (thumbByKey.get(d.key) ?? (d.key === key ? (train[0]?.input ?? null) : null)) : null,
+          worker: d.raw?.worker ?? null,
+          at: d.createdAt instanceof Date ? d.createdAt.toISOString() : null,
+          pass,
+        },
+      ];
     });
 
     // Rules refuted before this attempt: gate failures on the key, plus

@@ -3,7 +3,7 @@
 
 import type { Collections } from "../../shared/db.ts";
 import type { ProgressEntry, Task, TaskStatus } from "../../shared/types.ts";
-import type { FeedLine, ProgressLine, StagePayload, StageUnit, StageWorker } from "./types.ts";
+import type { CardStatus, FeedLine, ProgressLine, StageCard, StagePayload, StageUnit, StageWorker } from "./types.ts";
 
 export const PER_MINUTE_LAST = 60;
 export const FEED_LINES = 15;
@@ -11,6 +11,9 @@ export const DEAD_AFTER_S = 30;
 export const DROP_AFTER_S = 90;
 export const PROGRESS_LAST = 8; // progress entries per worker row
 export const DEAD_ROW_MS = 30_000; // a dead worker's row stays this long from diedAt
+export const CARDS_MAX = 8; // cards on the stage at 1920x1080
+export const RESUMED_MS = 120_000; // a claimed task whose diedAt is this recent reads "Resumed"
+export const RECENT_CARD_MS = 10 * 60_000; // finished tasks this recent may fill the grid
 
 const iso = (d: Date | null | undefined): string | null => (d instanceof Date ? d.toISOString() : null);
 
@@ -51,7 +54,98 @@ type LatestTask = {
   reasons: Array<string | null>; // first gate reason per task, newest first
 };
 
-export type ClaimedTask = Pick<Task, "_id" | "key" | "worker" | "heartbeat" | "attempt" | "step" | "progress">;
+export type ClaimedTask = Pick<Task, "_id" | "key" | "worker" | "heartbeat" | "attempt" | "step" | "progress"> &
+  Partial<Pick<Task, "hint" | "lastWorker" | "diedAt" | "updatedAt" | "blockReason">> & { gate?: { pass?: boolean; reasons?: string[] } | null };
+
+// A task that finished recently (merged, blocked, or requeued after a
+// failed gate): it fills the grid next to the claimed ones.
+export type RecentTask = Pick<Task, "_id" | "key" | "status" | "attempt" | "worker" | "hint" | "blockReason" | "updatedAt"> &
+  Partial<Pick<Task, "lastWorker" | "diedAt" | "step" | "progress">> & { gate?: { pass?: boolean; reasons?: string[] } | null; proposal?: { rule?: unknown } | null };
+
+const lastTool = (entries: ProgressEntry[] | null | undefined): string | null => {
+  const e = Array.isArray(entries) ? entries.at(-1) : undefined;
+  return e ? e.tool : null;
+};
+
+// The cards: every claimed task (working or resumed), the tasks that
+// died in the last 30 s (stopped), then the most recent finished ones
+// until CARDS_MAX, newest first. Solved needs the merged state's score.
+export function buildCards(claimed: ClaimedTask[], dead: DeadTask[], recent: RecentTask[], scoreByKey: Map<string, 0 | 1 | null>, now: Date): StageCard[] {
+  const cards: StageCard[] = [];
+  const seen = new Set<string>();
+  for (const t of claimed) {
+    if (!t.worker || !t.heartbeat) continue;
+    if (now.getTime() - t.heartbeat.getTime() > DROP_AFTER_S * 1000) continue;
+    const resumed = t.diedAt instanceof Date && !!t.lastWorker && now.getTime() - t.diedAt.getTime() <= RESUMED_MS;
+    seen.add(t.key);
+    cards.push({
+      key: t.key,
+      taskId: t._id.toHexString(),
+      status: resumed ? "resumed" : "working",
+      attempt: t.attempt,
+      worker: t.worker,
+      lastWorker: resumed ? (t.lastWorker ?? null) : null,
+      diedAt: resumed && t.diedAt instanceof Date ? t.diedAt.toISOString() : null,
+      step: typeof t.step === "number" ? t.step : null,
+      lastTool: lastTool(t.progress),
+      reason: first(t.gate?.reasons),
+      hint: t.hint ?? null,
+      rule: lastSubmitRule(t.progress),
+      updatedAt: (t.updatedAt ?? t.heartbeat).toISOString(),
+    });
+  }
+  for (const t of dead) {
+    if (!t.lastWorker || !(t.diedAt instanceof Date) || seen.has(t.key)) continue;
+    const sinceMs = now.getTime() - t.diedAt.getTime();
+    if (sinceMs < 0 || sinceMs > DEAD_ROW_MS) continue;
+    seen.add(t.key);
+    cards.push({
+      key: t.key,
+      taskId: t._id.toHexString(),
+      status: "stopped",
+      attempt: Math.max(1, t.attempt - 1),
+      worker: t.lastWorker,
+      lastWorker: t.lastWorker,
+      diedAt: t.diedAt.toISOString(),
+      step: typeof t.step === "number" ? t.step : null,
+      lastTool: lastTool(t.progress),
+      reason: null,
+      hint: null,
+      rule: lastSubmitRule(t.progress),
+      updatedAt: t.diedAt.toISOString(),
+    });
+  }
+  const live = cards.length;
+  const finished = [...recent].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  for (const t of finished) {
+    if (cards.length >= CARDS_MAX) break;
+    if (seen.has(t.key) || t.status === "claimed") continue;
+    if (now.getTime() - t.updatedAt.getTime() > RECENT_CARD_MS) continue;
+    let status: CardStatus;
+    if (t.status === "merged") status = scoreByKey.get(t.key) === 1 ? "solved" : "merged";
+    else if (t.status === "blocked" || t.status === "parked") status = "blocked";
+    else if (t.status === "open" && (t.hint || (t.gate && t.gate.pass === false) || t.attempt > 1)) status = "retrying";
+    else continue;
+    seen.add(t.key);
+    const rule = typeof t.proposal?.rule === "string" && t.proposal.rule.trim() ? t.proposal.rule : lastSubmitRule(t.progress);
+    cards.push({
+      key: t.key,
+      taskId: t._id.toHexString(),
+      status,
+      attempt: t.attempt,
+      worker: t.worker ?? t.lastWorker ?? null,
+      lastWorker: t.lastWorker ?? null,
+      diedAt: null,
+      step: typeof t.step === "number" ? t.step : null,
+      lastTool: lastTool(t.progress),
+      reason: t.blockReason ?? first(t.gate?.reasons),
+      hint: t.hint ?? null,
+      rule,
+      updatedAt: t.updatedAt.toISOString(),
+    });
+  }
+  return cards.slice(0, Math.max(CARDS_MAX, live));
+}
 
 // A task the reaper requeued recently, whatever its status now: another
 // worker may already hold it (a live row on the same key) while the dead
@@ -199,7 +293,7 @@ export function unitStatus(score: 0 | 1 | null | undefined, hasState: boolean, l
 
 export async function buildStage(c: Collections, now = new Date()): Promise<StagePayload> {
   const deadSince = new Date(now.getTime() - DEAD_ROW_MS);
-  const [metrics, goal, inputs, states, latestTasks, claimed, dead, feedSources, feedTasks] = await Promise.all([
+  const [metrics, goal, inputs, states, latestTasks, claimed, recent, dead, feedSources, feedTasks] = await Promise.all([
     c.metrics.findOne(
       { _id: "metrics" },
       { projection: { at: 1, totals: 1, solveRate: 1, perMinute: { $slice: -PER_MINUTE_LAST }, "lessons.text": 1 } },
@@ -228,8 +322,21 @@ export async function buildStage(c: Collections, now = new Date()): Promise<Stag
       ])
       .toArray(),
     c.tasks
-      .find({ status: "claimed" }, { projection: { key: 1, worker: 1, heartbeat: 1, attempt: 1, step: 1, progress: { $slice: -PROGRESS_LAST } } })
+      .find(
+        { status: "claimed" },
+        { projection: { key: 1, worker: 1, heartbeat: 1, attempt: 1, step: 1, hint: 1, lastWorker: 1, diedAt: 1, updatedAt: 1, "gate.pass": 1, "gate.reasons": { $slice: 1 }, progress: { $slice: -PROGRESS_LAST } } },
+      )
       .toArray() as Promise<ClaimedTask[]>,
+    c.tasks
+      .find(
+        { status: { $in: ["merged", "blocked", "open"] }, updatedAt: { $gte: new Date(now.getTime() - RECENT_CARD_MS) } },
+        {
+          sort: { updatedAt: -1 },
+          limit: CARDS_MAX * 3,
+          projection: { key: 1, status: 1, attempt: 1, worker: 1, lastWorker: 1, hint: 1, blockReason: 1, updatedAt: 1, step: 1, "gate.pass": 1, "gate.reasons": { $slice: 1 }, "proposal.rule": 1, progress: { $slice: -PROGRESS_LAST } },
+        },
+      )
+      .toArray() as unknown as Promise<RecentTask[]>,
     c.tasks
       .find({ diedAt: { $gte: deadSince } }, { projection: { key: 1, attempt: 1, lastWorker: 1, diedAt: 1, step: 1, progress: { $slice: -PROGRESS_LAST } } })
       .toArray() as Promise<DeadTask[]>,
@@ -292,6 +399,7 @@ export async function buildStage(c: Collections, now = new Date()): Promise<Stag
   for (const u of units) counts[u.status] += 1;
 
   const rows = workerRows(claimed, dead, now);
+  const cards = buildCards(claimed, dead, recent, new Map(states.map((st) => [st.key, st.score ?? null])), now);
 
   // A reaped task that is still open also shows up as a "requeued" task
   // line (its updatedAt is the death); the dead line is the same event, so
@@ -324,6 +432,7 @@ export async function buildStage(c: Collections, now = new Date()): Promise<Stag
         }
       : null,
     counts,
+    cards,
     units,
     workers: { target: Number(process.env.WORKERS_TARGET ?? 0) || 0, alive: rows.filter((r) => r.alive).length, rows },
     feed,
