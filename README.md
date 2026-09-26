@@ -112,7 +112,14 @@ directly (polling, since Vercel functions cannot hold change streams open).
 
 ## Built during the event
 
-Everything in `src/`. Atlas, the Vercel AI SDK, OpenRouter, Voyage,
-Next.js, Docker and the ARC-AGI-1 data (Apache 2.0) are reused as is.
+Everything in `src/` and `usecase/`, between 10:30 and 17:00 on September
+26, 2026: the worker loop (claim, heartbeat, context assembly, AI SDK tool
+loop with `try_submit`, gate, write), the library (enrichment, `$rankFusion`
+retrieval, rerank, briefing), the planner (reaper, emit, hidden scoring,
+reopen, metrics, lessons digest), the ARC use case (fixture, sandbox,
+checks, baseline script), the screen (stage, expanded card, task, library)
+and the kill switch. Reused as is: MongoDB Atlas, the Vercel AI SDK,
+OpenRouter, Voyage, Next.js, Docker, and the ARC-AGI-1 data (Apache 2.0).
+The live screen: https://goalkeeper-gamma.vercel.app
 
 License: Apache 2.0.
