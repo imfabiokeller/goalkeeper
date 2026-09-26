@@ -33,6 +33,14 @@ Chin, 2026); Greenblatt's GPT-4o pipeline was 42% with thousands of
 samples per task (2024). The public eval set is likely in training data,
 so any public-eval number is best case; ARC Prize scores semi-private.
 
+**What is the denominator of the solve rate?**
+Puzzles finished: merged (a program passed every example) or blocked
+(five refuted tries). Not puzzles attempted, which includes work in
+progress and swings with the number of workers. Hard puzzles finish
+later, so the rate over finished puzzles is optimistic early in the run;
+the number that only goes one way is solved over all 400, shown next to
+it.
+
 **Is the comparison with the control fair?**
 Same model, no thinking, same puzzle text, same gate, and at most two
 shots at the hidden test on both sides (ARC's rule). Not the same: the

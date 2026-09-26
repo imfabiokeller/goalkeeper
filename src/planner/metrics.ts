@@ -31,7 +31,7 @@ type SolveBucket = NonNullable<Metrics["solveRate"]>[number];
 // of the bucket, merged keys with state merged by then, solved keys whose
 // state scored 1 by then. Two aggregations: first task per key, and the
 // state timestamps.
-export async function solveRate(c: Collections, now: Date): Promise<{ buckets: SolveBucket[]; attempted: number; solved: number }> {
+export async function solveRate(c: Collections, now: Date): Promise<{ buckets: SolveBucket[]; attempted: number; finished: number; solved: number }> {
   const firsts = await c.tasks
     .aggregate<{ _id: string; at: Date }>([{ $group: { _id: "$key", at: { $min: "$createdAt" } } }])
     .map((k) => k.at.getTime())
@@ -41,7 +41,17 @@ export async function solveRate(c: Collections, now: Date): Promise<{ buckets: S
     .map((s) => ({ merged: s.mergedAt.getTime(), solved: s.score === 1 ? (s.scoredAt ?? s.mergedAt).getTime() : null }))
     .toArray();
   const solvedAts = states.flatMap((s) => (s.solved === null ? [] : [s.solved]));
-  const totals = { attempted: firsts.length, solved: solvedAts.length };
+  // Finished: merged, or blocked with no later task. The denominator of the
+  // solve rate on stage; attempted swings with the worker count.
+  const blockedAts = await c.tasks
+    .aggregate<{ _id: string; at: Date; open: number }>([
+      { $group: { _id: "$key", at: { $max: { $cond: [{ $eq: ["$status", "blocked"] }, "$updatedAt", null] } }, open: { $sum: { $cond: [{ $in: ["$status", ["open", "claimed"]] }, 1, 0] } } } },
+      { $match: { at: { $ne: null }, open: 0 } },
+    ])
+    .map((k) => k.at.getTime())
+    .toArray();
+  const finishedAts = [...states.map((s) => s.merged), ...blockedAts];
+  const totals = { attempted: firsts.length, finished: finishedAts.length, solved: solvedAts.length };
   if (!firsts.length) return { buckets: [], ...totals };
 
   const start = Math.floor(Math.min(...firsts) / SOLVE_BUCKET_MS) * SOLVE_BUCKET_MS;
@@ -52,6 +62,7 @@ export async function solveRate(c: Collections, now: Date): Promise<{ buckets: S
     buckets.push({
       bucket: new Date(b),
       attempted: upTo(firsts, end),
+      finished: upTo(finishedAts, end),
       merged: upTo(states.map((s) => s.merged), end),
       solved: upTo(solvedAts, end),
     });
@@ -209,6 +220,7 @@ export async function refreshMetrics(c: Collections, now = new Date()): Promise<
       contextLast20Avg: last20.length ? last20.reduce((a, b) => a + b, 0) / last20.length : null,
       solved: solve.solved,
       attempted: solve.attempted,
+      finished: solve.finished,
       stepsMedian: median,
     },
     perCriterion,

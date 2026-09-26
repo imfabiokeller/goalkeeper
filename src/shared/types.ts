@@ -219,6 +219,7 @@ export const Lessons = z.object({
 export const SolveBucket = z.object({
   bucket: z.date(),
   attempted: z.number().int(), // keys with at least one task created up to the end of the bucket
+  finished: z.number().int().optional(), // keys merged or blocked up to the end of the bucket: the solve rate's denominator
   merged: z.number().int(), // keys with state merged up to the end of the bucket
   solved: z.number().int(), // keys with state.score === 1 up to the end of the bucket
 });
@@ -237,6 +238,7 @@ export const Metrics = z.object({
     contextLast20Avg: z.number().nullable(),
     solved: z.number().int().optional(),
     attempted: z.number().int().optional(),
+    finished: z.number().int().optional(),
     stepsMedian: z.number().nullable().optional(),
   }),
   perCriterion: z.record(z.string(), z.object({ done: z.number().int(), total: z.number().int() })),
