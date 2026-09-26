@@ -8,13 +8,14 @@ statement two, long-horizon engineering.
 
 - Live dashboard: https://goalkeeper-gamma.vercel.app
 - The library view: https://goalkeeper-gamma.vercel.app/library
-- The architecture in one picture: [docs/architecture.html](docs/architecture.html)
-  (open it in a browser)
 - The pitch and the video script: [docs/PITCH.md](docs/PITCH.md)
+- The architecture as one page: [docs/architecture.html](docs/architecture.html)
 
 ![The stage view: six workers on six ARC puzzles, the solve rate curve, the control at 10%, and the library counter at 18.7M tokens](docs/screenshots/stage.png)
 
 ![The library view: every solve on a timeline, what one worker read before it solved its puzzle, and the whole append-only record](docs/screenshots/library.png)
+
+![The architecture: a human writes the goal once; Atlas holds the task queue, the goal and the library; each stateless worker claims, assembles a 4k slice, runs, passes the gate and writes the raw run back; the planner is a function any idle worker runs](docs/screenshots/architecture.png)
 
 ## What we were trying to fix
 
