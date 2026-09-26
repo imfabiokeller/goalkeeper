@@ -105,6 +105,10 @@ export const State = z.object({
   version: z.number().int(), // goal version it was verified under
   stateVersion: z.number().int(), // bumps on every merge of this key
   data: z.unknown(),
+  // The use case's hidden metric (usecase/checks.ts score()), written by
+  // the planner's score step, never by a worker. null until scored.
+  score: z.union([z.literal(0), z.literal(1)]).nullable().optional(),
+  scoredAt: z.date().nullable().optional(),
   taskId: objectId,
   mergedAt: z.date(),
 });
@@ -199,10 +203,19 @@ export const Lessons = z.object({
   text: z.string().max(2000), // the digest rendered for prompts
 });
 
+// One row per 15-minute bucket: the solve-rate curve on the stage view.
+export const SolveBucket = z.object({
+  bucket: z.date(),
+  attempted: z.number().int(), // keys with at least one task created up to the end of the bucket
+  merged: z.number().int(), // keys with state merged up to the end of the bucket
+  solved: z.number().int(), // keys with state.score === 1 up to the end of the bucket
+});
+
 export const Metrics = z.object({
   _id: z.literal("metrics"),
   at: z.date(),
   perMinute: z.array(MetricsMinute),
+  solveRate: z.array(SolveBucket).optional(),
   totals: z.object({
     merged: z.number().int(),
     blocked: z.number().int(),
@@ -210,6 +223,9 @@ export const Metrics = z.object({
     libraryTokens: z.number().int(),
     librarySources: z.number().int(),
     contextLast20Avg: z.number().nullable(),
+    solved: z.number().int().optional(),
+    attempted: z.number().int().optional(),
+    stepsMedian: z.number().nullable().optional(),
   }),
   perCriterion: z.record(z.string(), z.object({ done: z.number().int(), total: z.number().int() })),
   versions: z.array(z.object({ version: z.number().int(), at: z.date() })),
@@ -259,3 +275,5 @@ export type CrowdOutcome = z.infer<typeof CrowdOutcome>;
 export type CheckInput = { key: string; name: string; text: string; meta: Record<string, unknown> };
 export type CheckState = { merged: Record<string, unknown> };
 export type CheckFn = (proposal: unknown, input: CheckInput, state: CheckState) => { pass: boolean; reasons: string[] };
+// Optional hidden metric a use case may export next to its checks. Run by the planner only.
+export type ScoreFn = (proposal: unknown, input: CheckInput) => 0 | 1;
