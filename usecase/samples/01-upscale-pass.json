@@ -1,0 +1,11 @@
+{
+  "note": "60c09cac: every cell becomes a 2x2 block. Passes every check and solves the test.",
+  "input": "60c09cac",
+  "expect": { "schema": true, "reproduces": true, "general": true },
+  "score": 1,
+  "proposal": {
+    "key": "60c09cac",
+    "rule": "Scale the grid up by two: every cell becomes a 2x2 block of its color.",
+    "program": "function transform(grid) {\n  const out = [];\n  for (const row of grid) {\n    const r = row.flatMap((c) => [c, c]);\n    out.push(r, [...r]);\n  }\n  return out;\n}"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "note": "60c09cac with a program that returns the input unchanged: reproduces fails on size, pair 1 expected 6x6, got 3x3.",
+  "input": "60c09cac",
+  "expect": { "schema": true, "reproduces": false, "general": true },
+  "score": 0,
+  "proposal": {
+    "key": "60c09cac",
+    "rule": "The output is the input.",
+    "program": "function transform(grid) {\n  return grid.map((row) => [...row]);\n}"
+  }
+}

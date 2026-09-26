@@ -83,7 +83,7 @@ describe("assemble", () => {
       passages: [{ ...longPassage(0), gist: "banks report net revenue", excerpt: "JPMorgan net revenue" }],
     });
     expect(out.system).toContain("# Goal (version 1)");
-    expect(out.system).toContain("c1 [grounded]");
+    expect(out.system).toContain("c1 [reproduces]");
     expect(out.system).toContain("## Guidelines");
     expect(out.system).toContain("## Out of scope");
     expect(out.system).toContain("key: aapl-2026-07-30");

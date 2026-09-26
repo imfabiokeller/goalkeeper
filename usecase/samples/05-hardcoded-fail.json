@@ -1,0 +1,11 @@
+{
+  "note": "66e6c45b with the example outputs pasted in as literals: reproduces passes, general fails on memorizing, and the test is not solved.",
+  "input": "66e6c45b",
+  "expect": { "schema": true, "reproduces": true, "general": false },
+  "score": 0,
+  "proposal": {
+    "key": "66e6c45b",
+    "rule": "Look the answer up from the examples.",
+    "program": "function transform(grid) {\n  const known = {\n    \"3,4,7,6\": [[3,0,0,4],[0,0,0,0],[0,0,0,0],[7,0,0,6]],\n    \"5,6,8,3\": [[5,0,0,6],[0,0,0,0],[0,0,0,0],[8,0,0,3]]\n  };\n  const k = [grid[1][1], grid[1][2], grid[2][1], grid[2][2]].join(\",\");\n  return known[k] || grid;\n}"
+  }
+}

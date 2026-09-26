@@ -1,0 +1,11 @@
+{
+  "note": "66e6c45b: the four inner cells move to the four corners. Passes every check and solves the test.",
+  "input": "66e6c45b",
+  "expect": { "schema": true, "reproduces": true, "general": true },
+  "score": 1,
+  "proposal": {
+    "key": "66e6c45b",
+    "rule": "Move the 2x2 block in the middle to the four corners of an otherwise empty grid.",
+    "program": "function transform(grid) {\n  const h = grid.length, w = grid[0].length;\n  const out = grid.map((row) => row.map(() => 0));\n  out[0][0] = grid[1][1];\n  out[0][w - 1] = grid[1][2];\n  out[h - 1][0] = grid[2][1];\n  out[h - 1][w - 1] = grid[2][2];\n  return out;\n}"
+  }
+}

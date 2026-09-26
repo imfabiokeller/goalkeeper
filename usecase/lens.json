@@ -1,65 +1,44 @@
 {
   "_id": "lens",
   "version": 1,
-  "goal": "Build a table of headline quarterly results for S&P 500 companies from their own earnings press releases: revenue, net income and diluted earnings per share for the quarter just reported. Every figure carries the sentence or table row it came from, so anyone can check it in two seconds.",
+  "goal": "Solve as many ARC evaluation puzzles as possible with cheap open-weight models by writing, for each puzzle, a program that reproduces every example pair. A program counts as solved only when it also produces the hidden test output, which no worker ever sees.",
   "criteria": [
     {
       "id": "c1",
-      "text": "Every value in a proposal is backed by a quote that appears word for word in the press release and contains that value at the precision it was written.",
+      "text": "The program, run on each example input, returns exactly the example output.",
       "check": {
-        "kind": "grounded"
+        "kind": "reproduces"
       }
     },
     {
       "id": "c2",
-      "text": "The figures agree with each other and with the filing: net income never exceeds revenue, EPS carries the sign of net income, the stated growth matches the two revenue figures within one point, and the period ends at most 120 days before the filing date.",
+      "text": "The program runs on the test input within one second and returns a valid grid, and contains no example output as a literal.",
       "check": {
-        "kind": "consistent"
+        "kind": "general"
       }
     },
     {
       "id": "c3",
-      "text": "A proposal has exactly the fields of the proposal shape, correctly typed, with amounts in whole US dollars, and its key is not already merged.",
+      "text": "The proposal has exactly the fields of the proposal shape, the program defines transform(grid) in under 4000 characters, and the key is not already merged.",
       "check": {
         "kind": "schema"
       }
     }
   ],
   "guidelines": [
-    "Prefer GAAP figures over adjusted or non-GAAP ones when a release gives both.",
-    "Prefer the quarter just ended over year-to-date, nine-month, trailing or full-year figures.",
-    "Never estimate or derive a missing number. Leave the field null and give no quote for it.",
-    "Convert every amount to whole US dollars. A table row headed in millions is multiplied out; a per-share figure stays as written.",
-    "If the release gives two GAAP figures for the same item (restated, revised, a range), ask instead of choosing."
+    "State the rule in one sentence before writing any code.",
+    "Check first whether the output size differs from the input size; most failures are size failures.",
+    "Prefer the smallest program that reproduces every pair.",
+    "Reuse helpers from solved puzzles in the library (components, bounding box, symmetry, flood fill) instead of writing them again.",
+    "Never hardcode an example output. If the rule is unclear after three hypotheses, block with the hypotheses tried."
   ],
   "outOfScope": [
-    "Guidance, outlook and forecasts for future quarters.",
-    "Non-GAAP and adjusted measures, margins and ratios.",
-    "Segment, product, regional and customer breakdowns.",
-    "Balance sheet and cash flow items, dividends and buybacks.",
-    "Any ranking, comparison, recommendation or investment opinion.",
-    "Companies with no press release in the input folder."
+    "Puzzles outside the loaded set (ARC-AGI-2, training set, hand-made).",
+    "Any frontier model or any model not on the allowed list.",
+    "Changing how puzzles are scored or revealing test outputs.",
+    "Rankings of puzzles, workers or models."
   ],
   "contracts": {},
   "history": [],
-  "proposalShape": {
-    "key": "<equals the task key>",
-    "company": "<name as the release states it>",
-    "periodEnd": "<ISO date, last day of the quarter>",
-    "periodLabel": "Q[1-4] FY<year>",
-    "revenue": "<integer, whole US dollars>",
-    "netIncome": "<integer, whole US dollars, negative for a loss, or null>",
-    "dilutedEps": "<number, 2 decimals, or null>",
-    "revenuePriorYear": "<integer, whole US dollars, or null>",
-    "revenueChangePct": "<number, negative for a decline, or null>",
-    "currency": "USD",
-    "quotes": {
-      "periodEnd": "<verbatim passage>",
-      "revenue": "<verbatim passage>",
-      "netIncome": "<verbatim passage or omitted when null>",
-      "dilutedEps": "...",
-      "revenuePriorYear": "...",
-      "revenueChangePct": "..."
-    }
-  }
+  "proposalShape": "{\n  \"key\": \"<equals the task key, the ARC task id>\",\n  \"rule\": \"<one sentence: the hypothesis in words>\",\n  \"program\": \"function transform(grid) { ... return out; }  (JavaScript, no imports, no I/O, under 4000 characters; takes and returns a 2D array of integers 0 to 9)\"\n}"
 }

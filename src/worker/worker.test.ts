@@ -15,8 +15,14 @@ import { flattenRun, proposalLines } from "./write.ts";
 
 const lens = JSON.parse(readFileSync(new URL("../../usecase/lens.json", import.meta.url), "utf8"));
 const goal: Goal = goalFromLens(lens);
-const appleText = readFileSync(new URL("../../usecase/inputs/aapl-2026-07-30.txt", import.meta.url), "utf8");
-const appleSample = JSON.parse(readFileSync(new URL("../../usecase/samples/01-apple-pass.json", import.meta.url), "utf8"));
+const appleText = readFileSync(new URL("../../usecase/inputs/60c09cac.txt", import.meta.url), "utf8");
+const appleSample = JSON.parse(readFileSync(new URL("../../usecase/samples/01-upscale-pass.json", import.meta.url), "utf8"));
+// The puzzle's example pairs and test inputs, as the seed puts them into meta.
+const puzzleMeta = (() => {
+  const index = JSON.parse(readFileSync(new URL("../../usecase/inputs.json", import.meta.url), "utf8")) as { key: string; train: unknown; test: unknown }[];
+  const e = index.find((x) => x.key === "60c09cac")!;
+  return { train: e.train, test: e.test };
+})();
 
 let mongod: MongoMemoryServer;
 let client: MongoClient;
@@ -51,9 +57,8 @@ async function seedInput(key: string) {
   await c.inputs.insertOne({
     _id: key,
     key,
-    name: "Apple Inc.",
-    meta: { ticker: "AAPL", sector: "Information Technology", filedAt: "2026-07-30" },
-    source: "https://www.sec.gov/",
+    name: key,
+    meta: puzzleMeta,
     text: appleText,
     chars: appleText.length,
     scheduled: true,
@@ -135,8 +140,8 @@ describe("check input and state", () => {
 
 describe("worker iteration", () => {
   it("merges one task: state doc, merged task, one worker-run source with tokens", async () => {
-    await seedInput("aapl-2026-07-30");
-    const taskId = await seedTask("aapl-2026-07-30");
+    await seedInput("60c09cac");
+    const taskId = await seedTask("60c09cac");
 
     const outcome = await iteration(c, "w-1", { ...base, model: submitModel() });
     expect(outcome).toBe("merged");
@@ -145,13 +150,13 @@ describe("worker iteration", () => {
     expect(task?.status).toBe("merged");
     expect(task?.worker).toBeNull();
     expect(task?.gate?.pass).toBe(true);
-    expect((task?.proposal as { revenue: number }).revenue).toBe(109417000000);
+    expect((task?.proposal as { rule: string }).rule).toBe(appleSample.proposal.rule);
 
-    const state = await c.state.findOne({ _id: "aapl-2026-07-30" });
+    const state = await c.state.findOne({ _id: "60c09cac" });
     expect(state?.stateVersion).toBe(1);
     expect(state?.version).toBe(goal.version);
     expect(state?.taskId?.equals(taskId)).toBe(true);
-    expect((state?.data as { dilutedEps: number }).dilutedEps).toBe(2.02);
+    expect((state?.data as { program: string }).program).toBe(appleSample.proposal.program);
 
     const sources = await c.sources.find({}).toArray();
     expect(sources).toHaveLength(1);
@@ -166,13 +171,13 @@ describe("worker iteration", () => {
   });
 
   it("try_submit runs the gate on a draft and records nothing; the run still submits", async () => {
-    await seedInput("aapl-2026-07-30");
-    const taskId = await seedTask("aapl-2026-07-30");
+    await seedInput("60c09cac");
+    const taskId = await seedTask("60c09cac");
     let calls = 0;
     const model = mockModel((o) => {
       calls += 1;
       const key = keyOf(o);
-      if (calls === 1) return toolCallResult("try_submit", { proposal: { ...appleSample.proposal, key, revenue: 999999000000 } });
+      if (calls === 1) return toolCallResult("try_submit", { proposal: { ...appleSample.proposal, key, program: "function transform(grid) { return grid; }" } });
       if (calls === 2) return toolCallResult("try_submit", { proposal: { ...appleSample.proposal, key } });
       return toolCallResult("submit", { proposal: { ...appleSample.proposal, key } });
     });
@@ -190,7 +195,7 @@ describe("worker iteration", () => {
     const dry = steps.filter((s) => s.toolResults[0]?.name === "try_submit").map((s) => s.toolResults[0].output as { pass: boolean; reasons: string[] });
     expect(dry).toHaveLength(2);
     expect(dry[0].pass).toBe(false);
-    expect(dry[0].reasons.join(" ")).toContain("revenue");
+    expect(dry[0].reasons.join(" ")).toContain("pair 1: expected 6x6, got 3x3");
     expect(dry[1].pass).toBe(true);
   });
 
@@ -239,24 +244,24 @@ describe("worker iteration", () => {
   });
 
   it("a block call leaves a blocked task with the reason", async () => {
-    await seedInput("aapl-2026-07-30");
-    const taskId = await seedTask("aapl-2026-07-30");
-    const model = mockModel(() => toolCallResult("block", { reason: "two GAAP revenue figures, restated and original" }));
+    await seedInput("60c09cac");
+    const taskId = await seedTask("60c09cac");
+    const model = mockModel(() => toolCallResult("block", { reason: "three hypotheses tried, no rule fits pair 3" }));
 
     expect(await iteration(c, "w-1", { ...base, model })).toBe("blocked");
     const task = await c.tasks.findOne({ _id: taskId });
     expect(task?.status).toBe("blocked");
-    expect(task?.blockReason).toBe("two GAAP revenue figures, restated and original");
+    expect(task?.blockReason).toBe("three hypotheses tried, no rule fits pair 3");
     expect(task?.worker).toBeNull();
     expect(await c.state.countDocuments({})).toBe(0);
     const source = await c.sources.findOne({ kind: "worker-run" });
-    expect(source?.raw.blockReason).toBe("two GAAP revenue figures, restated and original");
+    expect(source?.raw.blockReason).toBe("three hypotheses tried, no rule fits pair 3");
   });
 
   it("a gate failure reopens with attempt + 1 until MAX_ATTEMPTS, then blocks with the reasons", async () => {
-    await seedInput("aapl-2026-07-30");
-    const taskId = await seedTask("aapl-2026-07-30");
-    const model = submitModel({ revenue: 999999000000 }); // not in any quote
+    await seedInput("60c09cac");
+    const taskId = await seedTask("60c09cac");
+    const model = submitModel({ program: "function transform(grid) { return grid; }" }); // wrong size on every pair
 
     expect(await iteration(c, "w-1", { ...base, model })).toBe("reopened");
     let task = await c.tasks.findOne({ _id: taskId });
@@ -264,7 +269,7 @@ describe("worker iteration", () => {
     expect(task?.attempt).toBe(2);
     expect(task?.worker).toBeNull();
     expect(task?.gate?.pass).toBe(false);
-    expect(task?.gate?.reasons.join(" ")).toContain("revenue");
+    expect(task?.gate?.reasons.join(" ")).toContain("pair 1: expected 6x6, got 3x3");
     expect(await c.state.countDocuments({})).toBe(0);
     expect(await c.sources.countDocuments({ kind: "gate", "raw.gate.pass": false })).toBe(1);
     expect(await c.sources.countDocuments({ kind: "worker-run" })).toBe(1);
@@ -282,28 +287,28 @@ describe("worker iteration", () => {
     task = await c.tasks.findOne({ _id: taskId });
     expect(task?.status).toBe("blocked");
     expect(task?.attempt).toBe(MAX_ATTEMPTS);
-    expect(task?.blockReason).toContain("revenue");
+    expect(task?.blockReason).toContain("pair 1");
     expect(await c.sources.countDocuments({ kind: "gate" })).toBe(MAX_ATTEMPTS);
   });
 
   it("the next attempt sees the refuted rule of the failed proposal and the planner's hint", async () => {
-    await seedInput("aapl-2026-07-30");
-    await seedTask("aapl-2026-07-30");
-    const failing = submitModel({ revenue: 999999000000, rule: "Revenue is the first number on the page." });
+    await seedInput("60c09cac");
+    await seedTask("60c09cac");
+    const failing = submitModel({ program: "function transform(grid) { return grid; }", rule: "The output is the input." });
     expect(await iteration(c, "w-1", { ...base, model: failing })).toBe("reopened");
-    await c.tasks.updateOne({ key: "aapl-2026-07-30" }, { $set: { hint: "read the table, not the prose" } });
+    await c.tasks.updateOne({ key: "60c09cac" }, { $set: { hint: "read the table, not the prose" } });
 
     expect(await iteration(c, "w-2", { ...base, model: submitModel() })).toBe("merged");
     const runs = await c.sources.find({ kind: "worker-run" }).sort({ createdAt: 1 }).toArray();
     expect(runs).toHaveLength(2);
     expect(runs[0].raw.system).not.toContain("refuted:");
-    expect(runs[1].raw.system).toContain("refuted: Revenue is the first number on the page.");
+    expect(runs[1].raw.system).toContain("refuted: The output is the input.");
     expect(runs[1].raw.system).toContain("Hint from the planner: read the table, not the prose");
   });
 
   it("a run that never submits on the last attempt blocks with the run reason", async () => {
-    await seedInput("aapl-2026-07-30");
-    const taskId = await seedTask("aapl-2026-07-30", { attempt: MAX_ATTEMPTS });
+    await seedInput("60c09cac");
+    const taskId = await seedTask("60c09cac", { attempt: MAX_ATTEMPTS });
     const model = mockModel(() => toolCallResult("read_input", { offset: 0 }));
     expect(await iteration(c, "w-1", { ...base, model, maxSteps: 2 })).toBe("blocked");
     const task = await c.tasks.findOne({ _id: taskId });
@@ -312,8 +317,8 @@ describe("worker iteration", () => {
   });
 
   it("a run that never submits or blocks reopens the task", async () => {
-    await seedInput("aapl-2026-07-30");
-    const taskId = await seedTask("aapl-2026-07-30");
+    await seedInput("60c09cac");
+    const taskId = await seedTask("60c09cac");
     const model = mockModel(() => toolCallResult("read_input", { offset: 0 }));
 
     expect(await iteration(c, "w-1", { ...base, model, maxSteps: 3 })).toBe("reopened");
@@ -326,13 +331,13 @@ describe("worker iteration", () => {
   });
 
   it("a lost state race reopens the task with the proposal as hint", async () => {
-    await seedInput("aapl-2026-07-30");
-    const taskId = await seedTask("aapl-2026-07-30");
+    await seedInput("60c09cac");
+    const taskId = await seedTask("60c09cac");
     // Someone merges the key after the worker reads state and before it writes.
     const model = mockModel(async (o) => {
       await c.state.insertOne({
-        _id: "aapl-2026-07-30",
-        key: "aapl-2026-07-30",
+        _id: "60c09cac",
+        key: "60c09cac",
         version: goal.version,
         stateVersion: 1,
         data: { other: true },
@@ -346,8 +351,8 @@ describe("worker iteration", () => {
     const task = await c.tasks.findOne({ _id: taskId });
     expect(task?.status).toBe("open");
     expect(task?.attempt).toBe(1);
-    expect(JSON.parse(task?.hint ?? "null")).toMatchObject({ key: "aapl-2026-07-30", revenue: 109417000000 });
-    const state = await c.state.findOne({ _id: "aapl-2026-07-30" });
+    expect(JSON.parse(task?.hint ?? "null")).toMatchObject({ key: "60c09cac", rule: appleSample.proposal.rule });
+    const state = await c.state.findOne({ _id: "60c09cac" });
     expect(state?.data).toEqual({ other: true });
   });
 
@@ -363,8 +368,8 @@ describe("worker iteration", () => {
   });
 
   it("puts the briefing and its cited records into the context and the run source", async () => {
-    await seedInput("aapl-2026-07-30");
-    await seedTask("aapl-2026-07-30");
+    await seedInput("60c09cac");
+    await seedTask("60c09cac");
     const hit = {
       id: "src-jpm",
       kind: "gate" as const,
@@ -425,12 +430,12 @@ describe("source text", () => {
   });
 
   it("the gate source text carries the refuted rule verbatim", async () => {
-    await seedInput("aapl-2026-07-30");
-    await seedTask("aapl-2026-07-30");
-    const model = submitModel({ revenue: 999999000000, rule: "Revenue is the first number on the page." });
+    await seedInput("60c09cac");
+    await seedTask("60c09cac");
+    const model = submitModel({ program: "function transform(grid) { return grid; }", rule: "The output is the input." });
     expect(await iteration(c, "w-1", { ...base, model })).toBe("reopened");
     const gate = await c.sources.findOne({ kind: "gate" });
-    expect(gate?.text).toContain("rule: Revenue is the first number on the page.");
+    expect(gate?.text).toContain("rule: The output is the input.");
   });
 });
 
@@ -451,16 +456,16 @@ describe("retrieve", () => {
     await c.sources.insertMany([
       mk("jpm-2026-07-15", "gate", "revenue quote missing: banks report net revenue", true),
       mk("nvda-2026-08-27", "worker-run", "fiscal year runs ahead of the calendar", true),
-      mk("aapl-2026-07-30", "worker-run", "own key, must be excluded", true),
+      mk("60c09cac", "worker-run", "own key, must be excluded", true),
       mk("meta-2026-07-29", "worker-run", "no enrichment but mentions revenue", false),
     ]);
     const r = await retrieve(c, "Every value is backed by a verbatim quote containing revenue", {
-      excludeKey: "aapl-2026-07-30",
+      excludeKey: "60c09cac",
       embed: async () => [0.1],
     });
     expect(r.degraded).toBe(true);
     const keys = r.passages.map((p) => p.key);
-    expect(keys).not.toContain("aapl-2026-07-30");
+    expect(keys).not.toContain("60c09cac");
     expect(keys).toContain("jpm-2026-07-15");
     expect(keys).toContain("nvda-2026-08-27");
     expect(keys).toContain("meta-2026-07-29"); // by the text regex

@@ -1,0 +1,12 @@
+{
+  "note": "68b67ca3 with an empty rule, an extra field and a program that names its function solve instead of transform: schema fails, the sandbox reports no transform on every pair.",
+  "input": "68b67ca3",
+  "expect": { "schema": false, "reproduces": false, "general": false },
+  "score": 0,
+  "proposal": {
+    "key": "68b67ca3",
+    "rule": "",
+    "notes": "keep every other row and column",
+    "program": "function solve(grid) {\n  return grid.filter((_, i) => i % 2 === 0).map((row) => row.filter((_, j) => j % 2 === 0));\n}"
+  }
+}

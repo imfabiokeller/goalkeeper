@@ -1,0 +1,12 @@
+{
+  "note": "68b67ca3 solved correctly (every other row and column) but the key is already merged: only schema fails.",
+  "input": "68b67ca3",
+  "merged": ["68b67ca3"],
+  "expect": { "schema": false, "reproduces": true, "general": true },
+  "score": 1,
+  "proposal": {
+    "key": "68b67ca3",
+    "rule": "Keep every other row and column, starting from the first.",
+    "program": "function transform(grid) {\n  return grid.filter((_, i) => i % 2 === 0).map((row) => row.filter((_, j) => j % 2 === 0));\n}"
+  }
+}

@@ -1,7 +1,7 @@
 // npm run seed -- --db live | --db dev  (live: MONGODB_DB, dev: MONGODB_DB_dev)
 //
 // live: the goal at version 1 (only if absent) and every input from
-//       usecase/, the first 200 scheduled. Idempotent.
+//       usecase/, the first 300 scheduled. Idempotent.
 // dev:  drop the database, then fill it with deterministic fakes for the
 //       screen: goal at version 2, inputs, tasks in every status, state,
 //       sources of every kind, questions, a lock and a metrics document.

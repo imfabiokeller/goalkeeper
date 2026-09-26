@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { Input } from "../shared/types.ts";
 
-export const SCHEDULED_COUNT = 200;
+export const SCHEDULED_COUNT = 300;
 
 export const USECASE_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "../../usecase");
 
@@ -17,7 +17,6 @@ const IndexEntry = z
   .object({
     key: z.string().min(1),
     name: z.string().min(1).optional(),
-    company: z.string().min(1).optional(), // display name fallback when name is absent
     file: z.string().min(1),
     source: z.string().optional(),
     chars: z.number().int().optional(),
@@ -28,7 +27,7 @@ export type IndexEntry = z.infer<typeof IndexEntry>;
 const HARNESS_FIELDS = new Set(["key", "name", "file", "source", "chars", "text"]);
 
 export function entryName(e: IndexEntry): string {
-  return e.name ?? e.company ?? e.key;
+  return e.name ?? e.key;
 }
 
 export function entryMeta(e: IndexEntry): Record<string, unknown> {

@@ -23,8 +23,8 @@ const index = new Map((JSON.parse(read("inputs.json")) as IndexEntry[]).map((e) 
 function loadInput(key: string): CheckInput {
   const e = index.get(key);
   if (!e) throw new Error(`no input with key ${key}`);
-  const { key: _key, file, source: _source, chars: _chars, ...meta } = e;
-  return { key, name: typeof meta.company === "string" ? meta.company : key, text: read(file), meta };
+  const { key: _key, name, file, source: _source, chars: _chars, ...meta } = e;
+  return { key, name: typeof name === "string" ? name : key, text: read(file), meta };
 }
 
 function stateFor(sample: Sample): CheckState {
@@ -41,7 +41,7 @@ describe("goalFromLens", () => {
     expect(goal._id).toBe("goal");
     expect(goal.version).toBe(1);
     expect(goal.statement.length).toBeGreaterThan(0);
-    expect(goal.criteria.map((c) => c.check.kind)).toEqual(["grounded", "consistent", "schema"]);
+    expect(goal.criteria.map((c) => c.check.kind)).toEqual(["reproduces", "general", "schema"]);
     expect(goal.criteria.every((c) => c.kind === "all-units")).toBe(true);
     expect(goal.history).toHaveLength(1);
     expect(goal.history[0]).toMatchObject({ version: 1, by: "seed", diff: null });
@@ -66,7 +66,7 @@ describe("gate over usecase/samples", () => {
 });
 
 describe("gate edge cases", () => {
-  const apple: Sample = JSON.parse(read("samples", "01-apple-pass.json"));
+  const apple: Sample = JSON.parse(read("samples", "01-upscale-pass.json"));
   const input = loadInput(apple.input);
   const empty: CheckState = { merged: {} };
 
@@ -87,9 +87,9 @@ describe("gate edge cases", () => {
     expect(result.reasons.join("\n")).toContain("model-review");
   });
 
-  it("runs only the grounded check for a task with criteria [c1]", () => {
+  it("runs only the reproduces check for a task with criteria [c1]", () => {
     const result = gate(goal, { key: apple.input, criteria: ["c1"] }, apple.proposal, input, empty);
-    expect(Object.keys(result.checks)).toEqual(["grounded"]);
+    expect(Object.keys(result.checks)).toEqual(["reproduces"]);
     expect(result.pass).toBe(true);
   });
 
@@ -100,15 +100,26 @@ describe("gate edge cases", () => {
   });
 
   it("fails when the input key is not the task key", () => {
-    const result = gate(goal, { key: "other-2026-01-01", criteria: ["c1"] }, apple.proposal, input, empty);
+    const result = gate(goal, { key: "00000000", criteria: ["c1"] }, apple.proposal, input, empty);
     expect(result.pass).toBe(false);
-    expect(result.reasons.join("\n")).toContain("other-2026-01-01");
+    expect(result.reasons.join("\n")).toContain("00000000");
   });
 
   it("never throws on garbage proposals", () => {
-    for (const p of [null, 42, "x", [], {}]) {
+    for (const p of [null, 42, "x", [], {}, { key: apple.input, rule: "x", program: 42 }]) {
       const result = gate(goal, { key: apple.input, criteria: allCriteria }, p, input, empty);
       expect(result.pass).toBe(false);
     }
+  });
+
+  it("turns a sandbox failure into a reason, not an exception", () => {
+    const hostile = { key: apple.input, rule: "loop forever", program: "function transform(grid) { while (true) {} }" };
+    const result = gate(goal, { key: apple.input, criteria: ["c2"] }, hostile, input, empty);
+    expect(result.pass).toBe(false);
+    expect(result.reasons.join("\n")).toContain("timeout");
+    const nosy = { key: apple.input, rule: "read the answers", program: "function transform(grid) { return require('fs').readdirSync('.') }" };
+    const r2 = gate(goal, { key: apple.input, criteria: ["c1"] }, nosy, input, empty);
+    expect(r2.pass).toBe(false);
+    expect(r2.reasons.join("\n")).toContain("require");
   });
 });

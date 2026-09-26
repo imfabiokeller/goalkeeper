@@ -20,13 +20,14 @@ describe("goal conversion", () => {
     expect(goal.version).toBe(1);
     expect(goal.statement.length).toBeGreaterThan(20);
     expect(goal.criteria.map((c) => c.id)).toEqual(["c1", "c2", "c3"]);
-    expect(goal.criteria.map((c) => c.check.kind)).toEqual(["grounded", "consistent", "schema"]);
+    expect(goal.criteria.map((c) => c.check.kind)).toEqual(["reproduces", "general", "schema"]);
     for (const c of goal.criteria) {
       expect(c.kind).toBe("all-units");
       expect(c.check.params).toEqual({});
     }
     expect(goal.guidelines.length).toBe(5);
-    expect(goal.outOfScope.length).toBe(6);
+    expect(goal.outOfScope.length).toBe(4);
+    expect(goal.proposalShape).toContain('"program"');
     expect(goal.history).toHaveLength(1);
     expect(goal.history[0]).toMatchObject({ version: 1, by: "seed", diff: null });
   });
@@ -35,13 +36,21 @@ describe("goal conversion", () => {
 describe("live input loader", () => {
   it("reads inputs.json and finds every referenced file", async () => {
     const index = await readIndex();
-    expect(index.length).toBeGreaterThanOrEqual(100);
+    expect(index.length).toBe(400);
     for (const e of index) await expect(access(join(USECASE_DIR, e.file))).resolves.toBeUndefined();
     const keys = new Set(index.map((e) => e.key));
     expect(keys.size).toBe(index.length);
+    // every puzzle carries its example pairs and test inputs, never a test output
+    for (const e of index) {
+      expect(/^[0-9a-f]{8}$/.test(e.key)).toBe(true);
+      expect(Array.isArray(e.train) && (e.train as unknown[]).length > 0).toBe(true);
+      const test = e.test as Record<string, unknown>[];
+      expect(test.length).toBeGreaterThan(0);
+      for (const t of test) expect(Object.keys(t)).toEqual(["input"]);
+    }
   });
 
-  it("produces Input documents with the first 200 scheduled", async () => {
+  it("produces Input documents with the first 300 scheduled", async () => {
     const inputs = await loadInputs(USECASE_DIR, NOW);
     const index = await readIndex();
     expect(inputs).toHaveLength(index.length);
@@ -50,15 +59,17 @@ describe("live input loader", () => {
       expect(doc._id).toBe(doc.key);
       expect(doc.key).toBe(index[i]!.key);
       expect(doc.chars).toBe(doc.text.length);
-      expect(doc.text.length).toBeGreaterThan(1000);
+      expect(doc.text.length).toBeGreaterThan(100);
+      expect(doc.text.startsWith("Example 1 input (")).toBe(true);
+      expect(doc.text).toMatch(/Test (\d+ )?input \(/);
       expect(doc.scheduled).toBe(i < SCHEDULED_COUNT);
       expect(doc.scheduledBy).toBe(i < SCHEDULED_COUNT ? "seed" : null);
       expect(doc.createdAt).toEqual(NOW);
       // the harness names the unit; every other index field lands in meta untouched
-      const { key: _key, file: _file, source: _source, chars: _chars, ...rest } = index[i]!;
+      const { key: _key, name: _name, file: _file, source: _source, chars: _chars, ...rest } = index[i]!;
       expect(doc.name).toBe(entryName(index[i]!));
       expect(doc.meta).toEqual(rest);
-      expect(doc).not.toHaveProperty("company");
+      expect(Object.keys(doc.meta)).toEqual(["train", "test"]);
     }
     expect(inputs.filter((d) => d.scheduled)).toHaveLength(SCHEDULED_COUNT);
   }, 60_000);
@@ -66,7 +77,7 @@ describe("live input loader", () => {
 
 describe("dev fakes", () => {
   // The generators only need the metadata, so the tests use short texts
-  // instead of reading 395 press releases.
+  // instead of reading 400 puzzles.
   async function smallInputs() {
     const index = await readIndex();
     return index.map((e, i) =>
@@ -76,7 +87,7 @@ describe("dev fakes", () => {
         name: entryName(e),
         meta: entryMeta(e),
         source: e.source,
-        text: `${entryName(e)} reports quarterly results.`,
+        text: `Example 1 input (3x3):\n0 0 0\n0 5 0\n0 0 0\n\nExample 1 output (3x3):\n5 5 5\n5 5 5\n5 5 5\n\nTest input (3x3):\n0 0 0\n0 3 0\n0 0 0\n`,
         chars: 40,
         scheduled: i < SCHEDULED_COUNT,
         scheduledBy: i < SCHEDULED_COUNT ? "seed" : null,
@@ -106,9 +117,9 @@ describe("dev fakes", () => {
     expect(data.goal.history[1]!.diff).toEqual({ op: "add-guideline", text: data.goal.guidelines.at(-1) });
     expect(data.goal.history[1]!.questionId).toEqual(data.questions[0]!._id);
 
-    // about 500 tasks across every status, attempts 1 to 3, last 90 minutes
-    expect(data.tasks.length).toBeGreaterThan(400);
-    expect(data.tasks.length).toBeLessThan(600);
+    // about 700 tasks across every status, attempts 1 to 3, last 90 minutes
+    expect(data.tasks.length).toBeGreaterThan(500);
+    expect(data.tasks.length).toBeLessThan(900);
     for (const status of TaskStatus.options) expect(data.tasks.some((t) => t.status === status)).toBe(true);
     for (const t of data.tasks) {
       expect(t.attempt).toBeGreaterThanOrEqual(1);
@@ -123,10 +134,10 @@ describe("dev fakes", () => {
     expect(new Set(claimed.map((t) => t.worker))).toEqual(new Set(WORKERS));
     for (const t of claimed) expect(NOW.getTime() - t.heartbeat!.getTime()).toBeLessThan(30_000);
 
-    // merged with proposal and passing gate, blocked with a reason
+    // merged with an ARC proposal and passing gate, blocked with a reason
     const merged = data.tasks.filter((t) => t.status === "merged");
     for (const t of merged) {
-      expect(t.proposal).not.toBeNull();
+      expect(t.proposal).toMatchObject({ key: t.key, rule: expect.any(String), program: expect.stringContaining("function transform(grid)") });
       expect(t.gate?.pass).toBe(true);
     }
     for (const t of data.tasks.filter((t) => t.status === "blocked")) expect(t.blockReason?.length).toBeGreaterThan(20);
@@ -139,6 +150,12 @@ describe("dev fakes", () => {
     expect(new Set(data.state.map((s) => s.key))).toEqual(mergedKeys);
     const taskIds = new Set(data.tasks.map((t) => t._id.toHexString()));
     for (const s of data.state) expect(taskIds.has(s.taskId.toHexString())).toBe(true);
+    // every merged state is scored, some solved, never a test output in it
+    for (const s of data.state) expect([0, 1]).toContain(s.score);
+    expect(data.state.some((s) => s.score === 1)).toBe(true);
+    expect(data.state.some((s) => s.score === 0)).toBe(true);
+    expect(data.metrics.solveRate?.length).toBeGreaterThan(5);
+    expect(data.metrics.totals.solved).toBe(data.state.filter((s) => s.score === 1).length);
 
     // sources of every kind, worker runs with messages and steps, enrichment with 1024 dims
     for (const kind of SourceKind.options) expect(data.sources.some((s) => s.kind === kind)).toBe(true);

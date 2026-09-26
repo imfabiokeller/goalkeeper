@@ -1,89 +1,94 @@
-// Deterministic check functions for the earnings extraction use case.
-// Plain code, no model. Each check takes (proposal, input, state) and
-// returns pass or fail with reasons. Runs on Node 24 with no build step:
+// Deterministic checks for the ARC use case. Plain code, no model. Each
+// check takes (proposal, input, state) and returns pass or fail with
+// reasons that name the pair and the first difference. Programs run only
+// in usecase/sandbox.ts. Runs on Node 24 with no build step:
 //   node usecase/check-samples.ts
 
-export const QUOTED_FIELDS = [
-  "periodEnd",
-  "revenue",
-  "netIncome",
-  "dilutedEps",
-  "revenuePriorYear",
-  "revenueChangePct",
-] as const;
-export type QuotedField = (typeof QUOTED_FIELDS)[number];
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { MAX_PROGRAM_CHARS, runProgram, type Grid } from "./sandbox.ts";
 
 export type Proposal = {
-  key: string;
-  company: string;
-  periodEnd: string; // ISO date, last day of the reported quarter
-  periodLabel: string; // "Q3 FY2026"
-  revenue: number; // whole US dollars
-  netIncome: number | null; // whole US dollars, negative for a loss
-  dilutedEps: number | null; // US dollars per share
-  revenuePriorYear: number | null; // whole US dollars, year-ago quarter
-  revenueChangePct: number | null; // percent, negative for a decline
-  currency: "USD";
-  quotes: Partial<Record<QuotedField, string>>;
+  key: string; // the ARC task id, equals the task key
+  rule: string; // one sentence, the hypothesis in words
+  program: string; // JavaScript defining transform(grid), under 4000 chars
 };
 
+export type Pair = { input: Grid; output: Grid };
+
+// What the gate hands a check: the harness fields plus the index entry's
+// extra fields (meta) spread flat. train and test come from inputs.json.
 export type Input = {
   key: string;
-  company: string;
-  ticker: string;
-  filedAt: string; // ISO date the 8-K was filed
-  text: string; // the press release as plain text
+  name: string;
+  text: string;
+  train: Pair[];
+  test: { input: Grid }[];
+  [extra: string]: unknown;
 };
 
-export type State = { merged: Record<string, Proposal> };
+export type State = { merged: Record<string, unknown> };
 
 export type CheckResult = { pass: boolean; reasons: string[] };
-export type CheckKind = "schema" | "grounded" | "consistent";
+export type CheckKind = "schema" | "reproduces" | "general";
 export type Check = (proposal: unknown, input: Input, state: State) => CheckResult;
+export type ScoreFn = (proposal: unknown, input: Input) => 0 | 1;
 
-const ALLOWED_KEYS = [
-  "key",
-  "company",
-  "periodEnd",
-  "periodLabel",
-  "revenue",
-  "netIncome",
-  "dilutedEps",
-  "revenuePriorYear",
-  "revenueChangePct",
-  "currency",
-  "quotes",
-];
-const MAX_QUOTE_CHARS = 400;
-const MIN_DOLLARS = 1_000_000; // S&P 500 figures below this were left in millions
-const MAX_DAYS_PERIOD_TO_FILING = 120;
+export const CHECK_KINDS: CheckKind[] = ["schema", "reproduces", "general"];
+const ALLOWED_KEYS = ["key", "rule", "program"];
+const MAX_SIDE = 30;
+const DEFINES_TRANSFORM = /(\bfunction\s+transform\s*\(|\b(?:const|let|var)\s+transform\s*=)/;
+
+const ANSWERS_DIR = join(dirname(fileURLToPath(import.meta.url)), "answers");
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
 
-function isValidIsoDate(s: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
-  const d = new Date(s + "T00:00:00Z");
-  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
+function size(g: Grid): string {
+  return `${g.length}x${g[0]?.length ?? 0}`;
 }
 
-function decimals(n: number): number {
-  const s = String(n);
-  const i = s.indexOf(".");
-  return i < 0 ? 0 : s.length - i - 1;
+function isPairList(v: unknown): v is Pair[] {
+  return Array.isArray(v) && v.every((p) => isRecord(p) && Array.isArray(p.input) && Array.isArray(p.output));
 }
 
-// Whitespace, quote and dash variants are the only differences allowed
-// between a quote and the input. Everything else must match exactly.
-export function normalize(s: string): string {
-  return s
-    .replace(/[‘’‚′]/g, "'")
-    .replace(/[“”„″]/g, '"')
-    .replace(/[‐-―−]/g, "-")
-    .replace(/ /g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+// A grid the puzzle accepts: 1 to 30 rows of equal length 1 to 30, every
+// cell an integer 0 to 9. Returns the first problem or null.
+export function gridProblem(v: unknown): string | null {
+  if (!Array.isArray(v)) return `output is not a grid (got ${v === undefined ? "undefined" : typeof v})`;
+  if (v.length < 1 || v.length > MAX_SIDE) return `output has ${v.length} rows, sides must be 1 to ${MAX_SIDE}`;
+  const width = Array.isArray(v[0]) ? v[0].length : -1;
+  for (let i = 0; i < v.length; i++) {
+    const row: unknown = v[i];
+    if (!Array.isArray(row)) return `output row ${i} is not an array`;
+    if (row.length !== width) return `output rows have different lengths (row 0 has ${width}, row ${i} has ${row.length})`;
+    for (let j = 0; j < row.length; j++) {
+      const c: unknown = row[j];
+      if (typeof c !== "number" || !Number.isInteger(c) || c < 0 || c > 9) return `output cell (${i},${j}) is ${JSON.stringify(c)}, cells must be integers 0 to 9`;
+    }
+  }
+  if (width < 1 || width > MAX_SIDE) return `output has ${width} columns, sides must be 1 to ${MAX_SIDE}`;
+  return null;
+}
+
+// The first difference between an output and the expected grid, or null.
+export function firstDifference(got: unknown, expected: Grid): string | null {
+  if (!Array.isArray(got) || !got.every((r) => Array.isArray(r))) return `expected ${size(expected)}, got ${got === undefined ? "undefined" : Array.isArray(got) ? "a flat array" : typeof got}`;
+  const g = got as unknown[][];
+  const gw = g[0]?.length ?? 0;
+  if (g.length !== expected.length || gw !== (expected[0]?.length ?? 0) || g.some((r) => r.length !== gw)) {
+    return `expected ${size(expected)}, got ${g.some((r) => r.length !== gw) ? "ragged rows" : size(g as Grid)}`;
+  }
+  for (let i = 0; i < expected.length; i++) {
+    for (let j = 0; j < expected[i]!.length; j++) {
+      const a = g[i]![j];
+      const b = expected[i]![j];
+      if (a !== b) return `cell (${i},${j}) is ${JSON.stringify(a)}, expected ${b}`;
+    }
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------- schema
@@ -93,240 +98,117 @@ export const schema: Check = (proposal, input, state) => {
   if (!isRecord(proposal)) return { pass: false, reasons: ["proposal is not an object"] };
   const p = proposal;
 
-  for (const k of Object.keys(p)) {
-    if (!ALLOWED_KEYS.includes(k)) reasons.push(`unknown field "${k}"`);
-  }
-  for (const k of ALLOWED_KEYS) {
-    if (!(k in p)) reasons.push(`missing field "${k}" (nullable fields must still be present)`);
-  }
+  for (const k of Object.keys(p)) if (!ALLOWED_KEYS.includes(k)) reasons.push(`unknown field "${k}"; the proposal has exactly key, rule and program`);
+  for (const k of ALLOWED_KEYS) if (!(k in p)) reasons.push(`missing field "${k}"`);
 
-  if (typeof p.key !== "string" || p.key !== input.key) {
-    reasons.push(`key must equal the task key "${input.key}", got ${JSON.stringify(p.key)}`);
-  }
-  if (typeof p.company !== "string" || p.company.trim().length === 0) {
-    reasons.push("company must be a non-empty string");
-  }
-  if (typeof p.periodEnd !== "string" || !isValidIsoDate(p.periodEnd)) {
-    reasons.push(`periodEnd must be an ISO date YYYY-MM-DD, got ${JSON.stringify(p.periodEnd)}`);
-  }
-  if (typeof p.periodLabel !== "string" || !/^Q[1-4] FY\d{4}$/.test(p.periodLabel)) {
-    reasons.push(`periodLabel must look like "Q3 FY2026", got ${JSON.stringify(p.periodLabel)}`);
-  }
-  if (p.currency !== "USD") reasons.push(`currency must be "USD", got ${JSON.stringify(p.currency)}`);
-
-  const dollars = (name: string, v: unknown, nullable: boolean) => {
-    if (v === null) {
-      if (!nullable) reasons.push(`${name} is required`);
-      return;
-    }
-    if (typeof v !== "number" || !Number.isFinite(v)) {
-      reasons.push(`${name} must be a number, got ${JSON.stringify(v)}`);
-      return;
-    }
-    if (!Number.isInteger(v)) reasons.push(`${name} must be whole US dollars (an integer), got ${v}`);
-    if (v !== 0 && Math.abs(v) < MIN_DOLLARS) {
-      reasons.push(`${name} = ${v} is too small for whole dollars; convert millions or thousands to dollars`);
-    }
-  };
-  dollars("revenue", p.revenue, false);
-  dollars("netIncome", p.netIncome, true);
-  dollars("revenuePriorYear", p.revenuePriorYear, true);
-
-  if (p.dilutedEps !== null) {
-    if (typeof p.dilutedEps !== "number" || !Number.isFinite(p.dilutedEps)) {
-      reasons.push(`dilutedEps must be a number or null, got ${JSON.stringify(p.dilutedEps)}`);
-    } else {
-      if (decimals(p.dilutedEps) > 2) reasons.push(`dilutedEps must have at most two decimals, got ${p.dilutedEps}`);
-      if (Math.abs(p.dilutedEps) >= 1000) reasons.push(`dilutedEps = ${p.dilutedEps} is not a per-share figure`);
+  if (typeof p.key !== "string" || p.key !== input.key) reasons.push(`key must equal the task key "${input.key}", got ${JSON.stringify(p.key)}`);
+  if ("rule" in p && (typeof p.rule !== "string" || p.rule.trim().length === 0)) reasons.push("rule must be a non-empty sentence");
+  if ("program" in p) {
+    if (typeof p.program !== "string" || p.program.trim().length === 0) reasons.push("program must be a non-empty string of JavaScript");
+    else {
+      if (p.program.length >= MAX_PROGRAM_CHARS) reasons.push(`program is ${p.program.length} characters; the limit is under ${MAX_PROGRAM_CHARS}`);
+      if (!DEFINES_TRANSFORM.test(p.program)) reasons.push("program does not define transform(grid)");
     }
   }
-  if (p.revenueChangePct !== null) {
-    if (typeof p.revenueChangePct !== "number" || !Number.isFinite(p.revenueChangePct)) {
-      reasons.push(`revenueChangePct must be a number or null, got ${JSON.stringify(p.revenueChangePct)}`);
-    } else if (Math.abs(p.revenueChangePct) > 1000) {
-      reasons.push(`revenueChangePct = ${p.revenueChangePct} is not a percentage`);
-    }
-  }
-
-  if (!isRecord(p.quotes)) {
-    reasons.push("quotes must be an object");
-  } else {
-    for (const [k, v] of Object.entries(p.quotes)) {
-      if (!(QUOTED_FIELDS as readonly string[]).includes(k)) reasons.push(`quotes has unknown key "${k}"`);
-      else if (typeof v !== "string" || v.trim().length === 0) reasons.push(`quotes.${k} must be a non-empty string`);
-      else if (v.length > MAX_QUOTE_CHARS) reasons.push(`quotes.${k} is ${v.length} chars; quote one sentence or table row, at most ${MAX_QUOTE_CHARS}`);
-    }
-  }
-
-  if (typeof p.key === "string" && state.merged[p.key]) {
-    reasons.push(`key "${p.key}" is already merged; a unit is never merged twice`);
-  }
+  if (typeof p.key === "string" && state.merged[p.key]) reasons.push(`key "${p.key}" is already merged; a unit is never merged twice`);
 
   return { pass: reasons.length === 0, reasons };
 };
 
-// -------------------------------------------------------------- grounded
+// ------------------------------------------------------------ reproduces
 
-type Candidate = { value: number; tolerance: number; scale: number };
-
-const SCALE_WORDS: Record<string, number> = {
-  thousand: 1e3,
-  thousands: 1e3,
-  k: 1e3,
-  million: 1e6,
-  millions: 1e6,
-  mm: 1e6,
-  m: 1e6,
-  billion: 1e9,
-  billions: 1e9,
-  bn: 1e9,
-  b: 1e9,
-  trillion: 1e12,
-};
-// Bare numbers in a table row may be stated in dollars, thousands or millions.
-const IMPLIED_SCALES = [1, 1e3, 1e6];
-
-const NUMBER_RE = /\(?-?\$?\s*(\d{1,3}(?:,\d{3})+|\d+)(\.\d+)?\)?(?:\s*(thousands?|millions?|billions?|trillion|bn|mm|[kmb])\b)?/gi;
-
-// Every number in a quote, with the tolerance implied by how it was written
-// ("$109.4 billion" means 109.4e9 give or take 0.05e9).
-export function numbersIn(quote: string): Candidate[] {
-  const out: Candidate[] = [];
-  const q = normalize(quote);
-  for (const m of q.matchAll(NUMBER_RE)) {
-    const whole = m[1].replace(/,/g, "");
-    const frac = m[2] ?? "";
-    let value = Number(whole + frac);
-    if (m[0].startsWith("(") && m[0].includes(")")) value = -value;
-    if (m[0].includes("-")) value = -Math.abs(value);
-    const dec = frac ? frac.length - 1 : 0;
-    const half = 0.5 * Math.pow(10, -dec);
-    const word = m[3]?.toLowerCase();
-    const scales = word ? [SCALE_WORDS[word]] : IMPLIED_SCALES;
-    for (const scale of scales) {
-      out.push({ value: value * scale, tolerance: half * scale + 1e-9, scale });
+export const reproduces: Check = (proposal, input) => {
+  if (!isRecord(proposal)) return { pass: false, reasons: ["proposal is not an object"] };
+  const program = proposal.program;
+  if (typeof program !== "string") return { pass: false, reasons: ["program is not a string"] };
+  if (!isPairList(input.train) || input.train.length === 0) return { pass: false, reasons: ["input has no example pairs"] };
+  const reasons: string[] = [];
+  input.train.forEach((pair, i) => {
+    const r = runProgram(program, pair.input);
+    if (!r.ok) {
+      reasons.push(`pair ${i + 1}: ${r.error}`);
+      return;
     }
-  }
-  return out;
-}
-
-function supports(quote: string, value: number, allowSignFlip: boolean): boolean {
-  return numbersIn(quote).some((c) => {
-    const ok = Math.abs(c.value - value) <= c.tolerance;
-    return ok || (allowSignFlip && Math.abs(Math.abs(c.value) - Math.abs(value)) <= c.tolerance);
+    const diff = firstDifference(r.output, pair.output);
+    if (diff) reasons.push(`pair ${i + 1}: ${diff}`);
   });
-}
-
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-export function dateVariants(iso: string): string[] {
-  const [y, m, d] = iso.split("-").map(Number);
-  const name = MONTHS[m - 1];
-  const abbr = name.slice(0, 3);
-  return [
-    iso,
-    `${name} ${d}, ${y}`,
-    `${name} ${d} ${y}`,
-    `${abbr}. ${d}, ${y}`,
-    `${abbr} ${d}, ${y}`,
-    `${d} ${name} ${y}`,
-    `${m}/${d}/${y}`,
-    `${String(m).padStart(2, "0")}/${String(d).padStart(2, "0")}/${y}`,
-  ];
-}
-
-// "June Quarter 2026" names no day; it grounds periodEnd only as the last
-// day of that month in that year.
-export function monthEndNamed(iso: string, quote: string): boolean {
-  const [y, m, d] = iso.split("-").map(Number);
-  const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
-  if (d !== lastDay) return false;
-  const q = quote.toLowerCase();
-  return q.includes(MONTHS[m - 1].toLowerCase()) && q.includes(String(y));
-}
-
-export const grounded: Check = (proposal, input) => {
-  const reasons: string[] = [];
-  if (!isRecord(proposal)) return { pass: false, reasons: ["proposal is not an object"] };
-  const p = proposal;
-  const quotes = isRecord(p.quotes) ? p.quotes : {};
-  const text = normalize(input.text);
-
-  for (const field of QUOTED_FIELDS) {
-    const value = p[field];
-    if (value === null || value === undefined) continue;
-    const quote = quotes[field];
-    if (typeof quote !== "string" || quote.trim().length === 0) {
-      reasons.push(`${field} = ${JSON.stringify(value)} has no quote; every extracted value carries the sentence it came from`);
-      continue;
-    }
-    const nq = normalize(quote);
-    if (nq.length < 8) {
-      reasons.push(`quotes.${field} is too short to identify a passage: ${JSON.stringify(quote)}`);
-      continue;
-    }
-    if (!text.includes(nq)) {
-      reasons.push(`quotes.${field} does not appear verbatim in the input: ${JSON.stringify(quote)}`);
-      continue;
-    }
-    if (field === "periodEnd") {
-      if (typeof value !== "string" || !isValidIsoDate(value)) continue; // schema reports this
-      const hit = dateVariants(value).some((v) => nq.toLowerCase().includes(v.toLowerCase()));
-      if (!hit && !monthEndNamed(value, nq)) {
-        reasons.push(`periodEnd ${value} is not the date written in its quote: ${JSON.stringify(quote)}`);
-      }
-      continue;
-    }
-    if (typeof value !== "number") continue; // schema reports this
-    const signFlip = field === "revenueChangePct" || field === "netIncome";
-    if (!supports(quote, value, signFlip)) {
-      reasons.push(`${field} = ${value} does not match any number in its quote: ${JSON.stringify(quote)}`);
-    }
-  }
   return { pass: reasons.length === 0, reasons };
 };
 
-// ------------------------------------------------------------ consistent
+// --------------------------------------------------------------- general
 
-export const consistent: Check = (proposal, input) => {
-  const reasons: string[] = [];
+// Every way an example output could be pasted into a program: as JSON, as
+// digit rows, as the digits alone. Whitespace is ignored on both sides.
+function literalForms(g: Grid): string[] {
+  const rows = g.map((r) => r.join(""));
+  const forms = [JSON.stringify(g), rows.join(","), rows.join("|"), rows.join(";")];
+  if (g.length * (g[0]?.length ?? 0) >= 6) forms.push(rows.join(""));
+  return forms.map((s) => s.replace(/\s+/g, ""));
+}
+
+export function hardcodedOutputs(program: string, train: Pair[]): number[] {
+  const flat = program.replace(/\s+/g, "");
+  const hits: number[] = [];
+  train.forEach((pair, i) => {
+    if (literalForms(pair.output).some((f) => flat.includes(f))) hits.push(i + 1);
+  });
+  return hits;
+}
+
+export const general: Check = (proposal, input) => {
   if (!isRecord(proposal)) return { pass: false, reasons: ["proposal is not an object"] };
-  const p = proposal;
-  const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
-  const revenue = num(p.revenue);
-  const netIncome = num(p.netIncome);
-  const eps = num(p.dilutedEps);
-  const prior = num(p.revenuePriorYear);
-  const pct = num(p.revenueChangePct);
-
-  if (revenue !== null && netIncome !== null && netIncome > revenue) {
-    reasons.push(`netIncome ${netIncome} exceeds revenue ${revenue}; check the scale of each figure`);
-  }
-  if (netIncome !== null && eps !== null && netIncome !== 0 && eps !== 0 && Math.sign(netIncome) !== Math.sign(eps)) {
-    reasons.push(`netIncome ${netIncome} and dilutedEps ${eps} have different signs`);
-  }
-  if (revenue !== null && prior !== null && pct !== null) {
-    const computed = (revenue / prior - 1) * 100;
-    if (Math.abs(computed - pct) > 1.0) {
-      reasons.push(`revenue ${revenue} vs revenuePriorYear ${prior} is ${computed.toFixed(1)}%, but revenueChangePct says ${pct}%`);
+  const program = proposal.program;
+  if (typeof program !== "string") return { pass: false, reasons: ["program is not a string"] };
+  const reasons: string[] = [];
+  const train = isPairList(input.train) ? input.train : [];
+  for (const i of hardcodedOutputs(program, train)) reasons.push(`pair ${i}: the program contains the example output as a literal; state the rule instead of memorizing`);
+  const tests = Array.isArray(input.test) ? input.test : [];
+  if (tests.length === 0) reasons.push("input has no test input");
+  tests.forEach((t, i) => {
+    const label = tests.length > 1 ? `test input ${i + 1}` : "test input";
+    if (!isRecord(t) || !Array.isArray(t.input)) {
+      reasons.push(`${label}: missing`);
+      return;
     }
-  }
-  if (typeof p.periodEnd === "string" && isValidIsoDate(p.periodEnd) && isValidIsoDate(input.filedAt)) {
-    const days = (Date.parse(input.filedAt) - Date.parse(p.periodEnd)) / 86_400_000;
-    if (days < 0) reasons.push(`periodEnd ${p.periodEnd} is after the filing date ${input.filedAt}`);
-    else if (days > MAX_DAYS_PERIOD_TO_FILING) {
-      reasons.push(`periodEnd ${p.periodEnd} is ${Math.round(days)} days before the filing date ${input.filedAt}; this release reports a more recent quarter`);
+    const r = runProgram(program, t.input as Grid);
+    if (!r.ok) {
+      reasons.push(`${label}: ${r.error}`);
+      return;
     }
-  }
+    const problem = gridProblem(r.output);
+    if (problem) reasons.push(`${label}: ${problem}`);
+  });
   return { pass: reasons.length === 0, reasons };
 };
 
-export const checks: Record<CheckKind, Check> = { schema, grounded, consistent };
+// ----------------------------------------------------------------- score
+
+// The hidden metric: the program on every test input against
+// usecase/answers/<key>.json. Read here and nowhere else. Never throws.
+export const score: ScoreFn = (proposal, input) => {
+  try {
+    if (!isRecord(proposal) || typeof proposal.program !== "string") return 0;
+    if (!/^[a-z0-9]+$/i.test(input.key)) return 0;
+    const answers = JSON.parse(readFileSync(join(ANSWERS_DIR, `${input.key}.json`), "utf8")) as { outputs: Grid[] };
+    const tests = Array.isArray(input.test) ? input.test : [];
+    if (!Array.isArray(answers.outputs) || answers.outputs.length !== tests.length || tests.length === 0) return 0;
+    for (let i = 0; i < tests.length; i++) {
+      const r = runProgram(proposal.program, tests[i]!.input);
+      if (!r.ok) return 0;
+      if (firstDifference(r.output, answers.outputs[i]!) !== null) return 0;
+    }
+    return 1;
+  } catch {
+    return 0;
+  }
+};
+
+export const checks: Record<CheckKind, Check> = { schema, reproduces, general };
 
 export function runAll(proposal: unknown, input: Input, state: State): Record<CheckKind, CheckResult> {
   return {
     schema: schema(proposal, input, state),
-    grounded: grounded(proposal, input, state),
-    consistent: consistent(proposal, input, state),
+    reproduces: reproduces(proposal, input, state),
+    general: general(proposal, input, state),
   };
 }

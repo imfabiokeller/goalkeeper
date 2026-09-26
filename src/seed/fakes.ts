@@ -20,7 +20,7 @@ import {
   type Tokens,
 } from "../shared/types.ts";
 import type { z } from "zod";
-import { MetricsMinute } from "../shared/types.ts";
+import { MetricsMinute, SolveBucket } from "../shared/types.ts";
 
 type Minute = z.infer<typeof MetricsMinute>;
 import { rng, type Rng } from "./rng.ts";
@@ -38,57 +38,101 @@ export type DevData = {
 
 export const WORKERS = Array.from({ length: 20 }, (_, i) => `w-${String(i + 1).padStart(2, "0")}`);
 export const CRITERIA = ["c1", "c2", "c3"];
-export const CHECKS = ["grounded", "consistent", "schema"] as const;
+export const CHECKS = ["reproduces", "general", "schema"] as const;
 
 const MINUTE = 60_000;
 
-export const APPROVED_GUIDELINE = "Banks report net revenue; take that as revenue.";
-export const REJECTED_GUIDELINE = "When diluted EPS is missing, take basic EPS and quote it.";
-export const OPEN_GUIDELINE =
-  "When a release gives restated and originally reported figures, take the restated one and quote the restatement note.";
+export const APPROVED_GUIDELINE = "When every example output has the same size, build a grid of that size first and fill it; size failures are the most common failure.";
+export const REJECTED_GUIDELINE = "After three failed hypotheses, submit the program that reproduces the most pairs.";
+export const OPEN_GUIDELINE = "Try the eight flips and rotations before writing a bespoke rule; a quarter of the puzzles are symmetries of the input.";
 
 const V1_BLOCK_REASONS = [
-  "Release reports net revenue and total net revenue for a bank; the guidelines do not say which one is revenue",
-  "No total revenue line: the release gives net interest income and noninterest income only",
-  "Revenue is stated as managed net revenue and reported net revenue; guideline says ask, no ask available",
-  "The income statement table has net revenue only and the narrative calls it revenue; unclear which figure the goal wants",
+  "Three hypotheses tried (mirror, crop to bounding box, recolor by count); every output size differs from the input and no rule fits all pairs",
+  "Output size varies per pair (3x3, 5x5, 4x4) and does not follow from any object count in the input; size rule unclear",
+  "Pairs 1 and 2 fit a flood fill of enclosed regions, pair 3 does not; no single rule found in three hypotheses",
+  "Output size is 1x1 in every pair but the color is neither the most nor the least frequent; three hypotheses failed",
 ];
 
 const V2_BLOCK_REASONS = [
-  "Release gives restated and originally reported net income; guideline says ask, no ask available",
-  "No diluted EPS in the release, only basic EPS and adjusted diluted EPS",
-  "The release covers a fiscal year, not a quarter; no quarterly revenue figure",
-  "Two GAAP revenue figures for the quarter (revised on page 3); guideline says ask, no ask available",
-  "Press release text is truncated before the income statement; net income cannot be quoted",
+  "Rule needs object tracking across a 30x30 grid; three hypotheses (gravity, component sort, symmetry completion) all fail pair 2",
+  "Every hypothesis reproduces the size but the cell rule depends on a diagonal pattern not stated in any example",
+  "Program times out on the test input at 1 s; the flood fill over 900 cells recurses too deep",
+  "Pairs disagree: the same input pattern maps to different colors in pair 1 and pair 3; three hypotheses tried",
+  "The test input has a color that appears in no example; no rule covers it after three hypotheses",
 ];
 
 const PARK_REASONS = [
-  "Ranking companies is out of scope: any ranking, comparison or investment opinion",
-  "Shopify is not in the input folder; companies without a press release are out of scope",
-  "Guidance for next quarter is out of scope",
-  "Operating margin is a non-GAAP ratio; out of scope",
-  "Request does not name a company or a field: nothing to schedule",
-  "Dividends and buybacks are balance sheet items; out of scope",
+  "Using a frontier model is out of scope: only cheap open-weight models on the allowed list",
+  "ARC-AGI-2 puzzles are outside the loaded set; out of scope",
+  "Revealing a test output is out of scope: the hidden answer never reaches a worker or the screen",
+  "Ranking workers or models is out of scope",
+  "Request names no puzzle in the loaded set: nothing to schedule",
+  "Changing how puzzles are scored is out of scope",
 ];
 
 const CROWD_REQUESTS: { text: string; outcome: "task" | "recheck" | "proposal" | "parked"; reason: string }[] = [
-  { text: "add Nvidia", outcome: "task", reason: "nvda-2026-08-26 is in the inputs and not merged; queued with priority" },
-  { text: "do the banks next", outcome: "task", reason: "12 Financials units in the reserve; queued with priority" },
-  { text: "add every Health Care company", outcome: "task", reason: "18 Health Care units in the reserve; queued with priority" },
-  { text: "add Tesla and Netflix", outcome: "task", reason: "two units in the reserve; queued with priority" },
-  { text: "can you add the utilities", outcome: "task", reason: "9 Utilities units in the reserve; queued with priority" },
-  { text: "Apple's net income looks wrong, check it again", outcome: "recheck", reason: "aapl-2026-07-30 is merged; recheck queued" },
-  { text: "recheck JPMorgan, growth is off", outcome: "recheck", reason: "jpm-2026-07-14 is merged; recheck queued" },
-  { text: "Meta EPS is 6.18 not 6.81", outcome: "recheck", reason: "meta-2026-07-29 is merged; recheck queued" },
-  { text: "also capture operating income", outcome: "proposal", reason: "new field needs a goal change; proposed to the inbox" },
-  { text: "use basic EPS when diluted is missing", outcome: "proposal", reason: "guideline change; proposed to the inbox" },
-  { text: "which company had the best quarter", outcome: "parked", reason: PARK_REASONS[0]! },
-  { text: "add Shopify", outcome: "parked", reason: PARK_REASONS[1]! },
-  { text: "capture guidance for next quarter", outcome: "parked", reason: PARK_REASONS[2]! },
-  { text: "is Apple a buy", outcome: "parked", reason: PARK_REASONS[0]! },
+  { text: "add puzzle 0a1d4ef5", outcome: "task", reason: "0a1d4ef5 is in the reserve and not merged; queued with priority" },
+  { text: "do the small puzzles next", outcome: "task", reason: "14 puzzles under 500 characters in the reserve; queued with priority" },
+  { text: "try the ones with 3x3 outputs", outcome: "task", reason: "9 puzzles with 3x3 outputs in the reserve; queued with priority" },
+  { text: "add 833dafe3 and 2072aba6", outcome: "task", reason: "two puzzles in the reserve; queued with priority" },
+  { text: "can you queue the symmetry puzzles", outcome: "task", reason: "11 puzzles with mirrored outputs in the reserve; queued with priority" },
+  { text: "60c09cac looks hardcoded, check it again", outcome: "recheck", reason: "60c09cac is merged; recheck queued" },
+  { text: "recheck 66e6c45b, the program only handles 4x4", outcome: "recheck", reason: "66e6c45b is merged; recheck queued" },
+  { text: "00576224 passes the examples but the test input has a new color", outcome: "recheck", reason: "00576224 is merged; recheck queued" },
+  { text: "always check output size first", outcome: "proposal", reason: "guideline change; proposed to the inbox" },
+  { text: "submit the best partial program after three tries", outcome: "proposal", reason: "guideline change; proposed to the inbox" },
+  { text: "use GPT for the hard ones", outcome: "parked", reason: PARK_REASONS[0]! },
+  { text: "solve ARC-2", outcome: "parked", reason: PARK_REASONS[1]! },
+  { text: "show me the answer for 66e6c45b", outcome: "parked", reason: PARK_REASONS[2]! },
+  { text: "which worker is best", outcome: "parked", reason: PARK_REASONS[3]! },
 ];
 
-const UNHANDLED_REQUESTS = ["add Broadcom", "rank by growth", "do the energy companies"];
+const UNHANDLED_REQUESTS = ["add 4cd1b7b2", "rank puzzles by difficulty", "do the 30x30 ones"];
+
+// Rule and program pairs a worker could plausibly submit. The rule is what
+// the library indexes; the program is real JavaScript in the sandbox shape.
+const PROGRAMS: { rule: string; program: string; query: string }[] = [
+  {
+    rule: "Mirror the grid left to right.",
+    program: "function transform(grid) {\n  return grid.map((row) => [...row].reverse());\n}",
+    query: "mirror flip horizontal",
+  },
+  {
+    rule: "Scale the grid up by two: every cell becomes a 2x2 block of its color.",
+    program: "function transform(grid) {\n  const out = [];\n  for (const row of grid) {\n    const r = row.flatMap((c) => [c, c]);\n    out.push(r, [...r]);\n  }\n  return out;\n}",
+    query: "upscale block size doubles",
+  },
+  {
+    rule: "Keep every other row and column, starting from the first.",
+    program: "function transform(grid) {\n  return grid.filter((_, i) => i % 2 === 0).map((row) => row.filter((_, j) => j % 2 === 0));\n}",
+    query: "downsample half size",
+  },
+  {
+    rule: "Tile the input three by three, flipping the middle band left to right.",
+    program: "function transform(grid) {\n  const flipped = grid.map((row) => [...row].reverse());\n  const band = (g) => g.map((row) => [...row, ...row, ...row]);\n  return [...band(grid), ...band(flipped), ...band(grid)];\n}",
+    query: "tile repeat pattern alternating",
+  },
+  {
+    rule: "Crop to the bounding box of the non-black cells.",
+    program: "function transform(grid) {\n  let r0 = grid.length, r1 = -1, c0 = grid[0].length, c1 = -1;\n  grid.forEach((row, i) => row.forEach((c, j) => { if (c) { r0 = Math.min(r0, i); r1 = Math.max(r1, i); c0 = Math.min(c0, j); c1 = Math.max(c1, j); } }));\n  return grid.slice(r0, r1 + 1).map((row) => row.slice(c0, c1 + 1));\n}",
+    query: "bounding box crop object",
+  },
+  {
+    rule: "Swap the two most frequent non-black colors.",
+    program: "function transform(grid) {\n  const count = new Map();\n  for (const row of grid) for (const c of row) if (c) count.set(c, (count.get(c) || 0) + 1);\n  const [a, b] = [...count.entries()].sort((x, y) => y[1] - x[1]).map((e) => e[0]);\n  return grid.map((row) => row.map((c) => (c === a ? b : c === b ? a : c)));\n}",
+    query: "swap colors recolor",
+  },
+  {
+    rule: "Fill every enclosed black region with the color of its border.",
+    program: "function transform(grid) {\n  const h = grid.length, w = grid[0].length;\n  const out = grid.map((row) => [...row]);\n  const seen = grid.map((row) => row.map(() => false));\n  const fill = (i, j) => {\n    const stack = [[i, j]]; const cells = []; let border = 0; let open = false;\n    while (stack.length) {\n      const [y, x] = stack.pop();\n      if (y < 0 || x < 0 || y >= h || x >= w) { open = true; continue; }\n      if (seen[y][x]) continue;\n      if (grid[y][x]) { border = grid[y][x]; continue; }\n      seen[y][x] = true; cells.push([y, x]);\n      stack.push([y + 1, x], [y - 1, x], [y, x + 1], [y, x - 1]);\n    }\n    if (!open) for (const [y, x] of cells) out[y][x] = border;\n  };\n  for (let i = 0; i < h; i++) for (let j = 0; j < w; j++) if (!grid[i][j] && !seen[i][j]) fill(i, j);\n  return out;\n}",
+    query: "flood fill enclosed region border color",
+  },
+  {
+    rule: "Rotate the grid a quarter turn clockwise.",
+    program: "function transform(grid) {\n  const h = grid.length, w = grid[0].length;\n  const out = [];\n  for (let j = 0; j < w; j++) { const row = []; for (let i = h - 1; i >= 0; i--) row.push(grid[i][j]); out.push(row); }\n  return out;\n}",
+    query: "rotate quarter turn",
+  },
+];
 
 // ------------------------------------------------------------ helpers
 
@@ -96,18 +140,6 @@ function oid(r: Rng, at: Date): ObjectId {
   // Timestamp prefix so ids sort with creation time, random tail from the PRNG.
   const secs = Math.floor(at.getTime() / 1000).toString(16).padStart(8, "0");
   return new ObjectId(secs + r.hex(16));
-}
-
-function fmtMillions(n: number): string {
-  return Math.round(Math.abs(n) / 1e6).toLocaleString("en-US");
-}
-
-function lastDayOfMonth(y: number, m: number): Date {
-  return new Date(Date.UTC(y, m + 1, 0));
-}
-
-function iso(d: Date): string {
-  return d.toISOString().slice(0, 10);
 }
 
 function embedding(r: Rng): number[] {
@@ -127,61 +159,27 @@ function tokens(r: Rng, kind: "run" | "gate" | "planner" | "small"): Tokens {
 
 export type Proposal = {
   key: string;
-  company: string;
-  periodEnd: string;
-  periodLabel: string;
-  revenue: number;
-  netIncome: number | null;
-  dilutedEps: number | null;
-  revenuePriorYear: number | null;
-  revenueChangePct: number | null;
-  currency: "USD";
-  quotes: Record<string, string>;
+  rule: string;
+  program: string;
   [extra: string]: unknown;
 };
 
-// A plausible passing proposal for a unit, shaped like usecase/samples/01
-// and 02 with the numbers varied per key.
+type Grid = number[][];
+
+function pairs(input: Input): { input: Grid; output: Grid }[] {
+  const train = input.meta.train;
+  return Array.isArray(train) ? (train as { input: Grid; output: Grid }[]) : [];
+}
+
+function sizeOf(g: Grid | undefined): string {
+  return g ? `${g.length}x${g[0]?.length ?? 0}` : "3x3";
+}
+
+// A plausible passing proposal for a puzzle, shaped like usecase/samples/01
+// and 02: one of the stock rules, picked per key.
 export function fakeProposal(r: Rng, input: Input): Proposal {
-  const filedAt = typeof input.meta.filedAt === "string" ? input.meta.filedAt : "2026-08-01";
-  const filed = new Date(filedAt + "T00:00:00Z");
-  const end = lastDayOfMonth(filed.getUTCFullYear(), filed.getUTCMonth() - 1 - (r.chance(0.2) ? 1 : 0));
-  const q = ((end.getUTCMonth() / 3) | 0) + 1;
-  const fy = end.getUTCFullYear() + (r.chance(0.15) ? 1 : 0);
-  const revenue = r.int(900, 120_000) * 1e6;
-  const pct = r.int(-12, 45);
-  const prior = Math.round(revenue / (1 + pct / 100) / 1e6) * 1e6;
-  const margin = r.next() * 0.35 - 0.03;
-  const netIncome = Math.round((revenue * margin) / 1e6) * 1e6;
-  const eps = Math.round((netIncome / 1e9) * r.int(2, 30)) / 100 || 0.01;
-  const rev = fmtMillions(revenue);
-  const pri = fmtMillions(prior);
-  const ni = netIncome < 0 ? `(${fmtMillions(netIncome)})` : fmtMillions(netIncome);
-  const style = r.pick(["narrative", "table", "mixed"] as const);
-  const tableRow = (label: string, a: string, b: string) => `${label} | $ | ${a} | $ | ${b}`;
-  return {
-    key: input.key,
-    company: input.name,
-    periodEnd: iso(end),
-    periodLabel: `Q${q} FY${fy}`,
-    revenue,
-    netIncome,
-    dilutedEps: eps,
-    revenuePriorYear: prior,
-    revenueChangePct: pct,
-    currency: "USD",
-    quotes: {
-      periodEnd: `today announced financial results for its fiscal ${fy} ${["first", "second", "third", "fourth"][q - 1]} quarter ended ${end.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" })}`,
-      revenue:
-        style === "narrative"
-          ? `${input.name} posted quarterly revenue of $${(revenue / 1e9).toFixed(1)} billion, ${pct >= 0 ? "up" : "down"} ${Math.abs(pct)} percent year over year`
-          : tableRow("Total revenue", rev, pri),
-      netIncome: style === "table" ? tableRow("Net income", ni, fmtMillions(netIncome * 0.9)) : `Net income was $${(Math.abs(netIncome) / 1e9).toFixed(1)} billion`,
-      dilutedEps: style === "table" ? tableRow("Diluted earnings per share", eps.toFixed(2), (eps * 0.9).toFixed(2)) : `Diluted earnings per share was $${eps.toFixed(2)}`,
-      revenuePriorYear: tableRow("Total revenue", rev, pri),
-      revenueChangePct: `Revenue of $${(revenue / 1e9).toFixed(1)} billion, ${pct >= 0 ? "up" : "down"} ${Math.abs(pct)}% from a year ago`,
-    },
-  };
+  const t = r.pick(PROGRAMS);
+  return { key: input.key, rule: t.rule, program: t.program };
 }
 
 // A proposal that fails one named check, with the reasons the gate would give.
@@ -191,42 +189,41 @@ export function fakeFailingProposal(
   check: (typeof CHECKS)[number],
 ): { proposal: Proposal; reasons: string[] } {
   const p = fakeProposal(r, input);
-  if (check === "grounded") {
-    const eps = p.dilutedEps ?? 1;
-    const digits = eps.toFixed(2).replace(".", "");
-    const swapped = Number(`${digits[0]}.${digits[2]}${digits[1]}`);
-    p.dilutedEps = swapped;
-    p.quotes.periodEnd = `${p.company} reported financial results for the quarter ended ${p.periodEnd}`;
-    return {
-      proposal: p,
-      reasons: [
-        `dilutedEps ${swapped}: the quote "${p.quotes.dilutedEps}" contains ${eps.toFixed(2)}, not ${swapped}`,
-        `periodEnd ${p.periodEnd}: quote not found verbatim in the input (paraphrase)`,
-      ],
-    };
+  const train = pairs(input);
+  if (check === "reproduces") {
+    const n = Math.max(1, train.length);
+    const pair = r.int(1, n);
+    const expected = train[pair - 1]?.output;
+    const got = train[pair - 1]?.input;
+    const sizeFail = r.chance(0.6) && sizeOf(expected) !== sizeOf(got);
+    const reasons = sizeFail
+      ? [`pair ${pair}: expected ${sizeOf(expected)}, got ${sizeOf(got)}`]
+      : [`pair ${pair}: cell (${r.int(0, 4)},${r.int(0, 4)}) is ${r.int(1, 9)}, expected ${r.int(0, 9)}`];
+    if (r.chance(0.4) && n > 1) reasons.push(`pair ${(pair % n) + 1}: cell (${r.int(0, 4)},${r.int(0, 4)}) is ${r.int(1, 9)}, expected 0`);
+    return { proposal: p, reasons };
   }
-  if (check === "consistent") {
-    const stated = (p.revenueChangePct ?? 0) + r.int(8, 25);
-    p.revenueChangePct = stated;
-    p.quotes.revenueChangePct = `Net income was $${((p.netIncome ?? 0) / 1e9).toFixed(1)} billion, up ${stated}%`;
-    const implied = Math.round(((p.revenue / (p.revenuePriorYear ?? p.revenue)) - 1) * 100);
-    return {
-      proposal: p,
-      reasons: [`revenueChangePct ${stated}: revenue ${p.revenue} over revenuePriorYear ${p.revenuePriorYear} implies ${implied}, more than one point off`],
-    };
+  if (check === "general") {
+    if (r.chance(0.5)) {
+      const literal = JSON.stringify(train[0]?.output ?? [[0, 0], [0, 0]]);
+      p.rule = "Look the answer up from the examples.";
+      p.program = `function transform(grid) {\n  const known = { "${train.length}": ${literal} };\n  return known[String(grid.length)] || grid;\n}`;
+      return { proposal: p, reasons: [`pair 1: the program contains the example output as a literal; state the rule instead of memorizing`] };
+    }
+    p.program = "function transform(grid) {\n  const out = grid.map((row) => [...row]);\n  let i = 0;\n  while (i < grid.length) { if (grid[i].some((c) => c === 5)) i = 0; else i++; }\n  return out;\n}";
+    return { proposal: p, reasons: [`test input: timeout: program ran longer than 1000 ms`] };
   }
-  const millions = Math.round((p.netIncome ?? 0) / 1e6);
-  p.netIncome = millions;
-  p.periodLabel = p.periodLabel.replace(/Q(\d) FY(\d{2})(\d{2})/, "$1Q$3");
-  p.operatingIncome = Math.round(p.revenue * 0.2);
-  return {
-    proposal: p,
-    reasons: [
-      `netIncome ${millions}: below 1000000, amount was left in millions`,
-      `periodLabel "${p.periodLabel}": expected "Q[1-4] FY<year>"`,
-      `operatingIncome: field not in the proposal shape`,
-    ],
-  };
+  const kind = r.pick(["notransform", "extra", "long"] as const);
+  if (kind === "notransform") {
+    p.program = p.program.replace("function transform", "function solve");
+    return { proposal: p, reasons: ["program does not define transform(grid)"] };
+  }
+  if (kind === "extra") {
+    p.notes = "tried mirror first";
+    return { proposal: p, reasons: [`unknown field "notes"; the proposal has exactly key, rule and program`] };
+  }
+  const chars = r.int(4000, 5200);
+  p.program = p.program + "\n" + "// ".repeat(Math.ceil((chars - p.program.length) / 3));
+  return { proposal: p, reasons: [`program is ${p.program.length} characters; the limit is under 4000`] };
 }
 
 function gatePass(): GateResult {
@@ -260,7 +257,7 @@ function workerRun(
 ): Source {
   const steps = r.int(6, 19);
   const seconds = r.int(20, 75);
-  const tools = ["read_input", "read_state", "search_library", "read_input", "read_input", "search_library"];
+  const tools = ["read_input", "read_state", "search_library", "try_submit", "try_submit", "search_library"];
   const stepList = Array.from({ length: steps }, (_, i) => {
     const last = i === steps - 1;
     const tool = last ? (outcome === "blocked" ? "block" : "submit") : r.pick(tools);
@@ -270,15 +267,17 @@ function workerRun(
         : tool === "read_state"
           ? { key: task.key }
           : tool === "search_library"
-            ? { query: r.pick(["net revenue bank", "fiscal year ahead of calendar", "diluted EPS table row", "restated figures"]) }
-            : tool === "block"
-              ? { reason }
-              : { proposal };
+            ? { query: r.pick(PROGRAMS).query }
+            : tool === "try_submit"
+              ? { proposal: proposal ?? fakeProposal(r, { key: task.key, meta: {} } as Input) }
+              : tool === "block"
+                ? { reason }
+                : { proposal };
     return { step: i + 1, tool, args, resultChars: tool === "submit" || tool === "block" ? 0 : r.int(400, 6000), tokens: r.int(300, 1500) };
   });
   type Message = { role: string; content: string; name?: string; toolCalls?: { name: string; args: unknown }[] };
   const messages: Message[] = [
-    { role: "system", content: "You extract headline quarterly results from an earnings press release. Follow the goal and the guidelines exactly." },
+    { role: "system", content: "You solve an ARC puzzle by writing transform(grid) that reproduces every example pair. Follow the goal and the guidelines exactly." },
     { role: "user", content: `Task ${task._id.toHexString()} on ${task.key} under goal version ${task.version}. Criteria ${task.criteria.join(", ")}.` },
     ...stepList.flatMap((s) => [
       { role: "assistant", content: "", toolCalls: [{ name: s.tool, args: s.args }] },
@@ -288,9 +287,9 @@ function workerRun(
   const text = messages.map((m) => `${m.role}: ${m.content || JSON.stringify(m.toolCalls)}`).join("\n");
   const gist =
     outcome === "merged"
-      ? `${worker} extracted ${task.key} in ${steps} steps, revenue ${proposal ? (proposal.revenue / 1e9).toFixed(1) : "?"}B, submitted`
+      ? `${worker} solved ${task.key} in ${steps} steps: ${proposal ? proposal.rule : "?"}`
       : outcome === "failed"
-        ? `${worker} submitted a proposal for ${task.key} after ${steps} steps; it did not pass the gate`
+        ? `${worker} submitted a program for ${task.key} after ${steps} steps; it did not pass the gate`
         : `${worker} blocked ${task.key} after ${steps} steps: ${reason}`;
   return Source.parse({
     _id: oid(r, at),
@@ -300,7 +299,7 @@ function workerRun(
     version: task.version,
     raw: { worker, attempt: task.attempt, seconds, steps: stepList, messages, proposal, outcome, reason },
     text,
-    enrichment: enrich(r, gist, [task.key], proposal ? Object.keys(proposal.quotes) : [], ["worker-run", outcome, ...(reason && /bank|net revenue/i.test(reason) ? ["bank"] : [])]),
+    enrichment: enrich(r, gist, [task.key], proposal ? ["rule", "program"] : [], ["worker-run", outcome, ...(reason && /size/i.test(reason) ? ["size"] : [])]),
     tokens: tokens(r, "run"),
     createdAt: at,
   });
@@ -309,7 +308,7 @@ function workerRun(
 function gateSource(r: Rng, task: Task, at: Date, proposal: Proposal, gate: GateResult): Source {
   const failed = Object.entries(gate.checks).filter(([, c]) => !c.pass).map(([k]) => k);
   const gist = gate.pass
-    ? `gate passed ${task.key}: grounded, consistent, schema`
+    ? `gate passed ${task.key}: reproduces, general, schema`
     : `gate failed ${task.key} on ${failed.join(", ")}: ${gate.reasons[0]}`;
   return Source.parse({
     _id: oid(r, at),
@@ -499,6 +498,10 @@ export function makeDevData(inputs: Input[], lens: unknown, now: Date = new Date
         data: proposal,
         taskId: task._id,
         mergedAt: task.updatedAt,
+        // The planner's score step: a merged program solves the hidden test
+        // about half the time at version 2, a third at version 1.
+        score: r.chance(task.version === 2 ? 0.5 : 0.33) ? 1 : 0,
+        scoredAt: new Date(task.updatedAt.getTime() + 1_500),
       }),
     );
   };
@@ -544,7 +547,7 @@ export function makeDevData(inputs: Input[], lens: unknown, now: Date = new Date
   const parkedRequests = crowdSources.filter((s) => s.outcome === "parked");
 
   // Phase v1: one task per scheduled key, created in the first minutes,
-  // finished before the version bump. Some blocked with bank reasons and
+  // finished before the version bump. Some blocked with size reasons and
   // were reopened by applyDiff at version 2.
   const v1Blocked: { _id: ObjectId; blockReason: string | null }[] = [];
   const mergedAtV1: Input[] = [];
@@ -632,15 +635,15 @@ export function makeDevData(inputs: Input[], lens: unknown, now: Date = new Date
   }
 
   // Questions: the approved one made version 2; one rejected; one open.
-  const bankEvidence = v1Blocked.filter((x) => /bank|net revenue|net interest/i.test(x.blockReason ?? "")).map((x) => x._id);
+  const sizeEvidence = v1Blocked.filter((x) => /size/i.test(x.blockReason ?? "")).map((x) => x._id);
   const v2Blocked = tasks.filter((x) => x.status === "blocked" && x.version === 2).map((x) => x._id);
   const questions: Question[] = [
     Question.parse({
       _id: oid(r, t(41)),
       kind: "approval",
-      question: `${bankEvidence.length} tasks are blocked because banks report net revenue, not total revenue. Adopt this guideline?`,
+      question: `${sizeEvidence.length} tasks are blocked because the output size differs from the input and no size rule was found. Adopt this guideline?`,
       proposedDiff: { op: "add-guideline", text: APPROVED_GUIDELINE },
-      evidence: bankEvidence,
+      evidence: sizeEvidence,
       status: "approved",
       answeredBy: "fabio",
       answeredAt: v2At,
@@ -649,7 +652,7 @@ export function makeDevData(inputs: Input[], lens: unknown, now: Date = new Date
     Question.parse({
       _id: oid(r, t(24)),
       kind: "approval",
-      question: `${Math.min(7, v2Blocked.length)} tasks are blocked because the release has no diluted EPS. Adopt this guideline?`,
+      question: `${Math.min(7, v2Blocked.length)} tasks are blocked after three failed hypotheses. Adopt this guideline?`,
       proposedDiff: { op: "add-guideline", text: REJECTED_GUIDELINE },
       evidence: v2Blocked.slice(0, 7),
       status: "rejected",
@@ -660,7 +663,7 @@ export function makeDevData(inputs: Input[], lens: unknown, now: Date = new Date
     Question.parse({
       _id: oid(r, t(6)),
       kind: "approval",
-      question: `${Math.min(9, v2Blocked.length)} tasks are blocked because the release gives restated and original figures. Adopt this guideline?`,
+      question: `${Math.min(9, v2Blocked.length)} tasks are blocked on puzzles whose output is a symmetry of the input. Adopt this guideline?`,
       proposedDiff: { op: "add-guideline", text: OPEN_GUIDELINE },
       evidence: v2Blocked.slice(7, 16),
       status: "open",
@@ -779,6 +782,17 @@ function makeMetrics(tasks: Task[], sources: Source[], state: State[], goal: Goa
     perMinute.push({ minute: new Date(start), merged, failed, blocked, firstTryPass, tokens: tokensSum, contextAvg, secondsMedian });
   }
   const last20 = runs.slice(-20);
+  // The solve-rate curve: one bucket per 15 minutes over the window.
+  const BUCKET = 15 * MINUTE;
+  const firstBucket = Math.floor((now.getTime() - 90 * MINUTE) / BUCKET) * BUCKET;
+  const solveRate: z.infer<typeof SolveBucket>[] = [];
+  for (let b = firstBucket; b <= now.getTime(); b += BUCKET) {
+    const end = b + BUCKET;
+    const attempted = new Set(tasks.filter((x) => x.createdAt.getTime() < end).map((x) => x.key)).size;
+    const mergedKeys = new Set(state.filter((s) => s.mergedAt.getTime() < end).map((s) => s.key));
+    const solved = state.filter((s) => s.score === 1 && (s.scoredAt ?? s.mergedAt).getTime() < end).length;
+    solveRate.push({ bucket: new Date(b), attempted, merged: mergedKeys.size, solved });
+  }
   const perCriterion = Object.fromEntries(
     CRITERIA.map((c) => [c, { done: state.filter((s) => s.version === 2 && tasks.some((t) => t._id.equals(s.taskId) && t.createdBy === "planner")).length, total: scheduledCount }]),
   );
@@ -793,7 +807,11 @@ function makeMetrics(tasks: Task[], sources: Source[], state: State[], goal: Goa
       libraryTokens: sources.reduce((a, s) => a + s.tokens.in + s.tokens.out, 0),
       librarySources: sources.length,
       contextLast20Avg: last20.length ? Math.round(last20.reduce((a, s) => a + s.tokens.in, 0) / last20.length) : null,
+      solved: state.filter((s) => s.score === 1).length,
+      attempted: new Set(tasks.map((x) => x.key)).size,
+      stepsMedian: median(runs.map((s) => (s.raw.steps as unknown[]).length)),
     },
+    solveRate,
     perCriterion,
     versions: [
       { version: 1, at: t0 },

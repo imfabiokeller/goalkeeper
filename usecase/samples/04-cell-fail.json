@@ -1,0 +1,11 @@
+{
+  "note": "00576224 tiled 3x3 without flipping the middle band: the size is right, reproduces fails on the first wrong cell, pair 1 cell (2,0) is 8, expected 6.",
+  "input": "00576224",
+  "expect": { "schema": true, "reproduces": false, "general": true },
+  "score": 0,
+  "proposal": {
+    "key": "00576224",
+    "rule": "Tile the 2x2 input three times in each direction.",
+    "program": "function transform(grid) {\n  const out = [];\n  for (let i = 0; i < 3; i++) for (const row of grid) out.push([...row, ...row, ...row]);\n  return out;\n}"
+  }
+}
