@@ -11,7 +11,8 @@
     "indexes": "node --env-file=.env src/shared/indexes.ts",
     "seed": "node --env-file=.env src/seed/index.ts",
     "worker": "node --env-file=.env src/worker/index.ts",
-    "invariants": "node --env-file=.env src/planner/invariants.ts"
+    "invariants": "node --env-file=.env src/planner/invariants.ts",
+    "baseline": "node --env-file=.env usecase/tools/baseline.ts"
   },
   "dependencies": {
     "@openrouter/ai-sdk-provider": "^3.1.0",

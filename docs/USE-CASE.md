@@ -103,6 +103,26 @@ Tools: `read_input`, `read_state`, `search_library`, `try_submit(proposal)`
 (runs the gate, returns the reasons, records nothing), `submit`, `block`.
 Step budget 20.
 
+## Baseline
+
+`npm run baseline` (`usecase/tools/baseline.ts`) measures the same model
+with no harness: one `generateText` call per puzzle, no tools, no
+`try_submit`, no retries, no library, no hint. The model gets the puzzle
+text a worker reads and must answer with a rule and a `transform(grid)`
+program in one shot. The answer goes through the same three checks and the
+same `score()` as a worker's proposal. Puzzles are picked
+deterministically (sorted keys, every k-th of the 400; `--keys` overrides),
+`--attempts 2` takes two independent samples per puzzle and also reports
+`solveRateAt2` (ARC's official two-attempt rule). The report
+(`usecase/tools/baseline.json`) lists per puzzle the gate verdict, the
+first failing reason, the score, tokens and seconds, and totals with the
+cost. A provider error counts as a miss and never stops the run.
+
+The `solveRate` total is the dashed horizontal line "same model, single
+shot" on the stage view's curve: the harness's curve at 17:00 is quoted
+against it. Same model, same gate, same puzzles; the only difference is
+the harness.
+
 ## The generic brief (what any use case must provide)
 
 Inputs as plain text, one per independent unit with a key; a proposal
