@@ -19,7 +19,10 @@ export function lessonsTitle(card: StageCard, precedents: Precedent[]): { title:
   return { title: "Lessons pulled from the library", note: "from other agents", arriving: false };
 }
 
-export function Card({ card: raw, unit, control, onOpen, flash }: { card: StageCard; unit: UnitPayload | null; control: ControlResult | undefined; onOpen: () => void; flash: "solved" | "retry" | null }) {
+export function Card({ card: raw, unit, control, onOpen, flash, box = 109 }: { card: StageCard; unit: UnitPayload | null; control: ControlResult | undefined; onOpen: () => void; flash: "solved" | "retry" | null; box?: number }) {
+  // The grid box scales with the card width; cells keep the mockup's ratio.
+  const maxCell = Math.round((box * 17) / 109);
+  const thumbCell = box > 130 ? 7 : 5;
   // The attempt on screen counts gate verdicts, not claims.
   const card: StageCard = { ...raw, attempt: attemptNumber(unit?.tasks, raw.attempt) };
   const t = TONES[card.status];
@@ -75,18 +78,18 @@ export function Card({ card: raw, unit, control, onOpen, flash }: { card: StageC
       <div style={{ display: "grid", gridTemplateColumns: "1fr 20px 1fr 1fr", gap: 10, alignItems: "end" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
           <span style={LABEL}>example</span>
-          {show ? <Cells grid={show.input} /> : <NoGrid text="" />}
+          {show ? <Cells grid={show.input} box={box} max={maxCell} /> : <NoGrid box={box} text="" />}
         </div>
-        <div style={{ marginBottom: 48 }}>
+        <div style={{ marginBottom: Math.round(box * 0.44) }}>
           <Arrow />
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
           <span style={LABEL}>expected</span>
-          {show ? <Cells grid={show.expected} /> : <NoGrid text="" />}
+          {show ? <Cells grid={show.expected} box={box} max={maxCell} /> : <NoGrid box={box} text="" />}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
           <span style={LABEL}>agent’s try</span>
-          {show?.actual ? <Cells grid={show.actual} diff={show.expected} /> : <NoGrid text={card.status === "stopped" ? "stopped" : "no program yet"} />}
+          {show?.actual ? <Cells grid={show.actual} diff={show.expected} box={box} max={maxCell} /> : <NoGrid box={box} text={card.status === "stopped" ? "stopped" : "no program yet"} />}
         </div>
       </div>
 
@@ -113,7 +116,7 @@ export function Card({ card: raw, unit, control, onOpen, flash }: { card: StageC
         <div style={{ display: "flex", gap: 12, minHeight: 30 }}>
           {tiles.map((l, j) => (
             <div key={j} className={lessons.arriving ? "arrive" : undefined} style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 9, animationDelay: `${j * 0.6}s` }}>
-              <Thumb grid={l.grid} tone={l.worked ? "#1d3527" : "#2e2612"} />
+              <Thumb grid={l.grid} cell={thumbCell} tone={l.worked ? "#1d3527" : "#2e2612"} />
               <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, overflow: "hidden" }}>
                 <span style={{ fontSize: 12, color: l.worked ? "#6fbf8e" : "#d9b45a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{l.kind}</span>
                 <span style={{ fontSize: 12, color: "var(--fg-dimmer)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{l.from}</span>
@@ -123,7 +126,7 @@ export function Card({ card: raw, unit, control, onOpen, flash }: { card: StageC
           {!tiles.length && lessons.arriving
             ? [0, 1, 2].map((j) => (
                 <div key={j} className="arrive" style={{ flex: 1, display: "flex", alignItems: "center", gap: 9, animationDelay: `${j * 0.6}s` }}>
-                  <Thumb grid={null} tone="#1c1c22" />
+                  <Thumb grid={null} cell={thumbCell} tone="#1c1c22" />
                   <span style={{ fontSize: 12, color: "var(--fg-dimmer)" }}>searching</span>
                 </div>
               ))

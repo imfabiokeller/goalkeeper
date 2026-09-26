@@ -19,6 +19,8 @@ import { useScale } from "../lib/useScale.ts";
 
 const ART_W = 1920;
 const ART_H = 1080;
+const DEFAULT_SLOTS = 8;
+const CARD_BOX = 109; // the mockup's grid box at 4 cards per row
 
 type BaselineTotals = { solveRate?: number; solveRateAt2?: number | null; n?: number; model?: string } | null;
 
@@ -119,6 +121,12 @@ function Stage() {
   }, [toast]);
 
   const fit = useScale(ART_W, ART_H);
+  // One card slot per worker, two rows; recent solved and retrying cards
+  // fill only the slots no live card holds. 8 workers give the mockup's
+  // 4x2; 6 give 3x2 with the grids scaled up in the same proportion.
+  const slotCount = Math.max(2, s?.workers.target || DEFAULT_SLOTS);
+  const cols = Math.ceil(slotCount / 2);
+  const box = Math.round(CARD_BOX * Math.min(1.6, 4 / cols));
   const totals = s?.metrics.totals ?? null;
   const solved = s?.counts.solved ?? 0;
   const alive = s?.workers.alive ?? 0;
@@ -163,10 +171,10 @@ function Stage() {
         </div>
       </header>
 
-      <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gridTemplateRows: "repeat(2, minmax(0, 1fr))", gap: 18 }}>
-        {cards.slice(0, 8).map((c, i) =>
+      <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: "repeat(2, minmax(0, 1fr))", gap: 18 }}>
+        {cards.slice(0, slotCount).map((c, i) =>
           c ? (
-            <Card key={c.key} card={c} unit={units[c.key] ?? null} control={controls[c.key]} onOpen={() => open(c.key)} flash={flashes[c.key] ?? null} />
+            <Card key={c.key} card={c} unit={units[c.key] ?? null} control={controls[c.key]} onOpen={() => open(c.key)} flash={flashes[c.key] ?? null} box={box} />
           ) : (
             <div key={`empty-${i}`} style={{ border: "1px dashed #1a1a1a", borderRadius: 14 }} />
           ),
