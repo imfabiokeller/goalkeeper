@@ -90,13 +90,17 @@ kill-and-resume. No other code.
 ```js
 { _id: "<key>", key: "<key>", version: 2, stateVersion: 3,
   data: { ...the proposal as submitted... },
+  score: null | 0 | 1,               // the use case's hidden metric, written by the planner, never by a worker
+  scoredAt: null | ISODate,
   taskId: ObjectId, mergedAt }
 ```
 
 Upsert with a precondition on `stateVersion` (or on absence). A lost race
-puts the task back to `open` with the proposal as `hint`. A `state` doc at
-an older `version` than the goal does not count as done, so the planner
-re-emits the key; that is the whole drift correction.
+puts the task back to `open` with the proposal as `hint`. `score` is set
+by the planner's score step from `usecase/answers/`; a `0` reopens the
+key once with a hint, and the solve rate on screen is `score: 1` over
+keys attempted. A guideline approval does not invalidate merged state
+(the criteria did not change); a criteria change would, by re-seeding.
 
 ## sources (the library: raw, append-only)
 
@@ -163,7 +167,9 @@ Created by `plan()`. Resolved by a human on `/inbox`. Approve calls
 
 - `locks`: `{ _id: "planner", holder: "w-07", until: ISODate }`. Acquired
   with `findOneAndUpdate({ _id: "planner", until: { $lt: now } })`.
-- `metrics`: `{ _id: "metrics", at, perMinute: [{ minute, merged, failed, blocked, firstTryPass, tokens, contextAvg }], totals: {...}, versions: [{ version, at }], lessons }`.
+- `metrics`: `{ _id: "metrics", at, perMinute: [{ minute, merged, failed, blocked, firstTryPass, tokens, contextAvg }], solveRate: [{ bucket, attempted, merged, solved }], totals: { ..., solved, attempted, stepsMedian }, versions: [{ version, at }], lessons }`.
+  `solveRate` is one entry per 15-minute bucket, from `state.score`; it is
+  the curve on the stage view.
   Refreshed by `plan()`. The screen reads this instead of scanning sources.
 
   `metrics.lessons` is the lessons digest, derived counts from the raw
@@ -201,9 +207,12 @@ two things: a `crowd-request` source from `/request` and an approval from
 1. `seed` writes `goal` version 1 and `inputs`.
 2. An idle worker takes the planner lock, `plan()` emits tasks for
    scheduled inputs with no state at version 1.
-3. A worker claims, assembles context, runs the AI SDK loop, gates its own
-   proposal, writes state or reopens or blocks, writes one `worker-run`
-   source with enrichment, exits the iteration.
+3. A worker claims, assembles context, runs the AI SDK loop (with
+   `try_submit` for dry runs of the gate), gates its own proposal, writes
+   state or reopens or blocks (after `MAX_ATTEMPTS`), writes one
+   `worker-run` source with enrichment, exits the iteration.
+3a. The next `plan()` scores the new state with `usecase/answers/` and
+   writes `state.score`; a `0` reopens the key once.
 4. A crowd request lands as a `crowd-request` source; the next `plan()`
    classifies it: task, recheck, proposal, or parked with a reason.
 5. Blocked tasks pile up; `plan()` proposes a guideline as a question.

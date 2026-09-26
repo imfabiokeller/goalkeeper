@@ -1,119 +1,122 @@
-# Use case brief: what the harness needs from a demo use case
+# Use case: ARC puzzles, decided at 14:00
 
-For whoever designs the demo use case. The harness is being built
-independently of the use case; anything that fits this brief will run on it.
+The use case is ARC-AGI-1, evaluation set. Decided at 14:00 on hackathon
+day after the storm-tracker and BIRD candidates were rejected (the storm
+reads as a dashboard and its agents only extract; BIRD has no gate that
+can verify correctness without the hidden answer). This file is the filled
+brief; the generic requirements a use case must meet are at the bottom.
 
-## Pure state, in one paragraph
+## The idea in one line
 
-Workers do not write code, open browsers or touch a repo. A worker reads an
-input document, reads the current state for its unit of work, and submits a
-proposal: a JSON object. A deterministic check function (plain code, no
-model) decides pass or fail. Pass means the proposal becomes the new state
-and lands in the ledger. Fail means the reasons are written to the library,
-and the next worker on that unit sees them in its briefing. Everything a
-worker is shown and everything it does is stored raw in the library.
+Each unit is one ARC puzzle: a few example grid pairs and one test input.
+A worker writes a JavaScript program `transform(grid)` that reproduces
+every example pair, verified by running it. The hidden test answer never
+reaches a worker; the planner scores merged programs against it, and that
+solve rate is the hard metric on screen. Every solved program and every
+refuted hypothesis lands in the library, so later workers on similar
+puzzles retrieve them. The claim: the same cheap open-weight model solves
+more puzzles at 17:00 than at 14:00 because the context it gets is better,
+not because the model changed.
 
-## The five things a use case must provide
+## Why this use case
 
-1. **Inputs.** A set of documents that are already plain text (or trivially
-   converted before 10:30). One input per unit of work. 100 to 500 of them.
-   Public, no login, no PDFs that need OCR.
-2. **Units of work with a key.** One string key per unit, for example
-   `acme-2024`. Units must be independent: finishing one never requires
-   another to be done first. This is what lets 20 workers run in parallel
-   without conflicts.
-3. **A proposal shape.** The JSON a worker submits, with every field named
-   and typed. Small: five to fifteen fields. Every extracted value should
-   carry the exact quote from the input it came from.
-4. **Check functions.** For each criterion in the goal, a rule a programmer
-   can write in under an hour that takes (proposal, input, current state)
-   and returns pass or fail with reasons. No "does this look right". Good
-   kinds of checks:
-   - the quote appears word for word in the input
-   - the number in the proposal matches the number in the quote
-   - required fields are present and typed correctly
-   - values are consistent with each other (parts add up to the total)
-   - units normalize to the expected unit
-   - the unit is not a duplicate of one already in state
-5. **A goal document.** Human-written, version 1:
-   - goal: two sentences
-   - criteria: three at most, each pointing at one check kind
-   - guidelines: five lines of taste ("prefer the audited figure", "never
-     estimate a missing number")
-   - out of scope: what gets parked, with the reason shown on screen
+- The agent is needed: write, run, read the diff, fix. No script does it.
+- The gate verifies correctness without the answer: the example pairs are
+  in the puzzle. No model judges a model.
+- Cheap models start low on ARC, so a climb is visible.
+- Statement two, word for word: learns from hard metric signals to
+  complete traditionally difficult tasks.
+- Data: public JSON, Apache 2.0, independent units, no rights issue.
+
+## 1. Inputs
+
+- Source: `arcprize/ARC-AGI-2` is out (cheap models score near zero);
+  `fchollet/ARC-AGI` `data/evaluation/`, 400 puzzles, Apache 2.0. The
+  evaluation set, not training, so the contamination question has an
+  answer.
+- `usecase/inputs/<key>.txt`: the puzzle as text. Each example pair as two
+  grids of digits, one row per line, then the test input. A grid is at most
+  30x30, so a puzzle is under 6k characters and fits one `read_input` page.
+- `usecase/inputs.json`: `key` (the ARC task id, like `0a1d4ef5`), `name`,
+  `file`, `chars`, `meta: { train: [...], test: [{ input }] }` (the grids as
+  JSON, for the checks).
+- `usecase/answers/<key>.json`: the test outputs. Read only by
+  `score()`. Never loaded into `inputs`, never in a worker context, never
+  in the library.
+- 400 loaded, 300 scheduled, 100 in reserve for the crowd.
+
+## 2. Units of work
+
+Key: the ARC task id. Every puzzle is independent.
+
+## 3. Proposal shape
+
+```json
+{
+  "key": "0a1d4ef5",
+  "rule": "Fill every enclosed region with the color of its border.",
+  "program": "function transform(grid) { ... return out; }"
+}
+```
+
+`rule` is one sentence, the hypothesis in words; it is what the library
+indexes and what refutations are pinned as. `program` is JavaScript, no
+imports, no I/O, under 4000 characters, defines `transform(grid)` that
+takes and returns a 2D array of integers 0 to 9.
+
+## 4. Checks (`usecase/checks.ts`)
+
+- `schema`: exactly the three fields, `rule` non-empty, `program` under
+  4000 characters and defines `transform`, key matches, not already merged.
+- `reproduces`: the program run on every example input equals the example
+  output, cell for cell. Reasons name the pair and the first difference:
+  `pair 2: expected 3x3, got 9x9`, `pair 1: cell (4,2) is 5, expected 0`.
+- `general`: the program run on the test input returns a valid grid (1 to
+  30 per side, integers 0 to 9) within the time limit, and the program text
+  contains no example output as a literal (no memorizing).
+
+Programs run in a sandbox (`usecase/sandbox.ts`): a child process started
+synchronously with an empty environment, Node's `--permission` flag (no
+file system, no network, no child processes), a 1 s wall clock, an output
+cap, `Math.random` and `Date` stubbed. Synchronous and deterministic, so
+the gate contract holds. Not `node:vm` in the worker process: that is no
+security boundary and the worker holds the keys.
+
+`score(proposal, input)` (optional export, not a check): runs the merged
+program on the test input and compares with `usecase/answers/`. Returns
+`1` or `0`. The planner calls it at merge time; the worker never can.
+
+## 5. Goal document, version 1
+
+See [GOAL.md](GOAL.md) and `usecase/lens.json`.
 
 ## What a worker gets
 
-- The goal document, pinned, always.
-- Its task: key, criterion, check kind.
-- The last failures on this key, pinned.
-- A short briefing synthesized from retrieved library passages: precedents
-  from other units ("unit X reports its figures in thousands").
-- Five tools: `read_input`, `read_state`, `search_library`, and one of
-  `submit(proposal)` or `block(reason)`.
-- A step budget of about 20 tool calls.
+The goal (pinned), the puzzle text, the current state (none, or the
+program that passed the examples but not the test, with the message "too
+specific"), the last failures on this key including the rules already
+tried marked refuted, the lessons digest, and a briefing from the library:
+programs and rules from similar solved puzzles, helpers other workers
+wrote.
 
-Context per request stays under 20k tokens no matter how big the library
-gets. That flat number is one of the two counters on screen.
+Tools: `read_input`, `read_state`, `search_library`, `try_submit(proposal)`
+(runs the gate, returns the reasons, records nothing), `submit`, `block`.
+Step budget 20.
 
-## What a worker returns
+## What the crowd can request
 
-Exactly one of:
+- A puzzle from the reserve: becomes a priority task.
+- A recheck of a solved puzzle ("that program is hardcoded"): priority
+  task, old state stays until the new one merges.
+- A guideline ("always check output size first"): proposal in the inbox.
+- Anything else ("use GPT", "solve ARC-2", "show me the answer"): parked
+  with the reason.
 
-- `submit(proposal)`: goes to the gate.
-- `block(reason)`: the task is marked blocked with the reason. Workers
-  never ask humans. When several tasks block for the same reason, the
-  planner proposes one guideline; a human approves it on the inbox, the
-  goal version bumps, and all of them reopen.
+## The generic brief (what any use case must provide)
 
-## What the screen sees (task statuses)
-
-`open` -> `claimed` (worker heartbeating) -> `merged`, or back to `open`
-once on a failed check, then `blocked`.
-
-A killed worker's task goes back to `open` after 30 seconds without a
-heartbeat. Nothing else happens; another worker claims it.
-
-## Crowd requests, four paths
-
-Every request from the QR page ends on exactly one path, visibly:
-
-- a unit from the unscheduled pool: becomes a priority task ("do Siemens
-  2023")
-- a doubt about a merged record: becomes a recheck task ("that Shell
-  number looks wrong")
-- a guideline: becomes a proposal in the inbox, only a human can approve
-  it ("always take the upper bound")
-- anything else, including new fields and judgment calls: parked with a
-  reason on screen ("also capture water usage", "rank the greenest")
-
-Design the use case so that all four paths are easy to trigger from the
-audience. Load more inputs than you schedule, so "add X" is real work.
-
-## Checklist for a candidate use case
-
-Answer yes to all of these or pick another one.
-
-- Are the inputs text already, public, and can we have 100+ by 10:30?
-- Is each unit independent of every other unit?
-- Can every criterion be checked by a rule with no judgment call?
-- Does a failed check produce a reason that would help the next attempt?
-- Does one unit take a model about 20 to 60 seconds, not ten minutes?
-- Would a non-engineer understand one merged unit on screen in two seconds
-  (a number plus the highlighted sentence it came from, for example)?
-- Can the audience suggest additions that hit all three crowd paths?
-- Does the result matter to someone outside the room?
-
-## Status: not decided
-
-The use case is not decided. `usecase/` holds a development fixture in the
-exact shape the harness reads (`lens.json`, `inputs.json`, `inputs/`,
-`checks.ts`, `samples/`, see [GOAL.md](GOAL.md)) so the harness can be
-built and tested now. The fixture is not the use case. Any use case must
-ship in that shape.
-
-## What to hand back
-
-A filled version of the five things above, plus the 100+ inputs as text
-files in a folder, plus five sample proposals written by hand so the check
-functions can be tested before any worker runs.
+Inputs as plain text, one per independent unit with a key; a proposal
+shape of a few typed fields; a check per criterion that a programmer
+writes in under an hour with no judgment call; a goal document with at
+most three criteria; a folder `usecase/` in the shape described in
+[GOAL.md](GOAL.md). A different use case in that shape replaces this one
+by re-seeding; nothing in `src/` is domain-specific.

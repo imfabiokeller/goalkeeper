@@ -44,9 +44,12 @@ by a deterministic gate, so nothing drifts.
   emit tasks for undone units, classify crowd requests, propose a
   guideline when tasks block for the same reason. It cannot edit the goal.
 - The gate is a registry of pure check functions. No model judges a model.
-- The work product is a JSON proposal per unit (pure state), not code. The
-  harness is work-agnostic; a coding worker is the same loop with a
-  worktree and a test check.
+- The work product is a JSON proposal per unit (pure state). Today the
+  units are ARC puzzles and the proposal carries a program that the gate
+  runs in a sandbox against the example pairs; the hidden test answer is
+  scored by the planner and never shown to a worker. The harness is
+  work-agnostic; a coding worker is the same loop with a worktree and a
+  test check.
 - Humans approve goal changes and submit requests. Nothing else.
 
 ## Docs
@@ -59,9 +62,10 @@ by a deterministic gate, so nothing drifts.
 - [docs/PLANNER.md](docs/PLANNER.md): the planner steps, classification,
   proposals, applyDiff.
 - [docs/GOAL.md](docs/GOAL.md): the goal document, version 1.
-- [docs/USE-CASE.md](docs/USE-CASE.md): what a demo use case must provide.
-- `usecase/`: the interface a use case ships in (see docs/GOAL.md). The
-  use case is not decided; the folder holds a development fixture.
+- [docs/USE-CASE.md](docs/USE-CASE.md): the use case (ARC puzzles) and
+  what any use case must provide.
+- `usecase/`: the use case in the shape the harness reads (see
+  docs/GOAL.md).
 - [docs/SCREEN-BRIEF.md](docs/SCREEN-BRIEF.md): the design brief for every
   screen.
 - [docs/DAY-PLAN.md](docs/DAY-PLAN.md): the rules and the cuts.
@@ -92,6 +96,6 @@ directly (polling, since Vercel functions cannot hold change streams open).
 ## Built during the event
 
 Everything in `src/`. Atlas, the Vercel AI SDK, OpenRouter, Voyage,
-Next.js and Docker are reused as is.
+Next.js, Docker and the ARC-AGI-1 data (Apache 2.0) are reused as is.
 
 License: Apache 2.0.

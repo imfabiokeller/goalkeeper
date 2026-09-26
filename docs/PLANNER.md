@@ -8,12 +8,20 @@ decides, writes, exits. Holds nothing between runs.
 
 1. **Reaper.** `claimed` tasks with `heartbeat < now - 30 s` go back to
    `open`, `attempt + 1`.
-2. **Emit.** For every `inputs` doc with `scheduled: true`, no `state` at
-   `goal.version`, and no task in `open`, `claimed` or `blocked`: insert
+2. **Emit.** For every `inputs` doc with `scheduled: true`, no `state`
+   (any version: a guideline approval never redoes solved keys), and no
+   task in `open`, `claimed` or `blocked`: insert
    one task with all criteria, `version: goal.version`,
    `createdBy: "planner"`. Stop when open tasks reach three times
    `WORKERS_TARGET`. Pure query, no model, cannot drift.
-3. **Crowd.** For each `crowd-request` source with `handled: false`, one
+3. **Score.** For every `state` with `score: null`: run the use case's
+   `score(proposal, input)` (reads `usecase/answers/`, nothing else in the
+   system may), write `score` and `scoredAt` in one `findOneAndUpdate`
+   with `{ score: null }` as the precondition. On `0`, if the key has no
+   prior `score: 0`, insert a priority task with the hint "passed the
+   examples, wrong on the test: the rule is too specific". Never the
+   answer.
+3b. **Crowd.** For each `crowd-request` source with `handled: false`, one
    model call (AI SDK `generateText` with `Output.object`, no tools, no
    history) with the goal, the request, the list of unscheduled input
    keys, and the current state keys. Output, validated with Zod:
@@ -37,6 +45,10 @@ decides, writes, exits. Holds nothing between runs.
    the model groups them in one call) and no `open` question cites any of
    them: one model call produces a guideline text. Insert a question
    `{ kind: "approval", proposedDiff: { op: "add-guideline", text }, evidence: [taskIds] }`.
+4b. **Reopen.** When the merged count crosses a multiple of 20, `blocked`
+   tasks whose `updatedAt` is older than that 20th merge go back to
+   `open` with `attempt: 1` and the block reason kept as `hint`. The
+   library grew; the puzzle may be solvable now.
 5. **Metrics.** One aggregation over `sources` and `tasks` bucketed with
    `$dateTrunc` per minute, plus the lessons digest (`computeLessons`:
    pass rate, fails per check kind, top gate reasons and block reasons
@@ -76,6 +88,7 @@ applyDiff(questionId, by):
 
 ## What the planner cannot do
 
-Edit the goal. Emit a task for a key that is busy. Merge anything. Talk to
+Edit the goal. Emit a task for a key that is busy. Merge anything. Show a
+worker a test answer. Talk to
 a worker. Remember the previous run except through the `planner-turn`
 sources it can read.

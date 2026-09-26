@@ -77,8 +77,11 @@ Two kinds of criteria: `all-units` (done when every unit passes) and
 `metric` (a measure over the whole state with a direction and a target;
 in the schema, not used today).
 
-**Learning from evaluation.** The gate's verdicts are the only signal
-about quality; no model grades itself. They flow back into the next
+**Learning from evaluation.** The gate's verdicts are the signal a worker
+can see; no model grades itself. A second signal the worker cannot see,
+the use case's hidden `score()` (for ARC, the test output), is run by the
+planner on merged state and drives the metric on screen. The split keeps
+the metric honest: nothing is graded on the answer it is scored against. They flow back into the next
 inputs three ways. Pinned: the last gate failures on the same key go into
 the worker's context verbatim, so a redo starts from what failed.
 Retrieved: gate sources on other keys come back through the library
@@ -102,14 +105,18 @@ own proposal, the write, one raw source with the entire run, exit. Heartbeat
 every 15 s; a stale heartbeat requeues the task. Kill-and-resume is the same
 code path as a first attempt: a new worker, a fresh context.
 
-A worker ends a run with `submit(proposal)` or `block(reason)`. It never
+A worker may call `try_submit(proposal)` any number of times: the gate
+runs on the draft and returns its reasons, nothing is recorded. That is
+the fastest learning loop, seconds, inside one run. A worker ends a run
+with `submit(proposal)` or `block(reason)`. It never
 asks a human. Blocked reasons pile up and become the planner's evidence for
 a proposed guideline.
 
 ## 6. Pure state and the gate
 
-The work product is a JSON proposal for one unit (one key). The gate is a
-registry of pure functions, `check(kind, params)(proposal, input, state) ->
+The work product is a JSON proposal for one unit (one key). It may carry
+a program as a string (ARC does); the check runs it in a sandbox and the
+proposal is still data. The gate is a registry of pure functions, `check(kind, params)(proposal, input, state) ->
 { pass, reasons }`, run by the worker itself. Merge is an upsert on `state`
 with a version precondition, so two workers on the same key cannot both
 win, and no serial merge process is needed. A lost race is a redo with the
@@ -138,8 +145,9 @@ sits in the inbox while everything else runs.
 - No framework swarm as the coordination layer. The coordination is the
   database.
 
-## 9. The two counters
+## 9. The two counters and the curve
 
 Library tokens consumed: rises all day. Context per request: flat, under
-20k. That pair is the claim made visible. The third line, first-attempt
-pass rate over time, is the memory proving it works.
+20k. That pair is the claim made visible. The curve, solve rate on the
+hidden metric over time with the same model, is the memory proving it
+works.

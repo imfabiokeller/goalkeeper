@@ -1,33 +1,31 @@
 # MVP: implementation plan
 
-Decided at 12:00 on hackathon day. This is the build reference. If a doc
-disagrees with this one, this one wins and the other doc gets fixed.
+Decided at 12:00, use case decided at 14:00 (ARC, see USE-CASE.md). This
+is the build reference. If a doc disagrees with this one, this one wins
+and the other doc gets fixed.
 
 ## Decisions
 
-- Pure state. Workers produce JSON proposals, not code. No repo, no
-  browser, no test runner inside a worker.
+- Pure state. Workers produce JSON proposals. For ARC the proposal carries
+  a program as a string; the check runs it in a sandbox. No repo, no
+  browser inside a worker.
 - The worker's agent loop is the Vercel AI SDK (`ai@7`, `generateText`
-  with tools, `stopWhen: stepCountIs(20)`). Providers: OpenRouter for
-  all model calls (a strong model for workers, a cheap one for enrichment,
-  classification and briefing synthesis), Voyage for embeddings.
+  with tools, `stopWhen: stepCountIs(20)`). OpenRouter for all model calls
+  (cheap open-weight models only), Voyage for embeddings.
 - Two deployables from one image: `worker` (N copies) and `screen`
-  (Next.js). The planner, the gate and the enrichment are functions inside
-  the worker. No other process.
+  (Next.js). The planner, the gate, the sandbox and the enrichment are
+  functions inside the worker. No other process.
 - No asks from workers. A worker submits or blocks with a reason.
 - The goal changes only through an approved diff proposed by the planner.
-  One diff operation today: `add-guideline`.
+  One diff operation: `add-guideline`.
 - The gate is a registry of pure check functions. No model reviews work.
-- The use case is not decided. We build the infrastructure and the
-  bootstrap around an unknown pure-state use case; nothing in `src/` is
-  domain-specific. `usecase/` holds a development fixture and is the
-  interface:
-  `lens.json` (the goal), `inputs.json` and `inputs/` (the units),
-  `checks.ts` (the check functions, `(proposal, input, state) -> { pass,
-  reasons }`), `samples/`. The harness imports from there and nothing
-  domain-specific lives in `src/`.
+- The hidden metric: `score()` from the use case, run by the planner on
+  merged state, never by a worker. Written to `state.score`. The solve
+  rate on screen is derived from it.
+- `usecase/` is the interface (lens, inputs, checks, samples, answers).
+  Nothing domain-specific in `src/`.
 - No UI implementation until the mockups exist. `docs/SCREEN-BRIEF.md` is
-  the design brief; S5 starts from the mockups.
+  the brief.
 
 ## Architecture
 
@@ -37,7 +35,7 @@ disagrees with this one, this one wins and the other doc gets fixed.
                  └──▲──────────────▲───────────────────▲─────────┘
                     │              │                   │
         worker ×N ──┘   (claim, run, gate, write; plan() under a lock when idle)
-        screen ────────────────────────────────────────┘   (change streams, read-only + two forms)
+        screen ────────────────────────────────────────┘   (read-only + two forms)
 ```
 
 One worker iteration:
@@ -45,147 +43,130 @@ One worker iteration:
 1. `claim()`: atomic `findOneAndUpdate` on `tasks`, open to claimed.
    Nothing to claim: try the planner lock, run `plan()`, sleep 2 s.
 2. `assemble()`: goal (fresh), input text, current state for the key, last
-   gate failures on the key, and a briefing synthesized with citations from
-   retrieved, reranked, context-expanded library passages (DESIGN.md
-   section 3). Under 20k tokens.
+   gate failures on the key (with the rules already tried, marked
+   refuted), the lessons digest, and a briefing synthesized from
+   retrieved library passages. Under 20k tokens.
 3. `run()`: AI SDK loop. Tools: `read_input`, `read_state`,
-   `search_library`, `submit(proposal)`, `block(reason)`. Heartbeat every
-   15 s. Iteration deadline 4 minutes.
-4. `gate()`: pure. Runs the checks named by the task's criteria with the
-   params from the goal version stamped on the task.
+   `search_library`, `try_submit(proposal)` (runs the gate, returns
+   reasons, records nothing), `submit`, `block`. Heartbeat every 15 s.
+   Deadline 4 minutes.
+4. `gate()`: pure. Runs the checks named by the task's criteria.
 5. Write: pass means `state` upsert with a version precondition and task
-   `merged`. Fail means task `open` with attempt + 1, second fail means
-   `blocked` with the reasons. Block means `blocked` with the reason.
-   Always one `sources` document with the entire run, enriched inline.
+   `merged`. Fail means task `open` with attempt + 1 until
+   `MAX_ATTEMPTS` (5), then `blocked` with the reasons. Block means
+   `blocked` with the reason. Always one `sources` document with the run.
 6. Any throw: task back to `open`, a `sources` document with the error.
 
 `plan()` (one worker at a time, lock with a 30 s TTL):
 
 1. Reaper: claimed tasks with a heartbeat older than 30 s go back to open.
-2. Emit: for every input key with no state at `goal.version` and no open,
-   claimed or blocked task, one task (all criteria). Keep about three times
-   the worker count open.
-3. Crowd: unhandled `crowd-request` sources, one model call each, into
-   task (priority), recheck, proposal or parked with a reason.
-4. Propose: three or more blocked tasks with similar reasons and no pending
-   question about them, one model call, `request_approval(add-guideline)`.
-5. Metrics: refresh the `metrics` document.
-6. Backfill: enrich sources missing `enrichment`.
-7. Write a `planner-turn` source.
+2. Emit: for every scheduled input with no state and no open, claimed or
+   blocked task, one task. Keep about three times the worker count open.
+   A guideline approval does not re-emit solved keys (the criteria did
+   not change); it reopens blocked ones through `applyDiff`.
+3. Score: merged state with `score: null`: run `score()`, write
+   `state.score`. A `0` reopens the key once with the hint "passed the
+   examples, wrong on the test: the rule is too specific" (ARC allows two
+   attempts); a second `0` stays unsolved.
+4. Crowd: unhandled `crowd-request` sources, one model call each, into
+   task, recheck, proposal or parked.
+5. Propose: three or more blocked tasks with similar reasons and no
+   pending question, one model call, `request_approval(add-guideline)`.
+6. Reopen: every 20 new merges, blocked tasks older than the 20th merge
+   go back to open (the library grew; a puzzle nobody could solve at
+   14:00 may be solvable now).
+7. Metrics: refresh the `metrics` document, including solve rate per
+   bucket.
+8. Backfill: enrich sources missing `enrichment`.
+9. Write a `planner-turn` source.
 
-`applyDiff()` (called by the screen on approval): append the guideline,
-`version + 1`, history entry, blocked tasks at the old version back to
-open, question `approved`.
+## Plan from 14:00, in parallel
 
-## Workstreams
+Five streams, each in its own folders. Two streams never edit the same
+file. `src/shared/types.ts` and DATABASE.md change in the same commit as
+the code that needs them (stream U, first).
 
-| Stream | Owner | Scope | Depends on |
-|---|---|---|---|
-| S0 scaffold | Fabio | package, tsconfig, `shared/` (types, db, llm), compose, this doc | nothing |
-| S1 gate | agent | `gate/` over `usecase/checks.ts`, tests on `usecase/samples/` | S0 types |
-| S2 worker | agent | `worker/` (claim, assemble, run, write), `context/` retrieval | S0 types, S1 gate interface |
-| S3 planner | agent | `planner/` (lock, reaper, emit, classify, propose, applyDiff, metrics) | S0 types |
-| S4 seed | agent | `seed/` goal from `usecase/lens.json`, inputs loader, dev fakes | S0 types |
-| S5 screen | after mockups | `screen/` Next.js against the dev database | mockups, S0 types, S4 dev fakes |
+| Stream | Owner | Folders | What | Done when |
+|---|---|---|---|---|
+| U usecase | agent | `usecase/`, `src/shared/types.ts` (additive) | Fetch ARC eval, write `inputs/`, `inputs.json`, `answers/`, `lens.json`, `sandbox.ts`, `checks.ts` (schema, reproduces, general, score), 5 samples, `check-samples.ts`. Delete the earnings fixture. Add `score` to `State`. | `node usecase/check-samples.ts` passes; `npm test` passes with the new fixture |
+| W worker | agent | `src/worker/`, `src/context/` | `try_submit` tool calling the gate through `RunCtx.dryRun`; `MAX_ATTEMPTS` 5 before blocked; pin refuted rules from prior attempts into the context; enrichment prompt made domain-neutral (reads the goal statement, no earnings words). | worker tests pass with a mocked model; one real merge against Atlas |
+| P planner | agent | `src/planner/` | Score step (`score()` at merge, `state.score`, reopen once on 0); emit skips keys with state regardless of goal version; reopen-on-library-growth; metrics: solve rate per 15-minute bucket, solved/merged/attempted counts, median steps to merge. | planner tests pass; `npm run invariants` clean |
+| S screen | after mockups | `src/screen/` | Stage view, puzzle page, task page, inbox; request and goal if time. Polling against Atlas. | renders from the live database |
+| D deploy and demo | Fabio | `compose.yaml`, `.env`, docs | Re-seed Atlas, 8 workers on the VPS by 15:00, 20 by 15:45, kill test, rehearse, record. | the moments in DEMO.md cannot fail |
 
-Every stream commits straight to `main` (pull with rebase first, push
-right after). Fabio reviews on `main`.
+Order inside the afternoon:
+
+- 14:00 to 14:30: U writes types first (10 minutes, additive), then the
+  fixture. W and P start against the types at once, with the earnings
+  fixture still in place for their tests.
+- 14:30: U merges the ARC fixture. `npm test` must pass on `main` with it.
+  Re-seed Atlas `--db live`. First real merge locally.
+- 14:45: W merges `try_submit`. 8 workers on the VPS. Watch the first ten
+  merges; fix the prompt if the model ignores `try_submit`.
+- 15:00: P merges score and metrics. The curve has its first points.
+- 15:15: kill test on the VPS. Scale to 20.
+- 15:30: proposals and inbox live. First approval, version 2.
+- 16:00: screen on Vercel against the live database.
+- 16:30: freeze `src/` except the screen. Record the video. Rehearse twice.
+- 16:50: repo public, README's built-today list accurate. Submit.
+
+Cuts, in order, if behind: reopen-on-library-growth, crowd classification
+(the form still records), the request and goal pages, proposals and the
+inbox (blocked list stays). Never cut: claim, heartbeat, reaper, gate,
+sandbox, `try_submit`, hidden score, the curve.
 
 ## Acceptance criteria
 
-Each is a command that passes, or a state you can see.
+U
+- `node usecase/check-samples.ts` passes: every sample produces its
+  expected outcome per check.
+- A program that hardcodes an example output fails `general`.
+- A program that loops forever fails `reproduces` within 2 s with a
+  timeout reason, and the worker process is unaffected.
+- No file under `usecase/inputs/` or in `inputs.json` contains a test
+  output.
 
-S0
-- `npm run typecheck` passes on an empty `src/` with `shared/` in place.
-- `npm run indexes` creates the collections and indexes on the configured
-  database and is idempotent.
+W
+- `try_submit` returns the same reasons `gate()` would and records no
+  outcome; a run can call it several times and still `submit`.
+- A third failed attempt reopens; the sixth blocks.
+- The pinned failures section lists the rules of prior attempts.
 
-S1
-- `npm test -- gate` passes: every sample in `usecase/samples/` produces
-  its expected outcome through `gate()`.
-- `gate()` is pure: no imports from `shared/db`.
-- A task citing a criterion whose check kind is not in `usecase/checks.ts`
-  fails the gate with a reason.
+P
+- After a merge, the next `plan()` writes `state.score` and never reads
+  `answers/` anywhere else.
+- A `score: 0` reopens the key once with a hint; a second `score: 0` does
+  not.
+- Approving a guideline reopens blocked tasks and emits nothing for solved
+  keys.
+- `metrics.solveRate` has one entry per 15-minute bucket.
 
-S2
-- `npm test -- worker` passes with a mocked model: one iteration against a
-  test database produces one `state` doc, one `merged` task, one `sources`
-  doc with `tokens` and `enrichment`.
-- Two workers started against the same queue never hold the same task
-  (integration test with 10 tasks, 2 workers, mocked model).
-- `assemble()` output is under 20k tokens for every fixture input.
-- Killing a worker mid-iteration (SIGKILL in the test) leaves the task in
-  `claimed` with a stale heartbeat and nothing else written.
+S
+- Stage view renders grid, curve, workers, feed and counters from the live
+  database and updates without reload.
+- Puzzle page renders grids with the diff outline, program, gate,
+  precedents.
 
-S3
-- `plan()` on a seeded database emits exactly one task per undone key and
-  none for keys with open, claimed or blocked tasks.
-- The reaper returns a task with a 31 s old heartbeat and leaves a 29 s
-  one alone.
-- Two concurrent `plan()` calls: one gets the lock, the other returns
-  immediately.
-- A crowd request fixture for each of the four outcomes lands in the right
-  place with a reason.
-- `applyDiff()` bumps the version, writes history, reopens blocked tasks at
-  the old version only.
-
-S4
-- `npm run seed -- --db dev` fills a database with a goal at version 2 with
-  history, 500 tasks in every status, sources of every kind, three
-  questions, a metrics doc. Rerunnable.
-- `npm run seed -- --db live` loads the goal at version 1 and the real
-  inputs, nothing else.
-
-S5
-- Stage view renders the units grid, worker rows, live feed, header and
-  sparklines from the dev database, updates without reload.
-- `/task/[id]`, `/timeline`, `/inbox`, `/request` render from the dev
-  database. Approve on `/inbox` calls `applyDiff()`.
-
-End to end (the milestone)
-- 13:15: one real merge locally against Atlas.
-- 14:00: eight workers on the VPS, kill two, both tasks requeued and
-  merged by others within two minutes.
-- 15:30: blocked pile, proposal in the inbox, approve, version 2, blocked
-  tasks resolve.
-- `npm run invariants` clean every 30 minutes from 14:00.
+End to end
+- 14:30: one real merge locally against Atlas.
+- 15:15: kill five of twenty on the VPS, all five tasks merged by others
+  within two minutes.
+- 15:30: proposal in the inbox, approve, version 2, blocked tasks reopen.
+- `npm run invariants` clean every 30 minutes from 15:00.
 
 ## How it runs
-
-Local:
 
 ```
 cp .env.example .env         # fill keys
 npm install
 npm run indexes              # once per database
-npm run seed -- --db live    # goal v1 and inputs
-npm run worker               # one worker, ROLE=worker
-npm run screen               # Next.js on :3000
+npm run seed -- --db live    # goal v1 and the puzzles
+npm run worker               # one worker
 ```
 
-VPS (compose):
-
-```
-docker compose up -d --build --scale worker=8
-docker compose kill worker-3 worker-7      # the demo moment
-docker compose up -d --scale worker=20
-```
+VPS: Dokploy Compose service, `WORKER_REPLICAS` for the swarm size. The
+kill moment: stop five containers from the Dokploy UI.
 
 Environment: `MONGODB_URI`, `MONGODB_DB`, `OPENROUTER_API_KEY`,
-`VOYAGE_API_KEY`, `WORKER_MODEL`, `ENRICH_MODEL`,
-`WORKERS_TARGET` (for the emit size), `BUDGET_USD`.
-
-## Timeline from 12:00
-
-- 12:00 to 12:40: S0 merged. S1 to S4 branches started in parallel. S5
-  starts when the mockups exist.
-- 12:40 to 13:30: S1, S2 merged. First real merge locally.
-- 13:30 to 14:00: S3 merged. Compose on the VPS, eight workers, kill test.
-- 14:00 to 15:00: retrieval quality, enrichment, crowd classification live.
-- 15:00 to 15:30: propose, applyDiff, inbox wired.
-- 15:30 to 16:30: invariants, scale to 20, rehearse, record.
-- 16:30: freeze. Only the screen changes after this.
-
-Cuts, in order, if behind: metrics page, proposals (blocked list stays),
-crowd classification (form still records), retrieval (pinned-only
-context). Never cut: claim, heartbeat, reaper, gate, raw sources.
+`VOYAGE_API_KEY`, `WORKER_MODEL`, `ENRICH_MODEL`, `WORKERS_TARGET`,
+`BUDGET_USD`.
