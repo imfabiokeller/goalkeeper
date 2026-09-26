@@ -9,7 +9,8 @@ disagrees with this one, this one wins and the other doc gets fixed.
   browser, no test runner inside a worker.
 - The worker's agent loop is the Vercel AI SDK (`ai@7`, `generateText`
   with tools, `stopWhen: stepCountIs(20)`). Providers: OpenRouter for
-  workers, Cerebras for enrichment, Voyage for embeddings.
+  all model calls (a strong model for workers, a cheap one for enrichment,
+  classification and briefing synthesis), Voyage for embeddings.
 - Two deployables from one image: `worker` (N copies) and `screen`
   (Next.js). The planner, the gate and the enrichment are functions inside
   the worker. No other process.
@@ -43,7 +44,9 @@ One worker iteration:
 1. `claim()`: atomic `findOneAndUpdate` on `tasks`, open to claimed.
    Nothing to claim: try the planner lock, run `plan()`, sleep 2 s.
 2. `assemble()`: goal (fresh), input text, current state for the key, last
-   gate failures on the key, retrieved library passages. Under 20k tokens.
+   gate failures on the key, and a briefing synthesized with citations from
+   retrieved, reranked, context-expanded library passages (DESIGN.md
+   section 3). Under 20k tokens.
 3. `run()`: AI SDK loop. Tools: `read_input`, `read_state`,
    `search_library`, `submit(proposal)`, `block(reason)`. Heartbeat every
    15 s. Iteration deadline 4 minutes.
@@ -168,7 +171,7 @@ docker compose up -d --scale worker=20
 ```
 
 Environment: `MONGODB_URI`, `MONGODB_DB`, `OPENROUTER_API_KEY`,
-`CEREBRAS_API_KEY`, `VOYAGE_API_KEY`, `WORKER_MODEL`, `ENRICH_MODEL`,
+`VOYAGE_API_KEY`, `WORKER_MODEL`, `ENRICH_MODEL`,
 `WORKERS_TARGET` (for the emit size), `BUDGET_USD`.
 
 ## Timeline from 12:00

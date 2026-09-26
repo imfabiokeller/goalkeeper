@@ -72,7 +72,7 @@ by a deterministic gate, so nothing drifts.
 
 ## Built during the event
 
-Everything in `src/`. Atlas, the Vercel AI SDK, OpenRouter, Cerebras,
-Voyage, Next.js and Docker are reused as is.
+Everything in `src/`. Atlas, the Vercel AI SDK, OpenRouter, Voyage,
+Next.js and Docker are reused as is.
 
 License: Apache 2.0.

@@ -117,7 +117,8 @@ Indexes: Atlas Vector Search `vec` on `enrichment.embedding`; Atlas Search
 `txt` on `text` and `enrichment.gist`; `{ key: 1, kind: 1, createdAt: -1 }`
 for pinned failures; `{ kind: 1, handled: 1 }` for the crowd queue.
 
-Retrieval for a briefing, one aggregation:
+Retrieval for a briefing (the Cerebras knowledge-base shape, see
+DESIGN.md section 3), one aggregation:
 
 ```js
 db.sources.aggregate([
@@ -129,9 +130,18 @@ db.sources.aggregate([
       } },
       combination: { weights: { vector: 1, text: 1, recent: 0.5 } }
   } },
-  { $limit: 10 }
+  { $limit: 30 },
+  { $rerank: { model: "voyage-rerank-2.5", query: queryText, path: ["enrichment.gist", "text"], limit: 8 } }
 ])
 ```
+
+`$rerank` is an Atlas preview feature; if it is unavailable the pipeline
+runs without it and keeps the top 8 from the fusion. Then context
+expansion (the full `raw` of each hit, capped at 1500 characters per
+source), then synthesis: one cheap model call writes a briefing where every
+sentence cites `[sourceId]`; sentences citing ids outside the retrieved
+set are dropped (grounding check). The briefing and the cited excerpts go
+into the worker's context.
 
 Pinned, not retrieved: goal; input text; state for the key; last three
 `gate` sources with a failure on the key.

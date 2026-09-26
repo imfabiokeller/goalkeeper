@@ -28,12 +28,29 @@ process can die. goalkeeper applies that shift to agents.
 ## 3. Library and goal
 
 **Library (cold).** Raw, append-only, machine-written. Every worker run,
-gate result, planner turn, crowd request, human answer. Enriched at ingest
-by a cheap model (gist, entities, labels, embedding). Retrieval is hybrid
-(vector, text, recency) fused with `$rankFusion`; the retrieved raw passages
-go into the worker's context as they are. Why raw and not consolidated:
-write-time consolidation paraphrases away the exact values and rejected
-options that matter later. Same shape as Cerebras's internal knowledge base.
+gate result, planner turn, crowd request, human answer. Built the way
+Cerebras built its internal knowledge base, on Atlas:
+
+1. No consolidation. The raw record is the document; nothing is rewritten.
+2. Distilled fields at ingest, by a cheap model: gist, entities (keys,
+   fields), labels, plus an embedding. Stored next to the raw, never
+   instead of it.
+3. Two indexes over the raw and the distilled fields: lexical (Atlas
+   Search) and vector (Atlas Vector Search).
+4. Hybrid retrieval fused with reciprocal rank fusion (`$rankFusion`:
+   vector, text, recency), then a reranker (`$rerank`, Voyage, native on
+   Atlas) over the top 30, keeping 8.
+5. Context expansion: each hit brings its full raw record back into the
+   worker's context, not just the matched excerpt, capped per source.
+6. Synthesis with citations: a cheap model turns the expanded hits into a
+   short briefing where every sentence cites a source id; a grounding
+   check drops any sentence whose citations are not in the retrieved set.
+   The cited raw excerpts travel with the briefing.
+7. Staleness by recency: the recency pipeline and a time decay in the
+   fusion weights keep last hour's failures ahead of this morning's.
+
+Why raw and not consolidated: write-time consolidation paraphrases away the
+exact values and rejected options that matter later.
 
 **Goal (hot).** Small, human-approved, versioned, pinned into every
 request: statement, criteria each with a deterministic check, guidelines,

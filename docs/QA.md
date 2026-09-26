@@ -52,8 +52,8 @@ same way.
 Built: the worker loop (claim, heartbeat, context assembly, AI SDK tool
 loop, gate, write), the check registry, the planner (reaper, emit, crowd
 classification, proposals, applyDiff, metrics), enrichment and retrieval,
-the live screen. Reused: Atlas, the Vercel AI SDK, OpenRouter, Cerebras,
-Voyage, Next.js, Docker.
+the live screen. Reused: Atlas, the Vercel AI SDK, OpenRouter, Voyage,
+Next.js, Docker.
 
 **What happens when a worker dies?**
 Its heartbeat stops, the task goes back to open within 30 seconds, a new

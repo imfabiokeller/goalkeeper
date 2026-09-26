@@ -14,7 +14,6 @@
     "invariants": "node --env-file=.env src/planner/invariants.ts"
   },
   "dependencies": {
-    "@ai-sdk/cerebras": "^3.0.57",
     "@openrouter/ai-sdk-provider": "^3.1.0",
     "ai": "^7.0.116",
     "mongodb": "^7.6.0",
