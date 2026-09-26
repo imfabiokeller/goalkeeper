@@ -74,20 +74,38 @@ by a deterministic gate, so nothing drifts.
 
 ## Run and deploy
 
-Local: `cp .env.example .env`, fill the keys, `npm install`,
-`npm run indexes`, `npm run seed -- --db live`, `npm run worker`.
+Local, against the Atlas cluster in `.env`:
 
-Workers run on the VPS as a Dokploy Compose service built from this repo
-(branch `main`, compose path `compose.yaml`), with the `.env` contents as
-the service's environment. `WORKER_REPLICAS` sets the swarm size (8 by
-default, 20 for the afternoon). Redeploy after a push from the Dokploy UI,
-or enable auto-deploy on push. There is nothing to route: workers make
-outbound connections only, and their heartbeat in Atlas is the health
-signal.
+```
+cp .env.example .env         # fill the keys
+npm install
+npm run indexes              # once per database
+npm run seed -- --db live    # goal v1 and all 400 ARC puzzles, idempotent
+npm run worker               # one worker; Ctrl-C finishes the iteration
+```
+
+The swarm is a Dokploy Compose service on the VPS, built from this repo:
+
+1. Dokploy: new Compose service, source GitHub, repository
+   `imfabiokeller/goalkeeper`, branch `main`, compose path `compose.yaml`.
+2. Environment: paste the `.env` contents (the file is the only config).
+   `WORKER_REPLICAS` sets the swarm size (8 by default, 20 for the
+   afternoon). Each worker gets 512 MB; the sandbox child is capped at
+   256 MB of heap, so a worker plus one child fits.
+3. Deploy. Redeploy after a push from the Dokploy UI, or enable auto
+   deploy on push.
+
+Nothing to route and nothing to mount: the image ships `src/` and
+`usecase/` (lens, inputs, checks, sandbox, answers) and the workers make
+outbound connections only (Atlas, OpenRouter, Voyage). Their heartbeat in
+Atlas is the health signal; a worker's id comes from its container
+hostname, so replicas never collide. Local check of the image:
+`docker build -t goalkeeper-worker .`.
 
 The kill moment: scale the service down by five and back up, or stop
-individual containers from the Dokploy UI; the reaper requeues their tasks
-within 30 seconds.
+individual containers from the Dokploy UI. Their claimed tasks stop
+heartbeating and the reaper requeues them within 30 seconds; the next
+idle worker picks them up with the attempt count raised.
 
 The screen is a separate Next.js project deployed on Vercel, reading Atlas
 directly (polling, since Vercel functions cannot hold change streams open).
