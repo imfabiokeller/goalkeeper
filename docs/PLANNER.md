@@ -21,11 +21,14 @@ step is a query.
    `findOneAndUpdate` with the unscored state as the precondition. On `0`,
    if the key has never had a "too specific" task, insert a priority task
    with the hint "passed the examples, wrong on the test: the rule is too
-   specific". Never the answer. Cap 50 per run.
-4. **Reopen.** When the merged count crosses a multiple of 20, `blocked`
-   tasks older than that 20th merge go back to `open`, `attempt: 1`, the
-   block reason kept as `hint`. The library grew; the puzzle may be
-   solvable now.
+   specific". Never the answer. Cap 50 per run. A state whose `scoredAt`
+   is older than its `mergedAt` (the key merged again) counts as unscored.
+4. **Reopen.** When the merged count crosses a multiple of 20 (the
+   previous count is read from the last `planner-turn` source), `blocked`
+   tasks older than that 20th merge go back to `open`, `attempt: 1`, with
+   `hint: "blocked earlier with: <reason>; the library has grown since"`.
+   Tasks blocked on the "too specific" second attempt stay blocked. The
+   library grew; the puzzle may be solvable now.
 5. **Metrics.** One aggregation over `sources` and `tasks` per minute,
    the solve-rate curve per 15-minute bucket from `state.score`, and the
    lessons digest (`computeLessons`: first-try pass rate, fails per check

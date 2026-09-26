@@ -11,9 +11,7 @@
 //   merges, which write no gate source).
 // - reasons: gate failure reasons, grouped by normalizeReason.
 // - blocked: block reasons of blocked tasks, grouped the same way.
-// - recentGuidelines: the last approved diffs in goal.history and how
-//   many tasks each reopened (tasks now at that version but created
-//   before it existed).
+// - recentGuidelines: always empty. The goal never changes during a run.
 
 import type { Collections } from "../shared/db.ts";
 import type { Goal, Lessons, Source, Task } from "../shared/types.ts";
@@ -23,7 +21,6 @@ import { normalizeReason } from "./normalize.ts";
 export const WINDOW_MS = 3 * 60 * 60_000;
 export const MAX_REASONS = 12;
 export const MAX_BLOCKED = 8;
-export const MAX_GUIDELINES = 3;
 export const MAX_EXAMPLE_KEYS = 3;
 export const MAX_TEXT_CHARS = 2000;
 export const REASON_CHARS = 160;
@@ -115,16 +112,6 @@ export function lessonsFrom(records: LessonsRecords, now: Date, since = new Date
     MAX_BLOCKED,
   );
 
-  const recentGuidelines = (records.goal?.history ?? [])
-    .filter((h) => h.diff !== null)
-    .sort((a, b) => b.version - a.version)
-    .slice(0, MAX_GUIDELINES)
-    .map((h) => ({
-      version: h.version,
-      text: h.diff?.text ?? "",
-      resolved: records.tasks.filter((t) => t.version === h.version && t.createdAt.getTime() < h.at.getTime()).length,
-    }));
-
   const lessons: Omit<Lessons, "text"> = {
     at: now,
     window: { tasks: tasks.length, since },
@@ -132,7 +119,9 @@ export function lessonsFrom(records: LessonsRecords, now: Date, since = new Date
     checks,
     reasons,
     blocked,
-    recentGuidelines,
+    // The goal never changes during a run; the field stays until the
+    // contract drops it.
+    recentGuidelines: [],
   };
   return { ...lessons, text: renderLessons(lessons) };
 }
@@ -156,12 +145,6 @@ export function renderLessons(l: Omit<Lessons, "text">): string {
   const sections: string[][] = [];
   if (l.reasons.length) sections.push(["Top gate failure reasons:", ...l.reasons.map((r) => `- ${r.count}x ${r.text}${eg(r.keys)}`)]);
   if (l.blocked.length) sections.push(["Blocked, grouped by reason:", ...l.blocked.map((r) => `- ${r.count}x ${r.text}${eg(r.keys)}`)]);
-  if (l.recentGuidelines.length) {
-    sections.push([
-      "Recent guidelines (approved by a human):",
-      ...l.recentGuidelines.map((g) => `- v${g.version}: ${g.text} (reopened ${g.resolved} tasks)`),
-    ]);
-  }
 
   const render = (secs: string[][]) => [...head, ...secs.flat()].join("\n");
   let text = render(sections);

@@ -82,7 +82,7 @@ describe("computeLessons", () => {
       { text: "Fiscal year release, no quarterly figure", count: 1, keys: ["tsla"] },
     ]);
 
-    expect(l.recentGuidelines).toEqual([{ version: 2, text: "Banks report net revenue; take that as revenue.", resolved: 2 }]);
+    expect(l.recentGuidelines).toEqual([]);
 
     expect(l.text.length).toBeLessThanOrEqual(MAX_TEXT_CHARS);
     expect(l.text).toContain("Lessons from the record so far");
@@ -91,7 +91,7 @@ describe("computeLessons", () => {
     expect(l.text).toContain("4x " + grounded);
     expect(l.text).toContain("e.g. aapl, msft, goog");
     expect(l.text).toContain("2x Bank reports net revenue");
-    expect(l.text).toContain("v2: Banks report net revenue; take that as revenue. (reopened 2 tasks)");
+    expect(l.text).not.toContain("Recent guidelines");
     expect(l.text).not.toContain("stale");
   });
 
@@ -123,7 +123,7 @@ describe("renderLessons", () => {
     ],
     reasons: [{ text: "quote not found verbatim", count: 7, keys: ["a", "b"] }],
     blocked: [{ text: "no quarterly figure", count: 3, keys: [] }],
-    recentGuidelines: [{ version: 2, text: "Take net revenue.", resolved: 5 }],
+    recentGuidelines: [],
   };
 
   pure("renders every section compactly", () => {
@@ -135,8 +135,6 @@ describe("renderLessons", () => {
       "- 7x quote not found verbatim (e.g. a, b)",
       "Blocked, grouped by reason:",
       "- 3x no quarterly figure",
-      "Recent guidelines (approved by a human):",
-      "- v2: Take net revenue. (reopened 5 tasks)",
     ]);
   });
 
@@ -146,7 +144,6 @@ describe("renderLessons", () => {
     expect(text.length).toBeLessThanOrEqual(MAX_TEXT_CHARS);
     expect(text).toContain("first-try pass rate 63%");
     expect(text).toContain("grounded [c1] 9 fails");
-    expect(text).toContain("Recent guidelines");
     expect(text).toContain("- 12x reason 0");
   });
 
