@@ -2,7 +2,7 @@
 // definitions. Every module gets its collections from here.
 
 import { MongoClient, type Collection, type Db } from "mongodb";
-import type { Goal, Input, Lock, Metrics, Source, State, Task } from "./types.ts";
+import type { Control, Goal, Input, Lock, Metrics, Source, State, Task } from "./types.ts";
 
 export type Collections = {
   goal: Collection<Goal>;
@@ -11,6 +11,7 @@ export type Collections = {
   state: Collection<State>;
   sources: Collection<Source>;
   locks: Collection<Lock>;
+  controls: Collection<Control>;
   metrics: Collection<Metrics>;
 };
 
@@ -43,6 +44,7 @@ export function collections(db: Db): Collections {
     state: db.collection<State>("state"),
     sources: db.collection<Source>("sources"),
     locks: db.collection<Lock>("locks"),
+    controls: db.collection<Control>("controls"),
     metrics: db.collection<Metrics>("metrics"),
   };
 }

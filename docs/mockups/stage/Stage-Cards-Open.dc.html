@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stage — puzzle card expanded</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+button{font:inherit}
+a{color:#ededed}a:hover{color:#ffffff}
+@keyframes gkpulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pulse{animation:gkpulse 2s ease-in-out infinite}
+@media (prefers-reduced-motion: reduce){.pulse{animation:none}}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px">
+<dc-import name="Stage-Cards" open="{{idx}}" hint-size="1920px,1080px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() { return { idx: 2 }; }
+}
+</script>
+</body>
+</html>

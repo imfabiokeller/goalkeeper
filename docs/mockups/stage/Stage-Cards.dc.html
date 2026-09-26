@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stage — puzzle cards</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#000}
+button{font:inherit}
+a{color:#ededed}a:hover{color:#ffffff}
+@keyframes gkpulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pulse{animation:gkpulse 2s ease-in-out infinite}
+@keyframes gksolved{0%,24%,48%{box-shadow:0 0 0 2px #4a8f67,0 0 36px rgba(74,143,103,.6)}12%,36%,60%{box-shadow:0 0 0 1px #1d3527}72%{opacity:1;transform:translateY(0)}84%{opacity:0;transform:translateY(-8px)}100%{opacity:0;transform:translateY(-8px)}}
+.solvedflash{animation:gksolved 5s ease-in-out infinite}
+@keyframes gkretry{0%,20%,40%{box-shadow:0 0 0 2px #c29a3a,0 0 30px rgba(194,154,58,.45)}10%,30%,50%,100%{box-shadow:0 0 0 1px #2e2612}}
+.retryflash{animation:gkretry 6s ease-in-out infinite}
+@keyframes gktick{0%,30%{opacity:0;transform:translateY(6px)}40%,100%{opacity:1;transform:translateY(0)}}
+.tick{display:inline-block;animation:gktick 6s ease-out infinite}
+@keyframes gktoast{0%{opacity:0;transform:translate(-50%,-8px)}8%,100%{opacity:1;transform:translate(-50%,0)}}
+.toast{animation:gktoast .5s ease-out both}
+@keyframes gkarrive{0%,8%{opacity:0;transform:translateY(10px)}18%,88%{opacity:1;transform:translateY(0)}100%{opacity:1}}
+.arrive{animation:gkarrive 7s ease-out infinite both}
+@media (prefers-reduced-motion: reduce){.pulse,.solvedflash,.arrive,.retryflash,.tick,.toast{animation:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 1920px; height: 1080px; box-sizing: border-box; padding: 36px 48px 36px; display: flex; flex-direction: column; gap: 24px; background: #000000; color: #ededed; font-family: 'Geist', system-ui, sans-serif; overflow: hidden">
+
+<div style="height: 60px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 40px">
+<div style="display: flex; align-items: center; gap: 18px">
+<svg width="24" height="24" viewBox="0 0 22 22" fill="none" stroke="#ededed" stroke-width="1.6"><circle cx="11" cy="11" r="9"></circle><path d="M6 11h10"></path></svg>
+<span style="font-size: 22px; font-weight: 600; letter-spacing: -0.01em">goalkeeper</span>
+<span style="font-size: 22px; color: #333">/</span>
+<span style="font-size: 20px; color: #a1a1a1">Solve 400 ARC puzzles</span>
+<span style="font-size: 13px; color: #9d8cf5; border: 1px solid #2a2450; border-radius: 999px; padding: 5px 12px; white-space: nowrap">goal written by a human · 14:20</span>
+</div>
+<div style="display: flex; align-items: center; gap: 28px">
+<div style="display: flex; align-items: center; gap: 14px">
+<svg width="84" height="32" viewBox="0 0 84 32" fill="none"><polyline points="2,25 14,24 26,25 38,23 50,24 62,25 74,23 82,24" stroke="#8f8f8f" stroke-width="1.5" stroke-dasharray="3 3"></polyline><polyline points="2,26 14,23 26,22 38,17 50,15 62,11 74,8 82,5" stroke="#6fbf8e" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline></svg>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Geist Mono', monospace; font-size: 26px; line-height: 1; color: #6fbf8e">44%</span><span style="font-size: 13px; color: #8f8f8f">solved · was 18%</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px; padding-left: 14px; border-left: 1px solid #262626"><span style="font-family: 'Geist Mono', monospace; font-size: 26px; line-height: 1; color: #8f8f8f">19%</span><span style="font-size: 13px; color: #8f8f8f">control · no library</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Geist Mono', monospace; font-size: 26px; line-height: 1">86<span style="color: #555"> / 400</span></span><span style="font-size: 13px; color: #8f8f8f">puzzles solved</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Geist Mono', monospace; font-size: 26px; line-height: 1; color: {{agentsC}}">{{agentsV}}</span><span style="font-size: 13px; color: #8f8f8f">{{agentsNote}}</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Geist Mono', monospace; font-size: 26px; line-height: 1">17.9k</span><span style="font-size: 13px; color: #8f8f8f">tokens each agent reads</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Geist Mono', monospace; font-size: 26px; line-height: 1">412.8M</span><span style="font-size: 13px; color: #8f8f8f">tokens in the library</span></div>
+<a href="Library.dc.html" style="height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 16px; border: 1px solid #333; border-radius: 10px; text-decoration: none; font-size: 15px"><span>Library</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#ededed" stroke-width="1.6"><path d="M4 8h8M9 5l3 3-3 3"></path></svg></a>
+</div>
+</div>
+
+<div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 18px">
+<sc-for list="{{cards}}" as="k" hint-placeholder-count="8">
+<button type="button" class="{{k.cls}}" onClick="{{k.open}}" style="text-align: left; border: 1px solid {{k.bd}}; box-shadow: {{k.ring}}; border-radius: 14px; background: {{k.bg}}; padding: 16px 20px; display: flex; flex-direction: column; justify-content: space-between; color: #ededed; cursor: pointer; min-height: 0">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; align-items: baseline; gap: 12px"><span style="font-family: 'Geist Mono', monospace; font-size: 16px">{{k.key}}</span><span style="font-size: 13px; color: #8f8f8f">attempt <span class="{{k.attCls}}" style="color: {{k.attC}}">{{k.att}}</span> of 5</span></div>
+<div style="display: flex; align-items: center; gap: 7px; height: 24px; padding: 0 10px; border: 1px solid {{k.chipBd}}; border-radius: 999px; font-size: 12px; color: {{k.chipC}}"><div class="{{k.dotCls}}" style="width: 7px; height: 7px; border-radius: 2px; background: {{k.dot}}"></div>{{k.chip}}</div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 20px 1fr 1fr; gap: 10px; align-items: end">
+<div style="display: flex; flex-direction: column; gap: 5px"><span style="font-size: 11px; color: #8f8f8f">example</span>
+<div style="display: grid; grid-template-columns: repeat({{k.inp.w}}, 17px); gap: 1px; padding: 1px; background: #2a2a2a; border-radius: 3px; justify-self: start">
+<sc-for list="{{k.inp.cells}}" as="c" hint-placeholder-count="36"><div style="width: 17px; height: 17px; background: {{c.c}}"></div></sc-for>
+</div></div>
+<svg width="20" height="14" viewBox="0 0 20 14" fill="none" stroke="#555" stroke-width="1.5" style="margin-bottom: 48px"><path d="M2 7h14M11 2l5 5-5 5"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 5px"><span style="font-size: 11px; color: #8f8f8f">expected</span>
+<div style="display: grid; grid-template-columns: repeat({{k.exp.w}}, 17px); gap: 1px; padding: 1px; background: #2a2a2a; border-radius: 3px; justify-self: start">
+<sc-for list="{{k.exp.cells}}" as="c" hint-placeholder-count="36"><div style="width: 17px; height: 17px; background: {{c.c}}"></div></sc-for>
+</div></div>
+<div style="display: flex; flex-direction: column; gap: 5px"><span style="font-size: 11px; color: #8f8f8f">agent’s try</span>
+<sc-if value="{{k.hasAct}}" hint-placeholder-val="{{ true }}">
+<div style="display: grid; grid-template-columns: repeat({{k.act.w}}, 17px); gap: 1px; padding: 1px; background: #2a2a2a; border-radius: 3px; justify-self: start">
+<sc-for list="{{k.act.cells}}" as="c" hint-placeholder-count="36"><div style="width: 17px; height: 17px; background: {{c.c}}; box-shadow: {{c.sh}}"></div></sc-for>
+</div>
+</sc-if>
+<sc-if value="{{k.noAct}}" hint-placeholder-val="{{ false }}">
+<div style="width: 109px; height: 109px; box-sizing: border-box; border: 1px dashed #333; border-radius: 3px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 11px; line-height: 1.3; color: #8f8f8f; padding: 6px">no program yet</div>
+</sc-if>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="display: flex; gap: 4px"><sc-for list="{{k.dots}}" as="d" hint-placeholder-count="3"><div style="width: 9px; height: 9px; border-radius: 50%; background: {{d.c}}; box-shadow: inset 0 0 0 1px {{d.b}}"></div></sc-for></div>
+<span style="font-size: 14px; color: {{k.noteC}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{k.note}}</span>
+<span style="margin-left: auto; flex-shrink: 0; display: flex; align-items: center; gap: 6px; font-size: 12px; color: #8f8f8f; white-space: nowrap"><span style="width: 12px; border-top: 1.5px dashed #6b6b6b"></span>{{k.ctrlLine}}</span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 14px 12px; border-radius: 10px; background: #070707; border: 1px solid #161616">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 13px; color: #e6e6e6">{{k.learnTitle}}</span><span style="font-size: 12px; color: #8f8f8f">{{k.learnNote}}</span></div>
+<div style="display: flex; gap: 12px">
+<sc-for list="{{k.learn}}" as="l" hint-placeholder-count="3">
+<div class="{{l.cls}}" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px; animation-delay: {{l.delay}}">
+<div style="position: relative; flex-shrink: 0; padding: 4px; border-radius: 6px; background: #111118; box-shadow: inset 0 0 0 1px {{l.bd}}">
+<div style="display: grid; grid-template-columns: repeat(6, 5px); gap: 1px">
+<sc-for list="{{l.cells}}" as="c" hint-placeholder-count="36"><div style="width: 5px; height: 5px; border-radius: 1px; background: {{c}}"></div></sc-for>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow: hidden">
+<span style="font-size: 12px; color: {{l.kc}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{l.kind}}</span>
+<span style="font-size: 12px; color: #8f8f8f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{l.from}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px">
+<span style="color: {{k.giveC}}">{{k.give}}</span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: #8f8f8f">{{k.step}}</span>
+</div>
+</button>
+</sc-for>
+</div>
+
+
+<sc-if value="{{killed}}" hint-placeholder-val="{{ false }}">
+<div class="toast" style="position: absolute; left: 50%; top: 116px; transform: translateX(-50%); height: 48px; padding: 0 20px; display: flex; align-items: center; gap: 12px; border: 1px solid #3a1a1b; border-radius: 12px; background: #140808; box-shadow: 0 12px 40px rgba(0,0,0,.6); font-size: 16px; white-space: nowrap">
+<div style="width: 8px; height: 8px; border-radius: 50%; background: #d4575b"></div>
+<span style="color: #f07178">5 agents stopped</span><span style="color: #a1a1a1">· their 5 puzzles went back in the queue · replacements starting · nothing lost</span>
+</div>
+</sc-if>
+<button type="button" onClick="{{toggleKill}}" style="position: absolute; right: 48px; bottom: 10px; height: 26px; padding: 0 12px; border-radius: 7px; background: transparent; border: 1px dashed #3a3a3a; color: #8f8f8f; font-size: 12px; cursor: pointer">{{killLabel}}</button>
+
+<sc-if value="{{isOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center">
+<div style="width: 1480px; height: 1010px; box-sizing: border-box; border: 1px solid #262626; border-radius: 18px; background: #0a0a0a; padding: 30px 36px; display: flex; flex-direction: column; gap: 24px; box-shadow: 0 30px 80px rgba(0,0,0,.8)">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; align-items: center; gap: 18px">
+<span style="font-family: 'Geist Mono', monospace; font-size: 30px; font-weight: 500">{{sel.key}}</span>
+<div style="display: flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px; border: 1px solid {{sel.chipBd}}; border-radius: 999px; font-size: 14px; color: {{sel.chipC}}"><div style="width: 8px; height: 8px; border-radius: 2px; background: {{sel.dot}}"></div>{{sel.chip}}</div>
+<span style="font-size: 16px; color: #8f8f8f">attempt {{sel.att}} of 5</span>
+</div>
+<button type="button" onClick="{{close}}" aria-label="Close" style="width: 40px; height: 40px; border-radius: 10px; background: transparent; border: 1px solid #333; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#ededed" stroke-width="1.6"><path d="M4 4l8 8M12 4l-8 8"></path></svg></button>
+</div>
+
+<div style="flex: 1; min-height: 0; display: flex; gap: 40px">
+<div style="width: 600px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="display: grid; grid-template-columns: 56px 1fr 24px 1fr 1fr; gap: 12px; font-size: 13px; color: #8f8f8f"><span></span><span>example</span><span></span><span>expected</span><span>agent’s try</span></div>
+<sc-for list="{{sel.rows}}" as="p" hint-placeholder-count="3">
+<div style="display: grid; grid-template-columns: 56px 1fr 24px 1fr 1fr; gap: 12px; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #161616">
+<div style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 14px; color: #a1a1a1">pair {{p.n}}</span><div style="width: 10px; height: 10px; border-radius: 50%; background: {{p.dot}}; box-shadow: inset 0 0 0 1px {{p.dotB}}"></div></div>
+<div style="display: grid; grid-template-columns: repeat({{p.inp.w}}, 16px); gap: 1px; padding: 1px; background: #2a2a2a; border-radius: 3px; justify-self: start">
+<sc-for list="{{p.inp.cells}}" as="c" hint-placeholder-count="36"><div style="width: 16px; height: 16px; background: {{c.c}}"></div></sc-for>
+</div>
+<svg width="24" height="14" viewBox="0 0 24 14" fill="none" stroke="#555" stroke-width="1.5"><path d="M2 7h18M15 2l5 5-5 5"></path></svg>
+<div style="display: grid; grid-template-columns: repeat({{p.exp.w}}, 16px); gap: 1px; padding: 1px; background: #2a2a2a; border-radius: 3px; justify-self: start">
+<sc-for list="{{p.exp.cells}}" as="c" hint-placeholder-count="36"><div style="width: 16px; height: 16px; background: {{c.c}}"></div></sc-for>
+</div>
+<sc-if value="{{p.hasAct}}" hint-placeholder-val="{{ true }}">
+<div style="display: grid; grid-template-columns: repeat({{p.act.w}}, 16px); gap: 1px; padding: 1px; background: #2a2a2a; border-radius: 3px; justify-self: start">
+<sc-for list="{{p.act.cells}}" as="c" hint-placeholder-count="36"><div style="width: 16px; height: 16px; background: {{c.c}}; box-shadow: {{c.sh}}"></div></sc-for>
+</div>
+</sc-if>
+<sc-if value="{{p.noAct}}" hint-placeholder-val="{{ false }}">
+<div style="width: 103px; height: 103px; box-sizing: border-box; border: 1px dashed #333; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #8f8f8f">no program yet</div>
+</sc-if>
+</div>
+</sc-for>
+<div style="display: flex; flex-direction: column; gap: 6px; padding-top: 4px">
+<span style="font-size: 13px; color: #8f8f8f">{{sel.ruleLabel}}</span>
+<span style="font-size: 20px; line-height: 1.3; font-weight: 500">{{sel.rule}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 6px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; color: #e6e6e6">{{sel.learnTitle}}</span><span style="font-size: 13px; color: #8f8f8f">most similar first</span></div>
+<sc-for list="{{sel.learnFull}}" as="l" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 14px; padding: 10px 12px; border: 1px solid {{l.bd}}; border-radius: 10px; background: #050505">
+<div style="flex-shrink: 0; padding: 4px; border-radius: 6px; background: #111118"><div style="display: grid; grid-template-columns: repeat(6, 6px); gap: 1px"><sc-for list="{{l.cells}}" as="c" hint-placeholder-count="36"><div style="width: 6px; height: 6px; border-radius: 1px; background: {{c}}"></div></sc-for></div></div>
+<div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+<span style="font-size: 15px; color: {{l.tc}}; text-decoration: {{l.deco}}; text-decoration-color: #6b5a2a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{l.gist}}</span>
+<span style="font-size: 13px; color: #8f8f8f"><span style="color: {{l.kc}}">{{l.kind}}</span> · {{l.where}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 14px; border: 1px solid #1f1f1f; border-radius: 14px; background: #050505; padding: 18px 20px">
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 17px; font-weight: 500">Compared with the control</span>
+<span style="font-size: 13px; color: #8f8f8f">same puzzle, same model, same token budget · the control agent has no library</span>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+<sc-for list="{{sel.cmp}}" as="m" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid {{m.bd}}; border-radius: 10px; background: {{m.bg}}">
+<div style="display: flex; align-items: center; gap: 8px"><span style="width: 16px; border-top: {{m.line}}"></span><span style="font-size: 14px; color: {{m.tc}}">{{m.who}}</span></div>
+<div style="display: flex; gap: 12px; align-items: flex-start">
+<sc-if value="{{m.hasGrid}}" hint-placeholder-val="{{ true }}">
+<div style="display: grid; grid-template-columns: repeat({{m.grid.w}}, 12px); gap: 1px; padding: 1px; background: #2a2a2a; border-radius: 3px; flex-shrink: 0">
+<sc-for list="{{m.grid.cells}}" as="c" hint-placeholder-count="36"><div style="width: 12px; height: 12px; background: {{c.c}}; box-shadow: {{c.sh}}"></div></sc-for>
+</div>
+</sc-if>
+<sc-if value="{{m.noGrid}}" hint-placeholder-val="{{ false }}"><div style="width: 79px; height: 79px; box-sizing: border-box; border: 1px dashed #333; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #8f8f8f; flex-shrink: 0">no try yet</div></sc-if>
+<div style="display: flex; flex-direction: column; gap: 8px; min-width: 0">
+<span style="font-size: 15px; line-height: 1.35; color: {{m.oc}}">{{m.outcome}}</span>
+<div style="display: flex; gap: 4px"><sc-for list="{{m.tries}}" as="t" hint-placeholder-count="5"><div style="width: 12px; height: 12px; border-radius: 3px; background: {{t.c}}; box-shadow: inset 0 0 0 1px {{t.b}}"></div></sc-for></div>
+<span style="font-size: 12px; color: #8f8f8f">{{m.sub}}</span>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+<span style="font-size: 14px; line-height: 1.45; color: #a1a1a1">{{sel.cmpNote}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; color: #e6e6e6">What it read</span><span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #8f8f8f">11,240 tokens · built fresh</span></div>
+<div style="display: flex; gap: 28px; flex-wrap: wrap">
+<sc-for list="{{ctx}}" as="c" hint-placeholder-count="5"><div style="display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Geist Mono', monospace; font-size: 16px; color: {{c.lc}}">{{c.tok}}</span><span style="font-size: 12px; color: #8f8f8f">{{c.t}}</span></div></sc-for>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 14px; color: #a1a1a1">Attempts</span>
+<sc-for list="{{sel.attempts}}" as="a" hint-placeholder-count="2">
+<div style="display: grid; grid-template-columns: 24px 96px 1fr; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px solid #161616">
+<span style="font-family: 'Geist Mono', monospace; font-size: 14px; color: #8f8f8f">{{a.n}}</span>
+<span style="font-family: 'Geist Mono', monospace; font-size: 14px; color: #a1a1a1">{{a.w}}</span>
+<div style="display: flex; align-items: center; gap: 8px; font-size: 14px"><div style="width: 8px; height: 8px; border-radius: 2px; background: {{a.c}}"></div><span>{{a.out}}</span><span style="color: #8f8f8f">{{a.why}}</span></div>
+</div>
+</sc-for>
+</div>
+<a href="Task.dc.html" style="margin-top: auto; align-self: flex-start; height: 42px; display: flex; align-items: center; gap: 10px; padding: 0 16px; border: 1px solid #333; border-radius: 10px; text-decoration: none; font-size: 15px">See everything {{sel.agentN}} read and did, step by step<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#ededed" stroke-width="1.6"><path d="M4 8h8M9 5l3 3-3 3"></path></svg></a>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"open":{"editor":"int","default":-1},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  mk(seed) { let s = seed >>> 0; return function () { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+  renderVals() {
+    const ARC = ['#07070d', '#5a5fe0', '#ec5a78', '#3fd0a4', '#f6c453', '#7c7f99', '#c65ae0', '#f58b4c', '#72d8f5', '#8a2f60'];
+    const K = { solved: '#4a8f67', refuted: '#c29a3a', gate: '#5a5a5a', run: '#2e2e2e', error: '#7a2e31' };
+    const P = s => s.split('|').map(r => r.split('').map(Number));
+    const mirror = g => g.map(row => row.slice().reverse());
+    const flipV = g => g.slice().reverse();
+    const recolor = (g, a, b) => g.map(row => row.map(v => v === a ? b : v));
+    const gravity = g => { const h = g.length, w = g[0].length, o = g.map(row => row.map(() => 0)); for (let x = 0; x < w; x++) { const col = []; for (let y = 0; y < h; y++) if (g[y][x]) col.push(g[y][x]); col.forEach((v, k) => { o[h - col.length + k][x] = v; }); } return o; };
+    const rot = g => g[0].map((_, x) => g.map(row => row[x]).reverse());
+    const mutate = (g, list) => { const o = g.map(row => row.slice()); list.forEach(m => { o[m[0]][m[1]] = m[2]; }); return o; };
+    const rnd = (seed, cols) => { const r = this.mk(seed); const g = []; for (let y = 0; y < 6; y++) { const row = []; for (let x = 0; x < 6; x++) row.push(r() < 0.32 ? cols[Math.floor(r() * cols.length)] : 0); g.push(row); } return g; };
+    const grid = (rows, ref) => rows ? { w: rows[0].length, cells: [].concat(...rows.map((row, y) => row.map((v, x) => ({ c: ARC[v], sh: ref && ref[y][x] !== v ? 'inset 0 0 0 2px #ededed' : 'none' })))) } : null;
+    const trio = (f, seeds, cols) => seeds.map(s => { const i = rnd(s, cols); return [i, f(i)]; });
+    const boxes = [
+      [P('000000|011110|010010|011110|000000|000000'), P('000000|011110|014410|011110|000000|000000')],
+      [P('111000|101000|111000|000000|000111|000101'), P('111000|141000|111000|000000|000111|000141')],
+      [P('000000|011100|010100|011100|000000|000000'), P('000000|011100|014100|011100|000000|000000')]
+    ];
+    const LIB = {
+      a: { key: '9e41c2a7', kind: 'solved', from: 'w-03', at: '15:12', score: '0.84', gist: 'Fill closed red boxes with their border color.' },
+      b: { key: '51d0b8f3', kind: 'solved', from: 'w-05', at: '15:31', score: '0.79', gist: 'Flood-fill enclosed black regions with yellow.' },
+      c: { key: 'c07a19e2', kind: 'refuted', from: 'w-02', at: '15:47', score: '0.66', gist: 'Fill black cells that touch two blue cells.' },
+      d: { key: '1a8c3e70', kind: 'solved', from: 'w-01', at: '14:58', score: '0.88', gist: 'Mirror each row around the center column.' },
+      e: { key: 'd2f64b19', kind: 'refuted', from: 'w-06', at: '15:20', score: '0.61', gist: 'Reverse the order of the rows.' },
+      f: { key: '88e0a4c2', kind: 'solved', from: 'w-04', at: '15:05', score: '0.82', gist: 'Drop colored cells until they hit something.' },
+      g: { key: 'f3b17d05', kind: 'refuted', from: 'w-07', at: '15:40', score: '0.58', gist: 'Sort each column by color.' },
+      h: { key: '4c7e91aa', kind: 'solved', from: 'w-02', at: '14:49', score: '0.86', gist: 'Swap two colors everywhere.' },
+      i: { key: 'b90d2e36', kind: 'solved', from: 'w-08', at: '15:26', score: '0.83', gist: 'Rotate the grid a quarter turn clockwise.' },
+      j: { key: '70ac5f18', kind: 'refuted', from: 'w-05', at: '15:55', score: '0.64', gist: 'Transpose the grid.' }
+    };
+    const ST = {
+      solved: { chip: 'Solved', chipC: '#6fbf8e', chipBd: '#1d3527', dot: '#4a8f67', bd: '#1d3527', bg: '#08120c', dotCls: '' },
+      work: { chip: 'Working', chipC: '#a1a1a1', chipBd: '#262626', dot: '#5b7cfa', bd: '#1f1f1f', bg: '#0a0a0a', dotCls: 'pulse' },
+      resumed: { chip: 'Resumed', chipC: '#a1a1a1', chipBd: '#262626', dot: '#5b7cfa', bd: '#1f1f1f', bg: '#0a0a0a', dotCls: 'pulse' },
+      retry: { chip: 'Retrying', chipC: '#d9b45a', chipBd: '#3a2f14', dot: '#c29a3a', bd: '#2e2612', bg: '#0d0b05', dotCls: '' },
+      merged: { chip: 'Passed examples', chipC: '#5fb8b3', chipBd: '#16403e', dot: '#2f8f8a', bd: '#16403e', bg: '#061110', dotCls: '' }
+    };
+    const defs = [
+      { key: '3b7f21c9', att: 2, st: 'solved', pairs: boxes, acts: [0, 0, 0], show: 0, worker: 'w-06', step: 'done', note: 'all 3 pairs match · hidden test passed', rule: 'Fill the inside of every closed blue box with yellow.', prec: ['a', 'b', 'c'], attempts: [['1', 'w-03', 'failed', 'pair 2 · 3 cells differ', '#c29a3a'], ['2', 'w-06', 'solved', 'hidden test passed', '#4a8f67']] },
+      { key: 'a90e4d12', att: 1, st: 'work', pairs: trio(mirror, [3, 4, 5], [1, 2, 8]), acts: [0, 0, [[1, 0, 2], [3, 5, 0]]], show: 2, worker: 'w-02', step: '12/20', note: '2 of 3 pairs match', rule: 'Mirror the grid left to right.', prec: ['d', 'e', 'i'], attempts: [['1', 'w-02', 'working', 'step 12 of 20', '#5b7cfa']] },
+      { key: '5c02ee8b', att: 3, st: 'retry', pairs: trio(gravity, [7, 8, 9], [2, 3, 6]), acts: [0, [[5, 1, 0], [4, 1, 3], [5, 4, 6], [3, 4, 0]], 0], show: 1, worker: 'queued', step: 'next', note: 'pair 2 · 4 cells differ', rule: 'Let every colored cell fall to the bottom.', prec: ['f', 'g', 'b'], attempts: [['1', 'w-01', 'failed', 'general · hard-coded height', '#c29a3a'], ['2', 'w-04', 'failed', 'pair 2 · 6 cells differ', '#c29a3a'], ['3', 'w-03', 'failed', 'pair 2 · 4 cells differ', '#c29a3a']] },
+      { key: '7c66bfe3', att: 1, st: 'work', pairs: trio(g => recolor(g, 5, 8), [11, 12, 13], [5, 1, 5]), acts: null, show: 0, worker: 'w-04', step: '4/20', note: 'reading 3 entries from the library', rule: null, prec: ['h', 'd', 'c'], attempts: [['1', 'w-04', 'working', 'step 4 of 20', '#5b7cfa']] },
+      { key: '68d01813', att: 2, st: 'resumed', pairs: trio(rot, [15, 16, 17], [7, 2, 1]), acts: null, show: 0, worker: 'w-09', step: '1/20', note: 'w-05 died · picked up again, nothing lost', rule: null, prec: ['i', 'j', 'd'], attempts: [['1', 'w-07', 'failed', 'pair 1 · 9 cells differ', '#c29a3a'], ['2', 'w-05 → w-09', 'resumed', 'w-05 died at step 7', '#5b7cfa']] },
+      { key: '6f18a2d4', att: 1, st: 'merged', pairs: trio(g => recolor(g, 1, 2), [19, 20, 21], [1, 3, 1]), acts: [0, 0, 0], show: 0, worker: 'w-07', step: 'done', note: 'all 3 pairs match · waiting for score', rule: 'Recolor every blue cell red.', prec: ['h', 'c', 'f'], attempts: [['1', 'w-07', 'passed examples', 'not scored yet', '#2f8f8a']] },
+      { key: 'e41b9c07', att: 1, st: 'work', pairs: trio(flipV, [23, 24, 25], [6, 8, 3]), acts: [[[2, 3, 6]], null, null], show: 0, worker: 'w-01', step: '9/20', note: 'pair 1 · 1 cell differs', rule: 'Flip the grid top to bottom.', prec: ['e', 'd', 'i'], attempts: [['1', 'w-01', 'working', 'step 9 of 20', '#5b7cfa']] },
+      { key: 'c8d17a30', att: 1, st: 'work', pairs: trio(g => recolor(g, 3, 4), [27, 28, 29], [3, 2, 3]), acts: [0, 0, 0], show: 0, worker: 'w-08', step: '15/20', note: '3 of 3 pairs match · about to submit', rule: 'Turn every green cell yellow.', prec: ['h', 'a', 'g'], attempts: [['1', 'w-08', 'working', 'step 15 of 20', '#5b7cfa']] }
+    ];
+    const openIdx = this.state && this.state.open !== undefined ? this.state.open : (this.props.open ?? -1);
+    const focus = this.state && this.state.focus !== undefined ? this.state.focus : (openIdx >= 0 ? openIdx : 7);
+    const kindLabel = { solved: 'solved', refuted: 'refuted' };
+    const ag = s => String(s).replace(/w-0?(\d+)/g, 'agent $1');
+    const precOf = (d, numbered) => d.prec.map((id, j) => {
+      const e = LIB[id];
+      return { n: String(j + 1), num: numbered, short: e.key.slice(0, 4), key: e.key, from: ag(e.from), at: e.at, score: e.score, gist: e.gist, kindLabel: kindLabel[e.kind], c: K[e.kind], bd: numbered ? '#555555' : '#262626', kc: e.kind === 'solved' ? '#6fbf8e' : '#d9b45a', tc: e.kind === 'solved' ? '#ededed' : '#a1a1a1', deco: e.kind === 'refuted' ? 'line-through' : 'none', kind: e.kind };
+    });
+    const GIVE = [
+      ['Solved. Its rule is now in the library for every agent.', '#6fbf8e'],
+      ['agent 2 is testing its program', '#a1a1a1'],
+      ['3 tries failed · the next agent starts with what went wrong', '#d9b45a'],
+      ['agent 4 is reading before it writes anything', '#a1a1a1'],
+      ['agent 5 stopped · agent 9 took over, nothing lost', '#a1a1a1'],
+      ['Right on the examples · waiting for the hidden test', '#5fb8b3'],
+      ['agent 1 is running its program', '#a1a1a1'],
+      ['agent 8 is about to hand it in', '#a1a1a1']
+    ];
+    const built = defs.map((d, i) => {
+      const s = ST[d.st];
+      const rows = d.pairs.map((p, j) => {
+        const a = d.acts ? d.acts[j] : null;
+        const act = a === 0 ? p[1] : Array.isArray(a) ? mutate(p[1], a) : null;
+        const ok = a === 0;
+        return { n: j + 1, inp: grid(p[0]), exp: grid(p[1]), act: grid(act, p[1]), hasAct: !!act, noAct: !act, dot: act ? (ok ? '#4a8f67' : '#c29a3a') : 'transparent', dotB: act ? (ok ? '#4a8f67' : '#c29a3a') : '#444444' };
+      });
+      const sh = rows[d.show];
+      return Object.assign({}, s, {
+        key: d.key, att: d.att, inp: sh.inp, exp: sh.exp, act: sh.act, hasAct: sh.hasAct, noAct: sh.noAct,
+        dots: rows.map(r => ({ c: r.dot, b: r.dotB })), note: d.note,
+        noteC: d.st === 'solved' ? '#6fbf8e' : d.st === 'retry' ? '#d9b45a' : d.st === 'merged' ? '#5fb8b3' : '#ededed',
+        cls: d.st === 'solved' ? 'solvedflash' : d.st === 'retry' ? 'retryflash' : '',
+        learnTitle: i === 3 ? 'Pulling lessons from the library…' : i === 2 ? 'Carrying forward what went wrong' : 'Learning from other puzzles',
+        learnNote: i === 2 ? 'for the next agent' : 'from other agents',
+        learn: d.prec.map((id, j) => {
+          const e = LIB[id]; const r3 = this.mk(500 + j + id.charCodeAt(0) * 7); const cl = [1 + Math.floor(r3() * 9), 1 + Math.floor(r3() * 9)]; const cells = []; for (let q = 0; q < 36; q++) cells.push(r3() < 0.34 ? ARC[cl[Math.floor(r3() * 2)]] : '#1c1c24');
+          const own = i === 2 && j < 2;
+          const worked = !own && e.kind === 'solved';
+          return { cells: own ? rows[1].exp.cells.map(c => c.c) : cells, kind: worked ? 'worked' : 'dead end', kc: worked ? '#6fbf8e' : '#d9b45a', bd: worked ? '#1d3527' : '#2e2612', from: own ? 'its try ' + (3 - j) : ag(e.from), cls: i === 3 ? 'arrive' : '', delay: (j * 0.6) + 's' };
+        }),
+        give: GIVE[i][0], giveC: GIVE[i][1],
+        worker: ag(d.worker), step: /^\d+\/20$/.test(d.step) ? 'step ' + d.step.replace('/', ' of ') : '', prec: precOf(d, i === focus), ring: i === focus ? '0 0 0 1px #8f8f8f' : 'none',
+        rows: rows, ruleLabel: d.rule ? (d.st === 'solved' ? 'Rule' : 'Current hypothesis') : 'Rule',
+        rule: d.rule || 'No rule yet. The worker is still reading.',
+        agentN: ag(d.worker),
+        attempts: d.attempts.map(a => ({ n: a[0], w: ag(a[1]), out: a[2], why: a[3], c: a[4] })),
+        open: () => this.setState({ open: i, focus: i })
+      });
+    });
+    const killed = !!(this.state && this.state.killed);
+    const killSet = [1, 3, 4, 6, 7];
+    built.forEach((b, i) => {
+      b.attCls = defs[i].st === 'retry' ? 'tick' : '';
+      b.attC = defs[i].st === 'retry' ? '#d9b45a' : '#8f8f8f';
+      if (defs[i].st === 'retry') b.att = 4;
+      if (killed && killSet.indexOf(i) >= 0) Object.assign(b, { chip: 'Agent stopped', chipC: '#f07178', chipBd: '#3a1a1b', dot: '#7a2e31', dotCls: '', bd: '#3a1a1b', bg: '#120707', cls: '', give: b.worker + ' stopped · puzzle back in the queue, nothing lost', giveC: '#f07178', step: '', learnTitle: 'Its lessons stay in the library', learnNote: 'the next agent reads them again' });
+    });
+    const CTRL = [
+      [5, 'Not solved after 5 tries', 'Why the difference: the control kept filling every enclosed black area. goalkeeper had that exact rule in its lessons as a dead end, so it never tried it.', 'control: not solved in 5', [[2, 2, 4], [4, 1, 4], [3, 4, 4]], true],
+      [2, '1 of 3 pairs right, still trying', 'The control starts every try from a blank page. goalkeeper started from a solved mirror puzzle.', 'control: 1 of 3 pairs', [[1, 1, 2], [2, 4, 1], [4, 0, 8]], false],
+      [5, 'Not solved after 5 tries', 'Both struggle here. goalkeeper’s next agent starts with its 3 failed tries; the control forgets them every time.', 'control: not solved in 5', [[5, 2, 3], [5, 3, 0], [4, 4, 6]], true],
+      [1, '0 of 3 pairs right so far', 'goalkeeper reads 3 lessons before it writes anything; the control guesses first.', 'control: 0 of 3 pairs', [[0, 0, 5], [1, 2, 8], [3, 3, 5], [5, 5, 8]], false],
+      [2, '1 of 3 pairs right, still trying', 'When a goalkeeper agent dies, the next one resumes with the same lessons. The control restarts cold.', 'control: 1 of 3 pairs', [[0, 1, 7], [2, 2, 1]], false],
+      [3, '2 of 3 pairs right, still trying', 'goalkeeper got it on its first try with a color-swap lesson; the control is on try 3.', 'control: 2 of 3 pairs', [[3, 3, 1]], false],
+      [1, '0 of 3 pairs right so far', 'Same puzzle, same budget: the only difference is the library.', 'control: 0 of 3 pairs', [[0, 0, 6], [1, 1, 8], [4, 2, 3]], false],
+      [2, '2 of 3 pairs right, still trying', 'Same puzzle, same budget: the only difference is the library.', 'control: 2 of 3 pairs', [[2, 2, 4]], false]
+    ];
+    const OURS = [['Solved on attempt 2', '#6fbf8e'], ['2 of 3 pairs right, still working', '#ededed'], ['3 tries failed · attempt 4 next', '#d9b45a'], ['Still reading its lessons', '#ededed'], ['Picked up again after its agent died', '#ededed'], ['All pairs right · waiting for the score', '#5fb8b3'], ['Pair 1 is 1 cell off, still working', '#ededed'], ['All pairs right · handing it in', '#ededed']];
+    const hollow = { c: 'transparent', b: '#333333' };
+    built.forEach((b, i) => {
+      const d = defs[i], Cc = CTRL[i];
+      const exp = d.pairs[d.show][1];
+      b.ctrlLine = Cc[3];
+      const oursTries = d.attempts.map(a => ({ c: a[4], b: a[4] })).concat([hollow, hollow, hollow, hollow, hollow]).slice(0, 5);
+      const ctrlTries = [];
+      for (let t = 0; t < 5; t++) ctrlTries.push(t < Cc[0] ? (Cc[5] || t < Cc[0] - 1 ? { c: '#c29a3a', b: '#c29a3a' } : { c: '#5b7cfa', b: '#5b7cfa' }) : hollow);
+      b.cmp = [
+        { who: 'goalkeeper · with the library', line: '2px solid #6fbf8e', tc: '#ededed', bd: '#1f2a23', bg: '#08100b', grid: b.act, hasGrid: b.hasAct, noGrid: !b.hasAct, outcome: OURS[i][0], oc: OURS[i][1], tries: oursTries, sub: 'read 3 lessons · 11.2k tokens a try' },
+        { who: 'control · no library', line: '2px dashed #8f8f8f', tc: '#a1a1a1', bd: '#1f1f1f', bg: '#0a0a0a', grid: grid(mutate(exp, Cc[4]), exp), hasGrid: true, noGrid: false, outcome: Cc[1], oc: '#a1a1a1', tries: ctrlTries, sub: 'reads only the puzzle · 10.9k tokens a try' }
+      ];
+      b.cmpNote = Cc[2];
+      b.learnTitle = i === 2 ? 'Carrying forward what went wrong' : 'Lessons pulled from the library';
+      b.learnFull = d.prec.map((id, j) => {
+        const e = LIB[id], L = b.learn[j], own = i === 2 && j < 2, worked = L.kind === 'worked';
+        return {
+          cells: L.cells, bd: worked ? '#1d3527' : '#2e2612', kc: worked ? '#6fbf8e' : '#d9b45a', kind: worked ? 'a rule that worked' : 'a dead end',
+          gist: own ? (j === 0 ? 'Let every colored cell fall to the bottom.' : 'Drop cells, but stop at the grey row.') : e.gist,
+          where: own ? 'its own try ' + (3 - j) + ' · pair 2 was off by ' + (j === 0 ? 4 : 6) + ' cells' : 'found by ' + ag(e.from) + ' on puzzle ' + e.key + ' at ' + e.at,
+          tc: worked ? '#ededed' : '#a1a1a1', deco: worked ? 'none' : 'line-through'
+        };
+      });
+    });
+    const C = 96, colW = 18.4, r = this.mk(77), field = [], tops = [];
+    for (let i = 0; i < C; i++) {
+      const n = Math.min(9, 1 + Math.floor(8 * Math.pow(i / (C - 1), 0.75) + r() * 1.4));
+      tops.push(n);
+      for (let k = 0; k < n; k++) {
+        const t = r(), late = i / C;
+        const kind = t < 0.42 ? 'run' : t < 0.66 ? 'gate' : t < 0.8 + late * 0.02 ? 'refuted' : t < 0.95 ? 'solved' : 'error';
+        field.push({ x: Math.round(i * colW), y: 140 - 12 - k * 15, c: K[kind] });
+      }
+    }
+    const fd = defs[focus];
+    const toCol = at => { const p = at.split(':').map(Number); const m = (p[0] * 60 + p[1]) - (14 * 60 + 20); return Math.max(0, Math.min(C - 1, Math.round(m / 121 * (C - 1)))); };
+    const fp = precOf(fd, true);
+    const marks = fp.map((p, j) => { const col = toCol(p.at); const k = tops[col] - 1; const x = Math.round(col * colW), y = 140 - 12 - k * 15; return { n: p.n, c: K[p.kind], x: x, y: y, lx: x - 4, ly: y - 28 }; });
+    const tileOf = { a: 6, b: 11, c: 17, d: 29, e: 35, f: 40, g: 26, h: 20, i: 9, j: 3 };
+    const selMap = {};
+    fd.prec.forEach((id, j) => { selMap[tileOf[id]] = String(j + 1); });
+    const tr = this.mk(91);
+    const tileCells = seed => { const r2 = this.mk(seed); const cols = [1 + Math.floor(r2() * 9), 1 + Math.floor(r2() * 9)]; const o = []; for (let q = 0; q < 36; q++) o.push(r2() < 0.34 ? ARC[cols[Math.floor(r2() * 2)]] : '#1a1a22'); return o; };
+    const boxCells = ['000000', '011110', '014410', '011110', '000000', '000000'].join('').split('').map(v => v === '0' ? '#1a1a22' : ARC[Number(v)]);
+    const kindById = {};
+    Object.keys(tileOf).forEach(id => { kindById[tileOf[id]] = LIB[id].kind; });
+    const tiles = [], links = [];
+    const TX = 343, TY = 851;
+    for (let t = 0; t < 46; t++) {
+      const col = t % 23, row = Math.floor(t / 23);
+      const x = col * 64, y = row * 64;
+      const kind = kindById[t] || (tr() < 0.3 ? 'refuted' : 'solved');
+      const sel = selMap[t] !== undefined;
+      const newest = t === 0;
+      tiles.push({
+        x: x, y: y, cells: newest ? boxCells : tileCells(300 + t), mark: kind === 'solved' ? '#6fbf8e' : '#d9b45a',
+        sel: sel, n: selMap[t] || '', op: sel || newest ? 1 : 0.5,
+        sh: sel ? 'inset 0 0 0 1px #ededed' : newest ? '0 0 0 1px #4a8f67, 0 0 18px rgba(74,143,103,.7)' : 'inset 0 0 0 1px #1c1c22'
+      });
+      if (sel && focus >= 4) {
+        const cardW = (1824 - 54) / 4, ccol = focus % 4;
+        const cx = 48 + ccol * (cardW + 18) + cardW / 2 + (Number(selMap[t]) - 2) * 40, cy = 806;
+        const tx = TX + x + 28, ty = TY + y;
+        links.push({ d: 'M' + cx.toFixed(0) + ' ' + cy + ' C ' + cx.toFixed(0) + ' ' + (cy + 24) + ', ' + tx + ' ' + (ty - 24) + ', ' + tx + ' ' + ty });
+      }
+    }
+    const ctxParts = [['goal', 1100, '', '#a1a1a1'], ['puzzle', 1800, '', '#a1a1a1'], ['lessons', 900, '', '#a1a1a1'], ['from the library', 4600, '', '#e6e6e6'], ['instructions + tools', 2840, '', '#a1a1a1']];
+    return {
+      killed: killed, toggleKill: () => this.setState({ killed: !killed, open: -1 }),
+      killLabel: killed ? 'Restart the 5 agents' : 'Simulate failure: stop 5 agents',
+      agentsV: killed ? '3 / 8' : '8 / 8', agentsC: killed ? '#f07178' : '#ededed', agentsNote: killed ? '5 restarting' : 'agents running',
+      tiles: tiles, links: links, showLinks: links.length > 0 && openIdx < 0,
+      cards: built, isOpen: openIdx >= 0, sel: openIdx >= 0 ? Object.assign({}, built[openIdx], { prec: precOf(defs[openIdx], true) }) : built[0],
+      close: () => this.setState({ open: -1 }),
+      field: field, marks: marks, focusKey: fd.key, focusPrec: fp,
+      kinds: [['solved programs, with their rule', 'solved', '2,140'], ['refuted rules, so nobody repeats them', 'refuted', '5,318'], ['gate verdicts', 'gate', '12,560'], ['raw worker runs and errors', 'run', '28,193']].map(k => ({ t: k[0], c: k[1] === 'run' ? '#555557' : k[1] === 'gate' ? '#777779' : K[k[1]], n: k[2] })),
+      recent: [
+        ['solved', 'solved rule', '3b7f21c9', 'w-06', '4s ago', 'Fill the inside of every closed blue box with yellow.'],
+        ['refuted', 'refuted rule', '5c02ee8b', 'w-03', '31s ago', 'Stop falling cells at the first grey row.'],
+        ['solved', 'solved rule', 'c8d17a30', 'w-08', '1m ago', 'Turn every green cell yellow.'],
+        ['refuted', 'refuted rule', 'a90e4d12', 'w-02', '2m ago', 'Mirror only the top half of the grid.']
+      ].slice(0, 3).map((e, i) => ({ c: K[e[0]], kc: e[0] === 'solved' ? '#6fbf8e' : '#d9b45a', kind: e[1], key: e[2], w: e[3], ago: e[4], gist: e[5], deco: e[0] === 'refuted' ? 'line-through' : 'none', op: (1 - i * 0.15).toFixed(2) })),
+      ctx: ctxParts.map(c => ({ t: c[0], tok: (c[1] / 1000).toFixed(1) + 'k', c: c[2], lc: c[3], w: (c[1] / 11240 * 100).toFixed(1) + '%' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

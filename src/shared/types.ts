@@ -182,6 +182,15 @@ export const Lock = z.object({
   until: z.date(),
 });
 
+// The kill switch for the demo (controls/kill): the screen sets remaining,
+// and the next workers to heartbeat each take one and SIGKILL themselves
+// mid-task. Docker restarts the container; the reaper requeues the task.
+export const Control = z.object({
+  _id: z.literal("kill"),
+  remaining: z.number().int().min(0),
+  at: z.date(),
+});
+
 export const MetricsMinute = z.object({
   minute: z.date(),
   merged: z.number().int(),
@@ -255,6 +264,7 @@ export type SourceKind = z.infer<typeof SourceKind>;
 export type Enrichment = z.infer<typeof Enrichment>;
 export type Tokens = z.infer<typeof Tokens>;
 export type Lock = z.infer<typeof Lock>;
+export type Control = z.infer<typeof Control>;
 export type Metrics = z.infer<typeof Metrics>;
 export type Lessons = z.infer<typeof Lessons>;
 

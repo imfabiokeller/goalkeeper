@@ -168,6 +168,12 @@ Pinned, not retrieved: goal; input text; state for the key; last three
 
 ## Singletons
 
+- `controls`: `{ _id: "kill", remaining: 5, at }`. The demo kill switch,
+  set by the screen. Each worker's heartbeat takes one kill atomically
+  (`findOneAndUpdate` with `remaining > 0`, `$inc -1`) and SIGKILLs
+  itself mid-task; Docker restarts the container and the reaper requeues
+  the task. Five kills stop exactly five workers.
+
 - `locks`: `{ _id: "planner", holder: "w-07", until: ISODate }`. Acquired
   with `findOneAndUpdate({ _id: "planner", until: { $lt: now } })`.
 - `metrics`: `{ _id: "metrics", at, perMinute: [{ minute, merged, failed, blocked, firstTryPass, tokens, contextAvg }], solveRate: [{ bucket, attempted, merged, solved }], totals: { ..., solved, attempted, stepsMedian }, versions: [{ version, at }], lessons }`.

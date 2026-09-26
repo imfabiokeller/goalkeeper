@@ -37,3 +37,10 @@ export async function heartbeat(c: Collections, taskId: ObjectId, workerId: stri
   );
   return r !== null;
 }
+
+// The kill switch (controls/kill): take one of the remaining kills, or none.
+// One atomic decrement, so five kills stop exactly five workers.
+export async function takeKill(c: Collections): Promise<boolean> {
+  const r = await c.controls.findOneAndUpdate({ _id: "kill", remaining: { $gt: 0 } }, { $inc: { remaining: -1 } });
+  return r !== null;
+}

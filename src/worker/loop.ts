@@ -11,7 +11,7 @@ import { synthesize, type Briefing, type SynthesizeArgs } from "../context/synth
 import { gate as realGate } from "../gate/gate.ts";
 import type { Collections } from "../shared/db.ts";
 import type { CheckInput, CheckState, Enrichment, GateResult, Goal, Input, Source, State, Task } from "../shared/types.ts";
-import { claim, heartbeat, stepDone } from "./claim.ts";
+import { claim, heartbeat, stepDone, takeKill } from "./claim.ts";
 import { runTask, type RunResult } from "./run.ts";
 import { enrich as realEnrich, enrichSource, writeErrorSource, writeGateSource, writeRun, type EnrichFn } from "./write.ts";
 
@@ -31,6 +31,7 @@ export type IterationOptions = {
   heartbeatMs?: number; // default 15 s
   maxSteps?: number;
   planEveryMs?: number; // default PLAN_EVERY_MS (env PLAN_EVERY_MS)
+  kill?: (() => void) | null; // null: ignore the kill switch (tests); default SIGKILL
 };
 
 // A failed gate reopens the task with attempt + 1 while attempt is below
@@ -115,6 +116,15 @@ export async function iteration(c: Collections, workerId: string, opts: Iteratio
 
   const beat = setInterval(() => {
     heartbeat(c, task._id, workerId).catch(() => undefined);
+    // The demo kill: die mid-task like a crashed container, no cleanup.
+    // The task stays claimed with a stale heartbeat until the reaper.
+    if (opts.kill !== null) {
+      takeKill(c)
+        .then((yes) => {
+          if (yes) (opts.kill ?? (() => process.kill(process.pid, "SIGKILL")))();
+        })
+        .catch(() => undefined);
+    }
   }, opts.heartbeatMs ?? HEARTBEAT_MS);
 
   try {
