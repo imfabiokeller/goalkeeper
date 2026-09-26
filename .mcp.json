@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "mongodb": {
-      "command": "npx",
-      "args": ["-y", "mongodb-mcp-server@<3", "--connectionString", "${MDB_MCP_CONNECTION_STRING}"]
+      "command": "sh",
+      "args": ["-c", "set -a; [ -f .env ] && . ./.env; set +a; exec npx -y mongodb-mcp-server@<3"]
     },
     "strands-agents": {
       "command": "uvx",
