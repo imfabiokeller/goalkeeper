@@ -89,6 +89,9 @@ export function assemble(args: AssembleArgs): Assembled {
   if (goal.outOfScope.length) {
     parts.push("## Out of scope\n" + goal.outOfScope.map((g) => `- ${clip(g, MAX_GOAL_LINE_CHARS)}`).join("\n"));
   }
+  if (goal.proposalShape) {
+    parts.push("## Proposal shape (submit exactly these fields, these names, these types)\n" + clip(goal.proposalShape, 3000));
+  }
 
   // Derived from the gate's verdicts over the last hours: what fails, why,
   // and what got blocked. Counts, not rules; the goal above is the rule.

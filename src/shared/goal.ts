@@ -34,6 +34,12 @@ export function goalFromLens(lens: unknown): Goal {
     criteria,
     guidelines: strings(lens.guidelines),
     outOfScope: strings(lens.outOfScope),
+    proposalShape:
+      typeof lens.proposalShape === "string"
+        ? lens.proposalShape
+        : lens.proposalShape === undefined
+          ? ""
+          : JSON.stringify(lens.proposalShape, null, 2),
     history: [{ version: 1, at: new Date(), by: "seed", diff: null }],
   });
 }

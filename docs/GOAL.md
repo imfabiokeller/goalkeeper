@@ -16,6 +16,9 @@ Criteria      at most three, each with a check kind the gate can run:
               { id, text, check: { kind, params } }
 Guidelines    a few lines of taste, appended to by approved proposals
 Out of scope  what gets parked, with the reason shown on screen
+Proposal shape the exact JSON a worker must submit: field names, types,
+              nullability, an example. Pinned into every worker context.
+              Without it the model invents its own field names.
 Version       1 at seed, +1 per approved diff
 History       one entry per version: at, by, diff, questionId
 ```
@@ -29,7 +32,7 @@ The `usecase/` folder is the interface between the use case and the
 harness. A use case is exactly these files:
 
 - `lens.json`: the goal document above (`goal`, `criteria`, `guidelines`,
-  `outOfScope`).
+  `outOfScope`, `proposalShape` as a JSON example or a string).
 - `inputs.json`: the index of units: `key`, `name`, `file`, plus any extra
   fields the checks need (stored as `meta`).
 - `inputs/<file>`: one plain-text input per unit.

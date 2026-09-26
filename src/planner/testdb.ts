@@ -46,6 +46,7 @@ export function goalFixture(over: Partial<Goal> = {}): Goal {
     ],
     guidelines: ["Prefer GAAP figures over adjusted ones."],
     outOfScope: ["Guidance and forecasts."],
+    proposalShape: "",
     history: [{ version: 1, at: new Date("2026-09-26T10:00:00Z"), by: "seed", diff: null }],
     ...over,
   };

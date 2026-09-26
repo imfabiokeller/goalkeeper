@@ -20,6 +20,7 @@ Every document that a goal version matters for carries `version`.
   ],
   guidelines: ["<taste line>", "...", "<guideline added by an approved proposal>"],
   outOfScope: ["<what gets parked>", "..."],
+  proposalShape: "<the exact JSON a proposal must have, pinned into every worker context>",
   history: [
     { version: 1, at: ISODate, by: "seed", diff: null },
     { version: 2, at: ISODate, by: "fabio", diff: { op: "add-guideline", text: "<guideline>" }, questionId: ObjectId }

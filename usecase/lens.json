@@ -6,17 +6,23 @@
     {
       "id": "c1",
       "text": "Every value in a proposal is backed by a quote that appears word for word in the press release and contains that value at the precision it was written.",
-      "check": { "kind": "grounded" }
+      "check": {
+        "kind": "grounded"
+      }
     },
     {
       "id": "c2",
       "text": "The figures agree with each other and with the filing: net income never exceeds revenue, EPS carries the sign of net income, the stated growth matches the two revenue figures within one point, and the period ends at most 120 days before the filing date.",
-      "check": { "kind": "consistent" }
+      "check": {
+        "kind": "consistent"
+      }
     },
     {
       "id": "c3",
       "text": "A proposal has exactly the fields of the proposal shape, correctly typed, with amounts in whole US dollars, and its key is not already merged.",
-      "check": { "kind": "schema" }
+      "check": {
+        "kind": "schema"
+      }
     }
   ],
   "guidelines": [
@@ -35,5 +41,25 @@
     "Companies with no press release in the input folder."
   ],
   "contracts": {},
-  "history": []
+  "history": [],
+  "proposalShape": {
+    "key": "<equals the task key>",
+    "company": "<name as the release states it>",
+    "periodEnd": "<ISO date, last day of the quarter>",
+    "periodLabel": "Q[1-4] FY<year>",
+    "revenue": "<integer, whole US dollars>",
+    "netIncome": "<integer, whole US dollars, negative for a loss, or null>",
+    "dilutedEps": "<number, 2 decimals, or null>",
+    "revenuePriorYear": "<integer, whole US dollars, or null>",
+    "revenueChangePct": "<number, negative for a decline, or null>",
+    "currency": "USD",
+    "quotes": {
+      "periodEnd": "<verbatim passage>",
+      "revenue": "<verbatim passage>",
+      "netIncome": "<verbatim passage or omitted when null>",
+      "dilutedEps": "...",
+      "revenuePriorYear": "...",
+      "revenueChangePct": "..."
+    }
+  }
 }

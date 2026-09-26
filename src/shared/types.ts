@@ -46,6 +46,9 @@ export const Goal = z.object({
   criteria: z.array(Criterion).min(1),
   guidelines: z.array(z.string()),
   outOfScope: z.array(z.string()),
+  // The exact shape a proposal must have, as the use case states it (a JSON
+  // example or a field list). Pinned into every worker context.
+  proposalShape: z.string().default(""),
   history: z.array(GoalHistoryEntry),
 });
 
