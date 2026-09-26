@@ -1,10 +1,10 @@
-// One planner run. Takes the lock or returns, then reap, emit, crowd,
-// propose, metrics, backfill, turn. Every step is its own try/catch that
-// leaves an error source and moves on; the lock is always released.
+// One planner run. Takes the lock or returns, then reap, emit, score,
+// crowd, propose, metrics, backfill, turn. Every step is its own try/catch
+// that leaves an error source and moves on; the lock is always released.
 // Holds nothing between runs.
 
 import type { Collections } from "../shared/db.ts";
-import type { Enrichment, Goal, Source, Tokens } from "../shared/types.ts";
+import type { Enrichment, Goal, ScoreFn, Source, Tokens } from "../shared/types.ts";
 import { applyDiff } from "./applyDiff.ts";
 import { classifyPending, type ClassifyResult, type Decide } from "./classify.ts";
 import { emit } from "./emit.ts";
@@ -13,6 +13,7 @@ import { acquire, release } from "./lock.ts";
 import { refreshMetrics } from "./metrics.ts";
 import { propose, type DecideGuideline } from "./propose.ts";
 import { reap } from "./reaper.ts";
+import { defaultScore, scoreStates, type ScoreReport } from "./score.ts";
 import { writeError, writeSource, ZERO_TOKENS } from "./sources.ts";
 
 export type PlanOptions = {
@@ -23,6 +24,8 @@ export type PlanOptions = {
   staleMs?: number;
   decideCrowd?: Decide;
   decideGuideline?: DecideGuideline;
+  // The use case's hidden metric. Defaults to usecase/checks.ts score(); null skips the step.
+  score?: ScoreFn | null;
   // Enrichment lives in the worker (S2). When not given, backfill is skipped.
   enrich?: (source: Source) => Promise<Enrichment>;
 };
@@ -31,6 +34,7 @@ export type PlanReport = {
   holder: string;
   reaped: number;
   emitted: number;
+  score: ScoreReport;
   crowd: ClassifyResult[];
   proposed: number;
   backfilled: number;
@@ -45,6 +49,7 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
     holder,
     reaped: 0,
     emitted: 0,
+    score: { scored: 0, solved: 0, reopened: 0, skipped: 0 },
     crowd: [],
     proposed: 0,
     backfilled: 0,
@@ -80,6 +85,9 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
       await step("emit", async () => {
         report.emitted = await emit(c, g, workersTarget);
       });
+      await step("score", async () => {
+        report.score = await scoreStates(c, g, opts.score === undefined ? defaultScore : opts.score);
+      });
       await step("crowd", async () => {
         report.crowd = await classifyPending(c, g, opts.crowdCap ?? 10, opts.decideCrowd, report.tokens, lessons);
       });
@@ -110,6 +118,7 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
           holder,
           reaped: report.reaped,
           emitted: report.emitted,
+          score: report.score,
           crowd: report.crowd.map((r) => ({ sourceId: r.sourceId, outcome: r.outcome, reason: r.reason })),
           proposed: report.proposed,
           backfilled: report.backfilled,
@@ -120,7 +129,7 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
           version: goal?.version ?? 0,
           tokens: { ...report.tokens },
           text: [
-            `planner ${holder}: reaped ${report.reaped}, emitted ${report.emitted}, proposed ${report.proposed}, backfilled ${report.backfilled}`,
+            `planner ${holder}: reaped ${report.reaped}, emitted ${report.emitted}, scored ${report.score.scored} (solved ${report.score.solved}, reopened ${report.score.reopened}), proposed ${report.proposed}, backfilled ${report.backfilled}`,
             ...outcomes,
             ...report.errors,
             ...(lessons ? ["", lessons] : []),
