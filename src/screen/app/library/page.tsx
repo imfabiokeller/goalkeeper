@@ -531,9 +531,6 @@ export default function LibraryPage() {
           </Link>
           <span style={{ fontSize: 22, color: "#333" }}>/</span>
           <span style={{ fontSize: 20, color: "#a1a1a1" }}>Library</span>
-          <span style={{ fontSize: 13, color: "#9d8cf5", border: "1px solid #2a2450", borderRadius: 999, padding: "5px 12px" }}>
-            goal · written by a human · {d?.runStart ? hhmm(d.runStart) : "--:--"} · locked{d?.goalVersion && d.goalVersion > 1 ? ` · v${d.goalVersion}` : ""}
-          </span>
           {poll.error ? <span className="gk-chip" style={{ color: "var(--gk-dead)", borderColor: "var(--gk-dead-bd)" }}>{poll.error}</span> : null}
         </div>
         <Link href="/" style={{ height: 40, display: "flex", alignItems: "center", gap: 8, padding: "0 16px", border: "1px solid #333", borderRadius: 10, fontSize: 15 }}>
