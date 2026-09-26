@@ -116,11 +116,11 @@ function Stage() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  // Portrait screens (phones, tablets) get a tall artboard: the header stacks and the
+  // Phones in portrait get a tall artboard: the header stacks and the
   // cards run two per row, so the stage is not a thin strip.
   const [portrait, setPortrait] = useState(false);
   useEffect(() => {
-    const update = () => setPortrait(window.innerHeight > window.innerWidth);
+    const update = () => setPortrait(window.innerWidth < 900 && window.innerHeight > window.innerWidth);
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
