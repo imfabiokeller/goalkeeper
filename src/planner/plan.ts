@@ -90,11 +90,19 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
     if (opts.enrich) {
       const enrich = opts.enrich;
       await step("backfill", async () => {
-        const missing = await c.sources.find({ enrichment: null }, { limit: opts.backfillCap ?? 20 }).toArray();
-        for (const source of missing) {
-          const enrichment = await enrich(source);
-          const r = await c.sources.updateOne({ _id: source._id, enrichment: null }, { $set: { enrichment } });
-          report.backfilled += r.modifiedCount;
+        // Ten at a time: one enrichment is about 7 s, and ten workers write
+        // faster than a serial backfill can index.
+        const missing = await c.sources.find({ enrichment: null }, { limit: opts.backfillCap ?? 40 }).toArray();
+        for (let i = 0; i < missing.length; i += 10) {
+          const batch = missing.slice(i, i + 10);
+          const results = await Promise.allSettled(
+            batch.map(async (source) => {
+              const enrichment = await enrich(source);
+              const r = await c.sources.updateOne({ _id: source._id, enrichment: null }, { $set: { enrichment } });
+              return r.modifiedCount;
+            }),
+          );
+          for (const r of results) if (r.status === "fulfilled") report.backfilled += r.value;
         }
       });
     }
