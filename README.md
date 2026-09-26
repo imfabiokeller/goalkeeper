@@ -57,6 +57,8 @@ by a deterministic gate, so nothing drifts.
 - [docs/MVP.md](docs/MVP.md): the build plan, acceptance criteria, how it
   runs. Wins over every other doc.
 - [docs/DESIGN.md](docs/DESIGN.md): the architecture and the reasoning.
+- [docs/architecture.html](docs/architecture.html): the architecture as
+  one picture, open it in a browser.
 - [docs/DATABASE.md](docs/DATABASE.md): collections, indexes, the claim,
   the retrieval query, operations end to end.
 - [docs/PLANNER.md](docs/PLANNER.md): the planner steps.

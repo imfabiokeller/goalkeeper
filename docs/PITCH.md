@@ -108,7 +108,7 @@ take and not a new capture. Two takes, keep the better.
 |---|---|---|
 | 0:00 | Slide, one line: "Every long-running agent degrades." | Beat 1 |
 | 0:20 | Slide: "Up, not down." Two sketched curves. | Beat 2 |
-| 0:35 | Slide: the architecture diagram | Beat 3 |
+| 0:35 | Slide: the architecture diagram ([architecture.html](architecture.html)) | Beat 3 |
 | 1:05 | Stage view, still, then the cursor on the curve and the four counters | Beat 6, the numbers |
 | 1:30 | Stage view, the control line and the 85% | The control |
 | 1:45 | One puzzle card: grids, precedents from other agents, a dead end, the gate | Beats 4 and 5 |
