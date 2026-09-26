@@ -190,6 +190,7 @@ export type LibraryPayload = {
   growth: Array<{ at: string; tokens: number }>; // cumulative tokens off metrics.perMinute
   lessons: string | null; // the digest text pinned into every context
   lessonsAt: string | null;
+  contextAvg: number | null; // tokens an agent reads, metrics.totals.contextLast20Avg
   newest: Array<{ id: string; at: string; kind: string; key: string | null; gist: string }>;
 };
 

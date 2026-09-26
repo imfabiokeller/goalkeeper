@@ -18,7 +18,7 @@ export async function buildLibrary(c: Collections): Promise<LibraryPayload> {
     storageSize(c),
     c.state.countDocuments({ score: 1 }),
     c.sources.countDocuments({ kind: "gate", "raw.gate.pass": false }),
-    c.metrics.findOne({ _id: "metrics" }, { projection: { at: 1, "totals.libraryTokens": 1, "totals.librarySources": 1, perMinute: 1, "lessons.text": 1, "lessons.at": 1 } }),
+    c.metrics.findOne({ _id: "metrics" }, { projection: { at: 1, "totals.libraryTokens": 1, "totals.contextLast20Avg": 1, perMinute: 1, "lessons.text": 1, "lessons.at": 1 } }),
     c.sources
       .find({}, { sort: { createdAt: -1 }, limit: NEWEST, projection: { kind: 1, key: 1, createdAt: 1, "enrichment.gist": 1, text: 1 } })
       .toArray(),
@@ -50,6 +50,7 @@ export async function buildLibrary(c: Collections): Promise<LibraryPayload> {
     growth,
     lessons: metrics?.lessons?.text ?? null,
     lessonsAt: metrics?.lessons?.at ? metrics.lessons.at.toISOString() : null,
+    contextAvg: metrics?.totals?.contextLast20Avg ?? null,
     newest: newest.map((s) => ({
       id: s._id.toHexString(),
       at: s.createdAt.toISOString(),
