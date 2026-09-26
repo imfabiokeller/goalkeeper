@@ -1,0 +1,9 @@
+.git
+.claude
+.env
+docs
+usecase/answers
+usecase/inputs
+usecase/samples
+usecase/tools
+node_modules
