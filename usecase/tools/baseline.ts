@@ -17,6 +17,7 @@ import { costUsd, workerModel, workerProviderOptions } from "../../src/shared/ll
 const usecase = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 export const MAX_OUTPUT_TOKENS = 8000;
+export const CALL_TIMEOUT_MS = 5 * 60_000;
 
 export const SYSTEM =
   "You solve ARC puzzles. A puzzle is a few example pairs (input grid, output grid) and one test input; the same hidden rule maps every input to its output. " +
@@ -152,6 +153,7 @@ export async function sampleOnce(entry: IndexEntry, text: string, model: Languag
     const result = await generateText({
       model,
       providerOptions: workerProviderOptions(),
+      abortSignal: AbortSignal.timeout(CALL_TIMEOUT_MS), // a hung provider call is a miss, not a stuck run
       system: SYSTEM,
       prompt: text,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
