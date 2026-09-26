@@ -92,8 +92,7 @@ export function classifyRow(d: RowDoc): { kind: LibraryRowKind; text: string } {
       return { kind: "run", text: `${who} · ${d.raw?.steps ?? 0} steps · ${tests} test run${tests === 1 ? "" : "s"}${outcome ? ` · ${outcome}` : ""}` };
     }
     case "gate":
-      if (rule) return { kind: "dead", text: rule };
-      return { kind: "gate", text: reasons[0] ? `gate: ${reasons[0]}` : gist };
+      return { kind: "dead", text: rule ?? (reasons[0] ? `refuted: ${reasons[0]}` : gist) };
     case "error":
       return { kind: "error", text: d.raw?.message ?? gist };
     default:
@@ -107,7 +106,8 @@ export type RowFilter = "all" | "worked" | "dead" | "gate" | "run";
 export function rowFilterMatch(kind: RowFilter): Record<string, unknown> {
   if (kind === "worked") return { kind: "worker-run", "raw.gate.pass": true };
   // A gate source carries no proposal; the refuted rule lives on the failed run.
-  if (kind === "dead") return { kind: "worker-run", "raw.gate.pass": false, "raw.proposal.rule": { $type: "string" } };
+  // In this run the refuted rules live in the failed gate verdicts.
+  if (kind === "dead") return { kind: "gate", "raw.gate.pass": false };
   if (kind === "gate") return { kind: "gate" };
   if (kind === "run") return { kind: "worker-run" };
   return {};
@@ -161,7 +161,7 @@ export async function buildLibrary(c: Collections, rowFilter: RowFilter = "all")
       ])
       .toArray(),
     c.sources.countDocuments({ kind: "worker-run", "raw.gate.pass": true }),
-    c.sources.countDocuments({ kind: { $in: ["worker-run", "gate"] }, "raw.gate.pass": false, "raw.proposal.rule": { $type: "string" } }),
+    c.sources.countDocuments({ kind: "gate", "raw.gate.pass": false }),
     c.inputs.countDocuments(),
   ]);
 

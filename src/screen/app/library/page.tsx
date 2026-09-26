@@ -186,7 +186,8 @@ function Timeline({ d, sel, solve, onPick }: { d: LibraryPayload | null; sel: st
       const x1 = t ? t.x + TILE / 2 : Math.round(((new Date(u.at).getTime() - start) / (now - start || 1)) * plotW);
       const y1 = t ? t.y : PLOT_H;
       const top = Math.max(6, Math.min(y0, y1) - 30 - Math.abs(x1 - x0) * 0.12);
-      arcs.push({ d: `M${x0} ${y0} C ${x0} ${top.toFixed(0)}, ${x1} ${top.toFixed(0)}, ${x1} ${y1}`, c: u.solved ? GREEN : GREY, end: t ? null : [x1, y1] });
+      if (!u.solved) continue; // a reader without a tile has nowhere to land; the panel lists it
+      arcs.push({ d: `M${x0} ${y0} C ${x0} ${top.toFixed(0)}, ${x1} ${top.toFixed(0)}, ${x1} ${y1}`, c: GREEN, end: null });
     }
   }
   const ticks = hourTicks(start, now, plotW);
@@ -202,10 +203,6 @@ function Timeline({ d, sel, solve, onPick }: { d: LibraryPayload | null; sel: st
           <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
             <span style={{ width: 18, height: 2, background: GREEN }} />
             its lesson helped solve
-          </span>
-          <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            <span style={{ width: 18, height: 2, background: GREY }} />
-            read, not solved yet
           </span>
         </div>
       </div>
@@ -413,7 +410,6 @@ const CHIPS: Array<{ id: Filter; t: string; c: string }> = [
   { id: "all", t: "all", c: "#ededed" },
   { id: "worked", t: "rules that worked", c: K.worked },
   { id: "dead", t: "dead ends", c: K.dead },
-  { id: "gate", t: "gate verdicts", c: K.gate },
   { id: "run", t: "raw runs", c: K.run },
 ];
 
@@ -462,7 +458,7 @@ function WholeLibrary({ d, solvedKeys, onPick, filter, setFilter }: { d: Library
         <span>record</span>
         <span style={{ textAlign: "right" }}>tokens</span>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", overflow: "auto", minHeight: 0 }}>
+      <div style={{ display: "flex", flexDirection: "column", overflow: "auto", minHeight: 0, flex: 1 }}>
         {rows.map((w) => {
           const solved = !!w.key && solvedKeys.has(w.key);
           return (
