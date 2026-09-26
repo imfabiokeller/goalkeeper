@@ -446,7 +446,7 @@ function selFromUrl(): string | null {
 // The library's size over time: cumulative tokens, one point per minute.
 function GrowthLine({ growth }: { growth: Array<{ at: string; tokens: number }> }) {
   const w = 400;
-  const h = 34;
+  const h = 26;
   const max = growth.length ? Math.max(...growth.map((g) => g.tokens), 1) : 1;
   const pts = growth.map((g, i) => `${((i / Math.max(1, growth.length - 1)) * w).toFixed(1)},${(h - 2 - (g.tokens / max) * (h - 4)).toFixed(1)}`);
   const first = growth[0]?.at ? hhmm(growth[0].at) : "";
@@ -518,7 +518,7 @@ export default function LibraryPage() {
       </header>
 
       <div style={{ height: 150, flexShrink: 0, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <Panel style={{ padding: "18px 22px", justifyContent: "center", gap: 16 }}>
+        <Panel style={{ padding: "14px 22px", justifyContent: "space-between", gap: 8, height: 150, boxSizing: "border-box", overflow: "hidden" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <span style={{ fontSize: 14, color: "#a1a1a1" }}>library · {d ? `${d.entries.toLocaleString("en-US")} records` : ""}</span>
