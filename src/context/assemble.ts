@@ -59,6 +59,16 @@ export function failureReasons(source: Pick<Source, "raw">): string[] {
   return [];
 }
 
+// The hypothesis a failed proposal stated, if the proposal shape has a
+// string field named `rule`: gate sources carry the proposal in
+// `raw.proposal`. Pinned as refuted so the next attempt does not retry it.
+export function failureRule(source: Pick<Source, "raw">): string | null {
+  const proposal = source.raw?.proposal;
+  if (!proposal || typeof proposal !== "object") return null;
+  const rule = (proposal as { rule?: unknown }).rule;
+  return typeof rule === "string" && rule.trim() ? rule.trim() : null;
+}
+
 export function inputPage(text: string, offset: number, size = PAGE_CHARS): { text: string; offset: number; total: number; next: number | null } {
   const start = Math.max(0, Math.min(offset, text.length));
   const end = Math.min(text.length, start + size);
@@ -107,7 +117,7 @@ export function assemble(args: AssembleArgs): Assembled {
   parts.push(
     `# Task\nkey: ${task.key}\nunit: ${input.name}\nattempt: ${task.attempt}\ncriteria:\n` +
       taskCriteria.map((t) => `- ${t}`).join("\n") +
-      (task.hint ? `\nhint (a previous proposal or a doubt about the merged one):\n${clip(task.hint, 4000)}` : ""),
+      (task.hint ? `\nHint from the planner: ${clip(task.hint, 4000)}` : ""),
   );
 
   if (state) {
@@ -122,11 +132,14 @@ export function assemble(args: AssembleArgs): Assembled {
   const failures = args.failures.slice(0, MAX_FAILURES);
   if (failures.length) {
     parts.push(
-      "# Last gate failures on this key (fix these first)\n" +
+      "# Last gate failures on this key (fix these first; a rule marked refuted did not pass, do not retry it)\n" +
         failures
           .map((f) => {
-            const reasons = failureReasons(f).slice(0, 8).map((r) => `  - ${clip(r, MAX_REASON_CHARS)}`);
-            return `- ${f.createdAt.toISOString()}\n${reasons.join("\n") || "  - (no reasons recorded)"}`;
+            const rule = failureRule(f);
+            const lines = rule ? [`  refuted: ${clip(rule, MAX_REASON_CHARS)}`] : [];
+            lines.push(...failureReasons(f).slice(0, 8).map((r) => `  - ${clip(r, MAX_REASON_CHARS)}`));
+            if (!lines.length) lines.push("  - (no reasons recorded)");
+            return `- ${f.createdAt.toISOString()}\n${lines.join("\n")}`;
           })
           .join("\n"),
     );

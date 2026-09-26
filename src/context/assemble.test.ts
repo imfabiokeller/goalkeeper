@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import { assemble, failureReasons, inputPage, PAGE_CHARS } from "./assemble.ts";
+import { assemble, failureReasons, failureRule, inputPage, PAGE_CHARS } from "./assemble.ts";
 import type { Passage } from "./retrieve.ts";
 import { goalFromLens } from "../shared/goal.ts";
 import type { Goal } from "../shared/types.ts";
@@ -115,6 +115,39 @@ describe("assemble", () => {
 
     expect(assemble({ ...heavy, input: baseInput }).system).not.toContain("# Lessons");
     expect(assemble({ ...heavy, input: baseInput, lessons: null }).system).not.toContain("# Lessons");
+  });
+
+  it("pins the refuted rule of each failed proposal and the planner's hint", () => {
+    const out = assemble({
+      goal,
+      task: { ...baseTask, attempt: 3, hint: "passed the examples, wrong on the test: the rule is too specific" },
+      input: baseInput,
+      state: null,
+      failures: [
+        {
+          createdAt: new Date("2026-09-26T14:10:00Z"),
+          raw: { reasons: ["pair 2: expected 3x3, got 9x9"], proposal: { key: "k", rule: "Tile the input three times.", program: "x" } },
+        },
+        { createdAt: new Date("2026-09-26T14:05:00Z"), raw: { gate: { pass: false, reasons: ["pair 1: cell (0,0) is 5, expected 0"] }, proposal: { key: "k" } } },
+        { createdAt: new Date("2026-09-26T14:00:00Z"), raw: { reasons: [] } },
+      ],
+      passages: [],
+    });
+    expect(out.system).toContain("refuted: Tile the input three times.");
+    expect(out.system).toContain("pair 2: expected 3x3, got 9x9");
+    expect(out.system).toContain("pair 1: cell (0,0) is 5, expected 0");
+    expect(out.system).toContain("(no reasons recorded)");
+    expect(out.system.match(/refuted:/g)).toHaveLength(1);
+    expect(out.system).toContain("Hint from the planner: passed the examples, wrong on the test: the rule is too specific");
+    expect(assemble({ ...heavy, input: baseInput, task: baseTask }).system).not.toContain("Hint from the planner");
+  });
+
+  it("reads the rule only from a string field named rule on the failed proposal", () => {
+    expect(failureRule({ raw: { proposal: { rule: "  r  " } } })).toBe("r");
+    expect(failureRule({ raw: { proposal: { rule: "" } } })).toBeNull();
+    expect(failureRule({ raw: { proposal: { rule: 3 } } })).toBeNull();
+    expect(failureRule({ raw: { proposal: null } })).toBeNull();
+    expect(failureRule({ raw: {} })).toBeNull();
   });
 
   it("extracts failure reasons from both raw shapes", () => {

@@ -285,6 +285,21 @@ describe("worker iteration", () => {
     expect(await c.sources.countDocuments({ kind: "gate" })).toBe(MAX_ATTEMPTS);
   });
 
+  it("the next attempt sees the refuted rule of the failed proposal and the planner's hint", async () => {
+    await seedInput("aapl-2026-07-30");
+    await seedTask("aapl-2026-07-30");
+    const failing = submitModel({ revenue: 999999000000, rule: "Revenue is the first number on the page." });
+    expect(await iteration(c, "w-1", { ...base, model: failing })).toBe("reopened");
+    await c.tasks.updateOne({ key: "aapl-2026-07-30" }, { $set: { hint: "read the table, not the prose" } });
+
+    expect(await iteration(c, "w-2", { ...base, model: submitModel() })).toBe("merged");
+    const runs = await c.sources.find({ kind: "worker-run" }).sort({ createdAt: 1 }).toArray();
+    expect(runs).toHaveLength(2);
+    expect(runs[0].raw.system).not.toContain("refuted:");
+    expect(runs[1].raw.system).toContain("refuted: Revenue is the first number on the page.");
+    expect(runs[1].raw.system).toContain("Hint from the planner: read the table, not the prose");
+  });
+
   it("a run that never submits on the last attempt blocks with the run reason", async () => {
     await seedInput("aapl-2026-07-30");
     const taskId = await seedTask("aapl-2026-07-30", { attempt: MAX_ATTEMPTS });
