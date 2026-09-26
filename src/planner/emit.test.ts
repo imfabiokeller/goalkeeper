@@ -16,6 +16,7 @@ describe("emit", () => {
       inputFixture("d"),
       inputFixture("e"),
       inputFixture("f"),
+      inputFixture("g"),
       inputFixture("unscheduled", { scheduled: false, scheduledBy: null }),
     ]);
     await c.tasks.insertMany([
@@ -25,13 +26,13 @@ describe("emit", () => {
       taskFixture("e", { status: "merged", version: 1 }), // old version, not busy
     ]);
     await c.state.insertMany([
-      stateFixture("e", { version: 1 }), // stale state: re-emit
+      stateFixture("e", { version: 1 }), // solved at an older version: still solved
       stateFixture("f", { version: 2 }), // done at current version
     ]);
 
     expect(await emit(c, goal, 8)).toBe(2);
     const open = await c.tasks.find({ status: "open", createdBy: "planner", version: 2 }).sort({ key: 1 }).toArray();
-    expect(open.map((t) => t.key)).toEqual(["a", "e"]);
+    expect(open.map((t) => t.key)).toEqual(["a", "g"]);
     expect(open[0]).toMatchObject({ criteria: ["c1", "c2"], priority: 0, attempt: 1, worker: null, heartbeat: null });
 
     // Idempotent: a second pass emits nothing.

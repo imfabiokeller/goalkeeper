@@ -1,5 +1,7 @@
-// Emit: one task per scheduled input that has no state at the current
-// goal version and no task in flight. Pure query, no model. The insert
+// Emit: one task per scheduled input that has no state at any goal
+// version and no task in flight. A guideline approval never redoes solved
+// keys (the criteria did not change; applyDiff reopens the blocked ones).
+// Pure query, no model. The insert
 // itself is guarded: an upsert keyed on "this key has no open, claimed or
 // blocked task" so two planners can never queue the same key twice.
 
@@ -53,7 +55,7 @@ export async function emit(c: Collections, goal: Goal, workersTarget: number): P
   if (room <= 0) return 0;
 
   const busy = new Set(await c.tasks.distinct("key", { status: { $in: BUSY } }));
-  const done = new Set(await c.state.distinct("key", { version: goal.version }));
+  const done = new Set(await c.state.distinct("key", {}));
 
   let emitted = 0;
   const cursor = c.inputs.find({ scheduled: true }, { projection: { key: 1 }, sort: { key: 1 } });
