@@ -125,12 +125,26 @@ export function stepLabel(card: StageCard): string {
 }
 
 // The control run's line for a card, from GET /api/baseline?key=.
-export type ControlResult = { gatePass?: boolean | null; score?: number | null; solvedAt2?: boolean | null; firstReason?: string | null; attempts?: number | null; pairsOk?: number | null; pairs?: number | null } | null;
+export type ControlResult = {
+  gatePass?: boolean | null;
+  score?: number | null;
+  solvedAt2?: boolean | null;
+  firstReason?: string | null;
+  attempts?: number | unknown[] | null; // the count, or one entry per try
+  pairsOk?: number | null;
+  pairs?: number | null;
+} | null;
+
+export function controlTries(ctrl: ControlResult | undefined): number {
+  if (!ctrl) return 0;
+  if (Array.isArray(ctrl.attempts)) return Math.max(1, ctrl.attempts.length);
+  return typeof ctrl.attempts === "number" ? Math.max(1, ctrl.attempts) : 1;
+}
 
 export function controlLine(ctrl: ControlResult | undefined, pairs: number): string | null {
   if (ctrl === undefined || ctrl === null) return null;
   if (ctrl.score === 1 || ctrl.solvedAt2) return "control: solved";
-  const tries = ctrl.attempts ?? 1;
+  const tries = controlTries(ctrl);
   if (typeof ctrl.pairsOk === "number") return `control: ${ctrl.pairsOk} of ${ctrl.pairs ?? pairs} pairs`;
   if (ctrl.gatePass) return "control: passed examples, wrong on the test";
   return `control: not solved in ${tries}`;
@@ -139,9 +153,9 @@ export function controlLine(ctrl: ControlResult | undefined, pairs: number): str
 export function controlOutcome(ctrl: ControlResult | undefined): { text: string; sub: string | null } {
   if (ctrl === undefined) return { text: "control has not tried this puzzle", sub: null };
   if (ctrl === null) return { text: "control has not tried this puzzle", sub: null };
-  if (ctrl.score === 1 || ctrl.solvedAt2) return { text: "Solved", sub: ctrl.attempts ? `on try ${ctrl.attempts}` : null };
+  const tries = controlTries(ctrl);
+  if (ctrl.score === 1 || ctrl.solvedAt2) return { text: "Solved", sub: `on try ${tries}` };
   if (ctrl.gatePass) return { text: "Right on the examples · wrong on the hidden test", sub: ctrl.firstReason ?? null };
-  const tries = ctrl.attempts ?? 1;
   return { text: `Not solved after ${tries} ${tries === 1 ? "try" : "tries"}`, sub: ctrl.firstReason ?? null };
 }
 

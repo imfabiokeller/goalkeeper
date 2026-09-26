@@ -6,7 +6,7 @@
 // Used by the stage overlay (?open=key) and the standalone /unit/[key].
 
 import Link from "next/link";
-import { agentName, controlOutcome, pairVerdicts, precedentKind, shortGist, type ControlResult } from "../lib/cards.ts";
+import { agentName, controlOutcome, controlTries, pairVerdicts, precedentKind, shortGist, type ControlResult } from "../lib/cards.ts";
 import { compact, hhmm } from "../lib/format.ts";
 import { contextSections } from "../lib/transcript.ts";
 import type { CardStatus, StageCard, TaskPayload, UnitPayload, UnitTask } from "../lib/types.ts";
@@ -74,7 +74,7 @@ export function Expanded({ card, unit, control, task, onClose, contextAvg }: { c
     const r = attemptRow(t, status === "solved", t.id === last?.id);
     return { c: r.c, b: r.c };
   });
-  const ctrlN = control && typeof control.attempts === "number" ? control.attempts : control ? 1 : 0;
+  const ctrlN = controlTries(control);
   const ctrlTries = tryDots(ctrlN, control?.score === 1 || control?.solvedAt2 ? "#4a8f67" : "#c29a3a");
   const cmpNote =
     control === undefined || control === null
