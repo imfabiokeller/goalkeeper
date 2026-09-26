@@ -1,0 +1,10 @@
+services:
+  worker:
+    build: .
+    env_file: .env
+    environment:
+      ROLE: worker
+      WORKERS_TARGET: ${WORKERS_TARGET:-8}
+    restart: always
+    deploy:
+      replicas: 8

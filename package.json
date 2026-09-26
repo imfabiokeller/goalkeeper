@@ -1,0 +1,29 @@
+{
+  "name": "goalkeeper",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "indexes": "node --env-file=.env src/shared/indexes.ts",
+    "seed": "node --env-file=.env src/seed/index.ts",
+    "worker": "node --env-file=.env src/worker/index.ts",
+    "invariants": "node --env-file=.env src/planner/invariants.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/cerebras": "^3.0.57",
+    "@openrouter/ai-sdk-provider": "^3.1.0",
+    "ai": "^7.0.116",
+    "mongodb": "^7.6.0",
+    "voyage-ai-provider": "^5.0.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}

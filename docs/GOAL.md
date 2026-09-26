@@ -1,48 +1,68 @@
-# The goal for the hackathon day
+# The goal, version 1
 
-This is the first lens document, version 1. The human writes it, the
-orchestrator derives nothing beyond what is here, and the swarm starts.
+The first goal document. Seeded before the swarm starts; changed only by
+approved diffs afterwards. The machine-readable form is
+`usecase/lens.json` (the seed converts it to the `goal` document); this is
+the readable one.
 
-## Goal
+**No use case has been chosen yet.** We are still looking for a pure-state
+use case that fits [USE-CASE.md](USE-CASE.md). The `usecase/` folder holds
+one candidate (headline earnings from press releases) that is used to
+build and test the harness until the decision is made. The text below is
+that candidate, not the decision. The harness does not care which domain
+it is: it reads `usecase/lens.json`, `usecase/inputs.json`,
+`usecase/inputs/` and `usecase/checks.ts`, so a different use case in that
+shape drops in without code changes.
 
-Migrate `<fork of repo X>` to strict TypeScript, file by file, without
-breaking it, and ship what the room asks for.
+## Statement
+
+Build a table of headline quarterly results for S&P 500 companies from
+their own earnings press releases: revenue, net income and diluted EPS for
+the quarter just reported. Every figure carries the sentence or table row
+it came from, so anyone can check it in two seconds.
 
 ## Criteria
 
-1. Every file under `src/` passes `tsc --strict` with no `any`.
-   Check: `tsc-strict-file` (per-file run in the gate).
-2. The existing test suite stays green on every merge.
-   Check: `suite` (full suite in the gate).
-3. A crowd request classified as a feature ships with a test the
-   orchestrator wrote first.
-   Check: `new-test` (the new test passes, the suite stays green).
+1. Every value is backed by a quote that appears word for word in the
+   release and contains that value at the precision it was written.
+   Check: `grounded`.
+2. The figures agree with each other and with the filing: net income never
+   exceeds revenue, EPS carries the sign of net income, stated growth
+   matches the two revenue figures within one point, period ends at most
+   120 days before filing.
+   Check: `consistent`.
+3. Exactly the twelve fields of the proposal shape, correctly typed,
+   amounts in whole US dollars, key not already merged.
+   Check: `schema`.
 
-## Guidelines (taste)
+## Guidelines
 
-- Smallest diff that satisfies the criterion.
-- No refactors beyond the file's declared scope.
-- No new dependencies without an ask.
-- Never edit a test to make it pass.
-- Tests are the judge.
+- Prefer GAAP figures over adjusted or non-GAAP ones.
+- Prefer the quarter just ended over year-to-date or full-year figures.
+- Never estimate or derive a missing number. Leave it null with no quote.
+- Convert every amount to whole US dollars; per-share figures stay as
+  written.
+- If the release gives two GAAP figures for the same item, block with the
+  reason instead of choosing.
 
 ## Out of scope
 
-Build tooling, CI config, docs, anything that changes the library's public
-API. Parked with a reason, visible on the screen.
+Guidance and forecasts. Non-GAAP measures, margins, ratios. Segment and
+regional breakdowns. Balance sheet, cash flow, dividends, buybacks. Any
+ranking, comparison or investment opinion. Companies not in the inputs.
 
-## Picking the repo (first twenty minutes, decide by 10:50)
+## Inputs
 
-MIT or Apache. 100 to 400 source files. Tests under a minute, plain
-`npm test`. No exotic build. Enough surface that crowd features make sense.
+395 press releases as plain text, keyed `<ticker>-<filing date>`. The
+first 200 are scheduled; the rest are the reserve the audience can pull
+from.
 
-Fallback if no repo fits fast: "build a small REST service from this
-40-test acceptance suite", where the tests are the criteria.
+## What the audience can request
 
-## Two lanes
-
-- Lane 1, the backbone: the migration. Hundreds of naturally disjoint
-  tasks, a built-in check each, a file grid turning green all day.
-- Lane 2, the crowd: a QR page. Each request is classified as serving an
-  existing criterion (queued), a new criterion (an ask to the team, then a
-  test first), or out of scope (parked with a reason).
+- A company from the reserve: becomes a priority task.
+- A recheck of a merged record: becomes a priority task, the old record
+  stays until the new one merges.
+- A guideline ("banks report net revenue, take that"): becomes a proposal
+  in the inbox.
+- Anything else (new fields, rankings, companies not in the inputs):
+  parked with a reason on screen.

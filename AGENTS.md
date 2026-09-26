@@ -1,8 +1,10 @@
 # Working in this repo
 
-Read README.md, then docs/DESIGN.md and docs/DATABASE.md before writing any
-code. docs/DATABASE.md is the contract between the two halves of the build;
-change it in the same commit as the code that changes it.
+Read README.md, then docs/MVP.md, docs/DESIGN.md and docs/DATABASE.md
+before writing any code. docs/MVP.md is the build plan and wins over every
+other doc. docs/DATABASE.md and `src/shared/types.ts` are the contract
+between the streams; change both in the same commit as the code that
+changes them.
 
 ## Rules
 
@@ -10,36 +12,45 @@ change it in the same commit as the code that changes it.
   10:30 to 17:00). Nothing is pasted in from other projects.
 - One logical change per commit, committed as soon as it works.
 - No em dashes in any text: code comments, docs, commit messages, UI copy.
-- No agent keeps state. No agent edits the `lens` collection. The gate is
-  deterministic. Memory is raw and append-only. If a change breaks one of
-  these, it is wrong, however convenient.
-- The coding agent inside a worker is a subprocess (Claude Code headless or
-  Codex CLI) with a tool allowlist and a step budget, running in a fresh git
-  worktree from the task's `baseCommit`.
-- Keys live in `.env`, never in the repo. `RETRIEVAL_BENCH_ENV_FILE` style
-  indirection is fine.
+- No process keeps state. Nothing but `applyDiff()` after a human approval
+  writes the `goal` document. The gate is deterministic. The library
+  (`sources`) is raw and append-only. Workers never ask humans; they submit
+  or block. If a change breaks one of these, it is wrong, however
+  convenient.
+- The worker's agent loop is the Vercel AI SDK (`generateText` with tools
+  and a step budget). No direct provider SDK calls.
+- Every write that two processes could race on is one `findOneAndUpdate`
+  with a precondition. No read-then-write.
+- Keys live in `.env`, never in the repo.
+- No UI implementation until the design mockups exist (docs/SCREEN-BRIEF.md
+  is the brief). The screen stream starts from the mockups.
 
 ## Git
 
 - Commit messages follow Conventional Commits: `type: summary`, with type
   one of `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `planning`.
-- Before starting work, before committing, and before pushing, run
-  `git pull --rebase --autostash` so you build on the latest `origin/main`.
-- Push to `origin main` right after each commit so teammates see it.
-- Never force-push and never rewrite commits that are already on GitHub.
-- If a rebase conflicts, resolve it before any other work. If you cannot,
-  run `git rebase --abort` and ask a human.
+- Work on a branch per stream (`s1-checks`, `s2-worker`, ...). Push the
+  branch after every commit so others see it. Open a pull request early
+  and keep pushing to it.
+- Nothing lands on `main` without Fabio's review. Do not merge your own
+  pull request.
+- Before starting work and before opening a pull request, run
+  `git fetch origin && git rebase origin/main` so you build on the latest
+  `main`. Resolve conflicts before any other work; if you cannot, ask a
+  human.
+- Never force-push a branch someone else has pulled. Never rewrite `main`.
 
-## Layout (planned)
+## Layout
 
 ```
 src/
-  orchestrator/   one iteration: read, plan (script + model), validate, write
-  worker/         claim, briefing, subprocess agent, write run, exit
-  gate/           rebase, checks (tsc-strict-file, suite, new-test, scope), merge, redo
-  memory/         ingest enrichment, retrieval ($rankFusion), briefing synthesis, grounding
-  lens/           read, version, human edit, ask-approved change
-  screen/         Next.js: live view (change streams), QR request page, asks page
-  shared/         Atlas client, collections, types
+  shared/    types.ts (Zod schemas, the contract), db.ts (client, collections, indexes), llm.ts (AI SDK providers)
+  checks/    registry.ts and one file per check kind: pure functions
+  gate/      gate.ts: pure, runs the checks named by the task's criteria
+  context/   retrieve.ts ($rankFusion), assemble.ts (pinned plus passages into messages)
+  worker/    loop.ts, claim.ts, run.ts (AI SDK tools), write.ts (source plus enrichment)
+  planner/   lock.ts, reaper.ts, emit.ts, classify.ts, propose.ts, applyDiff.ts, metrics.ts, plan.ts
+  seed/      goal.json, inputs loader, dev fakes
+  screen/    Next.js (after mockups)
 docs/
 ```

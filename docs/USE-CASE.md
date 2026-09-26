@@ -25,7 +25,7 @@ worker is shown and everything it does is stored raw in the library.
 3. **A proposal shape.** The JSON a worker submits, with every field named
    and typed. Small: five to fifteen fields. Every extracted value should
    carry the exact quote from the input it came from.
-4. **Check functions.** For each criterion in the lens, a rule a programmer
+4. **Check functions.** For each criterion in the goal, a rule a programmer
    can write in under an hour that takes (proposal, input, current state)
    and returns pass or fail with reasons. No "does this look right". Good
    kinds of checks:
@@ -35,7 +35,7 @@ worker is shown and everything it does is stored raw in the library.
    - values are consistent with each other (parts add up to the total)
    - units normalize to the expected unit
    - the unit is not a duplicate of one already in state
-5. **A lens.** The human-written document, version 1:
+5. **A goal document.** Human-written, version 1:
    - goal: two sentences
    - criteria: three at most, each pointing at one check kind
    - guidelines: five lines of taste ("prefer the audited figure", "never
@@ -44,16 +44,16 @@ worker is shown and everything it does is stored raw in the library.
 
 ## What a worker gets
 
-- The lens, pinned, always.
+- The goal document, pinned, always.
 - Its task: key, criterion, check kind.
 - The last failures on this key, pinned.
 - A short briefing synthesized from retrieved library passages: precedents
   from other units ("company X reports in thousands of tonnes").
-- Four tools: `read_input`, `read_state`, `search_library`, and one of
-  `submit(proposal)` or `ask(question, options, default)`.
+- Five tools: `read_input`, `read_state`, `search_library`, and one of
+  `submit(proposal)` or `block(reason)`.
 - A step budget of about 20 tool calls.
 
-Context per request stays around 15k tokens no matter how big the library
+Context per request stays under 20k tokens no matter how big the library
 gets. That flat number is one of the two counters on screen.
 
 ## What a worker returns
@@ -61,30 +61,34 @@ gets. That flat number is one of the two counters on screen.
 Exactly one of:
 
 - `submit(proposal)`: goes to the gate.
-- `ask(question, options, default, deadline?)`: the task suspends, the
-  worker exits, a human answers from a phone, the answer becomes a library
-  source, a new worker picks the task up with the answer in its briefing.
+- `block(reason)`: the task is marked blocked with the reason. Workers
+  never ask humans. When several tasks block for the same reason, the
+  planner proposes one guideline; a human approves it on the inbox, the
+  goal version bumps, and all of them reopen.
 
 ## What the screen sees (task statuses)
 
-`open` -> `claimed` (worker heartbeating) -> `gated` -> `merged` or
-`failed` (back to `open` once, then `asked`) or `asked` or `parked`.
+`open` -> `claimed` (worker heartbeating) -> `merged`, or back to `open`
+once on a failed check, then `blocked`.
 
-A killed worker's task goes back to `open` after 60 seconds without a
+A killed worker's task goes back to `open` after 30 seconds without a
 heartbeat. Nothing else happens; another worker claims it.
 
-## Crowd requests, three paths
+## Crowd requests, four paths
 
 Every request from the QR page ends on exactly one path, visibly:
 
-- serves an existing criterion: becomes a task ("add company Y")
-- needs a new criterion or field: becomes an ask to the team, and only a
-  human can change the lens ("also capture water usage")
-- judgment or out of scope: parked with a reason on screen ("rank which
-  company is greenest")
+- a unit from the unscheduled pool: becomes a priority task ("do Siemens
+  2023")
+- a doubt about a merged record: becomes a recheck task ("that Shell
+  number looks wrong")
+- a guideline: becomes a proposal in the inbox, only a human can approve
+  it ("always take the upper bound")
+- anything else, including new fields and judgment calls: parked with a
+  reason on screen ("also capture water usage", "rank the greenest")
 
-Design the use case so that all three paths are easy to trigger from the
-audience.
+Design the use case so that all four paths are easy to trigger from the
+audience. Load more inputs than you schedule, so "add X" is real work.
 
 ## Checklist for a candidate use case
 
@@ -100,21 +104,13 @@ Answer yes to all of these or pick another one.
 - Can the audience suggest additions that hit all three crowd paths?
 - Does the result matter to someone outside the room?
 
-## Worked example: emissions extraction
+## Status: still looking
 
-- Inputs: text of 200 corporate sustainability reports, one per company
-  and year.
-- Key: `<company>-<year>`.
-- Proposal: `{ scope1, scope2, scope3, total, unit, year, quotes: { scope1: "...", ... } }`.
-- Checks: `grounded` (every quote appears verbatim in the input and the
-  number matches the quote), `arithmetic` (scopes sum to the total within
-  1 percent), `schema` (fields, types, unit normalized to tCO2e).
-- Lens guidelines: prefer market-based Scope 2 when both are given; never
-  fill a missing scope with an estimate; if the report gives a range, ask.
-- Crowd paths: "add company Y" (task), "capture water usage" (ask),
-  "which company is greenest" (parked).
-- On screen: a company grid filling in; click a cell to see the numbers and
-  the highlighted sentences in the report.
+No use case has been chosen. `usecase/` holds one candidate (headline
+quarterly results from earnings press releases, [usecase/README.md](../usecase/README.md))
+in the exact shape the harness reads: `lens.json`, `inputs.json`,
+`inputs/`, `checks.ts`, `samples/`. Any replacement must ship in that
+shape. The candidate stays as the development fixture until then.
 
 ## What to hand back
 
