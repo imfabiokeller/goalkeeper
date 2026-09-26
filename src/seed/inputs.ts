@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { Input } from "../shared/types.ts";
 
-export const SCHEDULED_COUNT = 300;
+export const SCHEDULED_COUNT = 400; // all puzzles, no reserve
 
 export const USECASE_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "../../usecase");
 
