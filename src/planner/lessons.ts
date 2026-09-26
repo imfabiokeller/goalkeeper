@@ -11,7 +11,6 @@
 //   merges, which write no gate source).
 // - reasons: gate failure reasons, grouped by normalizeReason.
 // - blocked: block reasons of blocked tasks, grouped the same way.
-// - recentGuidelines: always empty. The goal never changes during a run.
 
 import type { Collections } from "../shared/db.ts";
 import type { Goal, Lessons, Source, Task } from "../shared/types.ts";
@@ -121,7 +120,6 @@ export function lessonsFrom(records: LessonsRecords, now: Date, since = new Date
     blocked,
     // The goal never changes during a run; the field stays until the
     // contract drops it.
-    recentGuidelines: [],
   };
   return { ...lessons, text: renderLessons(lessons) };
 }

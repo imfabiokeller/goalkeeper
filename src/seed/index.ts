@@ -1,17 +1,13 @@
-// npm run seed -- --db live | --db dev  (live: MONGODB_DB, dev: MONGODB_DB_dev)
+// npm run seed -- --db live
 //
-// live: the goal at version 1 (only if absent) and every input from
-//       usecase/, the first 300 scheduled. Idempotent.
-// dev:  drop the database, then fill it with deterministic fakes for the
-//       screen: goal at version 2, inputs, tasks in every status, state,
-//       sources of every kind, questions, a lock and a metrics document.
+// The goal at version 1 (only if absent) and every input from usecase/,
+// all scheduled. Idempotent.
 
 import { parseArgs } from "node:util";
 import type { AnyBulkWriteOperation, Collection, Db, Document } from "mongodb";
 import { close, connect, ensureIndexes, type Collections } from "../shared/db.ts";
 import { goalFromLens } from "../shared/goal.ts";
 import type { Input } from "../shared/types.ts";
-import { makeDevData } from "./fakes.ts";
 import { loadInputs, readLens } from "./inputs.ts";
 
 const BATCH = 50;
@@ -51,22 +47,6 @@ async function seedLive(c: Collections, db: Db): Promise<void> {
   await printCounts(c, db);
 }
 
-async function seedDev(c: Collections, db: Db): Promise<void> {
-  await db.dropDatabase();
-  await ensureIndexes(c);
-  const inputs = await loadInputs();
-  const data = makeDevData(inputs, await readLens());
-  await c.goal.insertOne(data.goal);
-  await inBatches(c.inputs, data.inputs.map((d) => ({ insertOne: { document: d } })));
-  await inBatches(c.tasks, data.tasks.map((d) => ({ insertOne: { document: d } })));
-  await inBatches(c.state, data.state.map((d) => ({ insertOne: { document: d } })));
-  await inBatches(c.sources, data.sources.map((d) => ({ insertOne: { document: d } })));
-  await c.questions.insertMany(data.questions);
-  await c.locks.insertMany(data.locks);
-  await c.metrics.insertOne(data.metrics);
-  await printCounts(c, db);
-}
-
 async function printCounts(c: Collections, db: Db): Promise<void> {
   for (const name of Object.keys(c)) {
     console.log(`${name.padEnd(10)} ${await db.collection(name).countDocuments()}`);
@@ -78,20 +58,15 @@ async function printCounts(c: Collections, db: Db): Promise<void> {
 }
 
 const { values } = parseArgs({ options: { db: { type: "string" } }, strict: true });
-if (values.db !== "live" && values.db !== "dev") {
-  console.error("usage: npm run seed -- --db live | --db dev");
+if (values.db !== "live") {
+  console.error("usage: npm run seed -- --db live");
   process.exit(2);
 }
-// live seeds MONGODB_DB itself; dev seeds a sibling database with a _dev
-// suffix so the screen can be built against fakes without touching the run.
-const base = process.env.MONGODB_DB ?? "goalkeeper";
-process.env.MONGODB_DB = values.db === "live" ? base : `${base}_dev`;
-console.log(`seeding ${values.db} into database ${process.env.MONGODB_DB}`);
+console.log(`seeding into database ${process.env.MONGODB_DB ?? "goalkeeper"}`);
 
 const { c, db } = await connect();
 try {
-  if (values.db === "live") await seedLive(c, db);
-  else await seedDev(c, db);
+  await seedLive(c, db);
 } finally {
   await close();
 }

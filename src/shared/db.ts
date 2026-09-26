@@ -2,7 +2,7 @@
 // definitions. Every module gets its collections from here.
 
 import { MongoClient, type Collection, type Db } from "mongodb";
-import type { Goal, Input, Lock, Metrics, Question, Source, State, Task } from "./types.ts";
+import type { Goal, Input, Lock, Metrics, Source, State, Task } from "./types.ts";
 
 export type Collections = {
   goal: Collection<Goal>;
@@ -10,7 +10,6 @@ export type Collections = {
   tasks: Collection<Task>;
   state: Collection<State>;
   sources: Collection<Source>;
-  questions: Collection<Question>;
   locks: Collection<Lock>;
   metrics: Collection<Metrics>;
 };
@@ -43,7 +42,6 @@ export function collections(db: Db): Collections {
     tasks: db.collection<Task>("tasks"),
     state: db.collection<State>("state"),
     sources: db.collection<Source>("sources"),
-    questions: db.collection<Question>("questions"),
     locks: db.collection<Lock>("locks"),
     metrics: db.collection<Metrics>("metrics"),
   };
@@ -67,10 +65,8 @@ export async function ensureIndexes(c: Collections): Promise<void> {
   await c.state.createIndexes([{ key: { version: 1 }, name: "version" }]);
   await c.sources.createIndexes([
     { key: { key: 1, kind: 1, createdAt: -1 }, name: "pinned" },
-    { key: { kind: 1, handled: 1 }, name: "crowd" },
     { key: { createdAt: -1 }, name: "recent" },
   ]);
-  await c.questions.createIndexes([{ key: { status: 1, createdAt: -1 }, name: "inbox" }]);
 }
 
 export const EMBEDDING_DIMENSIONS = 1024; // voyage-3.5

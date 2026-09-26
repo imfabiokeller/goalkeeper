@@ -3,7 +3,7 @@ import { withDb } from "./harness.ts";
 import { plan } from "./plan.ts";
 import { previousMergedCount, reopenOnGrowth, REOPENED_PREFIX } from "./reopen.ts";
 import { TOO_SPECIFIC_HINT } from "./score.ts";
-import { crowdFixture, goalFixture, stateFixture, taskFixture } from "./testdb.ts";
+import { sourceFixture, goalFixture, stateFixture, taskFixture } from "./testdb.ts";
 
 const ago = (s: number) => new Date(Date.now() - s * 1000);
 
@@ -54,9 +54,9 @@ describe("reopen on library growth", () => {
   it("reads the previous merged count from the last planner-turn source", async (c) => {
     expect(await previousMergedCount(c)).toBe(0);
     await c.sources.insertMany([
-      crowdFixture("t1", { kind: "planner-turn", raw: { merged: 7 }, createdAt: ago(60) }),
-      crowdFixture("t2", { kind: "planner-turn", raw: { merged: 19 }, createdAt: ago(30) }),
-      crowdFixture("old-shape", { kind: "planner-turn", raw: { emitted: 2 }, createdAt: ago(10) }),
+      sourceFixture("t1", { kind: "planner-turn", raw: { merged: 7 }, createdAt: ago(60) }),
+      sourceFixture("t2", { kind: "planner-turn", raw: { merged: 19 }, createdAt: ago(30) }),
+      sourceFixture("old-shape", { kind: "planner-turn", raw: { emitted: 2 }, createdAt: ago(10) }),
     ]);
     expect(await previousMergedCount(c)).toBe(19);
   });

@@ -3,7 +3,7 @@ import { describe, expect, it as pure } from "vitest";
 import type { GateResult, Lessons } from "../shared/types.ts";
 import { withDb } from "./harness.ts";
 import { computeLessons, lessonsFrom, MAX_BLOCKED, MAX_REASONS, MAX_TEXT_CHARS, readLessons, renderLessons } from "./lessons.ts";
-import { crowdFixture, goalFixture, taskFixture } from "./testdb.ts";
+import { sourceFixture, goalFixture, taskFixture } from "./testdb.ts";
 
 const now = new Date("2026-09-26T15:00:00Z");
 const ago = (minutes: number) => new Date(now.getTime() - minutes * 60_000);
@@ -17,7 +17,7 @@ function gate(checks: Record<string, boolean>, reasons: string[]): GateResult {
 }
 
 function gateSource(key: string, g: GateResult, at: Date, taskId = new ObjectId()) {
-  return crowdFixture("gate", { kind: "gate", key, taskId, raw: { gate: g, reasons: g.reasons }, createdAt: at });
+  return sourceFixture("gate", { kind: "gate", key, taskId, raw: { gate: g, reasons: g.reasons }, createdAt: at });
 }
 
 describe("computeLessons", () => {
@@ -54,7 +54,7 @@ describe("computeLessons", () => {
       taskFixture("tsla", { status: "blocked", blockReason: "Fiscal year release, no quarterly figure", updatedAt: ago(8) }),
       taskFixture("stale", { status: "blocked", blockReason: "Bank reports net revenue, not total revenue", updatedAt: ago(500) }),
       taskFixture("open", { status: "open" }),
-      // Reopened by applyDiff at version 2: created before the bump, now at version 2.
+      // Created before the version bump, now at version 2.
       taskFixture("wfc", { status: "open", version: 2, createdAt: ago(100) }),
       taskFixture("c", { status: "open", version: 2, createdAt: ago(90) }),
       taskFixture("fresh", { status: "open", version: 2, createdAt: ago(10) }),
@@ -82,8 +82,6 @@ describe("computeLessons", () => {
       { text: "Fiscal year release, no quarterly figure", count: 1, keys: ["tsla"] },
     ]);
 
-    expect(l.recentGuidelines).toEqual([]);
-
     expect(l.text.length).toBeLessThanOrEqual(MAX_TEXT_CHARS);
     expect(l.text).toContain("Lessons from the record so far");
     expect(l.text).toContain("first-try pass rate 67%");
@@ -98,7 +96,6 @@ describe("computeLessons", () => {
   it("is empty but well formed on an empty record, and readLessons returns null before the first metrics doc", async (c) => {
     expect(await readLessons(c)).toBeNull();
     const l = await computeLessons(c, null, now);
-    expect(l).toMatchObject({ firstTryPass: null, checks: [], reasons: [], blocked: [], recentGuidelines: [], window: { tasks: 0 } });
     expect(l.text).toContain("0 tasks finished, no merges yet");
   });
 
@@ -123,7 +120,6 @@ describe("renderLessons", () => {
     ],
     reasons: [{ text: "quote not found verbatim", count: 7, keys: ["a", "b"] }],
     blocked: [{ text: "no quarterly figure", count: 3, keys: [] }],
-    recentGuidelines: [],
   };
 
   pure("renders every section compactly", () => {

@@ -3,7 +3,7 @@ import { withDb } from "./harness.ts";
 import { answerNeedles, checkInvariants } from "./invariants.ts";
 import { refreshMetrics } from "./metrics.ts";
 import { plan } from "./plan.ts";
-import { crowdFixture, goalFixture, inputFixture, stateFixture, taskFixture } from "./testdb.ts";
+import { sourceFixture, goalFixture, inputFixture, stateFixture, taskFixture } from "./testdb.ts";
 
 describe("plan", () => {
   const it = withDb();
@@ -11,20 +11,13 @@ describe("plan", () => {
   it("runs every step under the lock and writes a planner-turn source", async (c) => {
     const goal = goalFixture();
     await c.goal.insertOne(goal);
-    await c.inputs.insertMany([inputFixture("a"), inputFixture("b"), inputFixture("nvda", { scheduled: false, scheduledBy: null })]);
+    await c.inputs.insertMany([inputFixture("a"), inputFixture("b"), inputFixture("held", { scheduled: false, scheduledBy: null })]);
     await c.tasks.insertOne(taskFixture("stale", { status: "claimed", worker: "w-9", heartbeat: new Date(Date.now() - 60_000) }));
-    await c.sources.insertOne(crowdFixture("add nvidia"));
 
-    const report = await plan(c, "w-1", {
-      workersTarget: 8,
-      decideCrowd: async () => ({ outcome: "task", key: "nvda" }),
-      decideGuideline: async () => ({ guideline: "never called" }),
-    });
-    expect(report).toMatchObject({ reaped: 1, emitted: 2, proposed: 0, backfilled: 0, errors: [] });
-    expect(report?.crowd).toHaveLength(1);
-    expect(report?.crowd[0].outcome).toBe("task");
+    const report = await plan(c, "w-1", { workersTarget: 8 });
+    expect(report).toMatchObject({ reaped: 1, emitted: 2, backfilled: 0, errors: [] });
 
-    expect(await c.tasks.countDocuments({ status: "open" })).toBe(4); // stale + a + b + nvda
+    expect(await c.tasks.countDocuments({ status: "open" })).toBe(3); // stale + a + b
     expect(await c.metrics.findOne({ _id: "metrics" })).not.toBeNull();
     const turn = await c.sources.findOne({ kind: "planner-turn" });
     expect(turn?.raw).toMatchObject({ holder: "w-1", reaped: 1, emitted: 2 });
@@ -32,7 +25,7 @@ describe("plan", () => {
 
     // Lock released: a second run gets it and finds nothing to do.
     const again = await plan(c, "w-2", { workersTarget: 8 });
-    expect(again).toMatchObject({ reaped: 0, emitted: 0, crowd: [] });
+    expect(again).toMatchObject({ reaped: 0, emitted: 0 });
   });
 
   it("two concurrent plan() calls: one gets the lock, the other returns null", async (c) => {
@@ -51,12 +44,12 @@ describe("plan", () => {
 
   it("backfills sources without enrichment when an enrich function is given", async (c) => {
     await c.goal.insertOne(goalFixture());
-    await c.sources.insertOne(crowdFixture("x", { handled: true }));
+    await c.sources.insertOne(sourceFixture("x"));
     const report = await plan(c, "w-1", {
       enrich: async () => ({ gist: "g", entities: { keys: [], fields: [] }, labels: [], embedding: [0.1] }),
     });
     expect(report?.backfilled).toBe(1);
-    expect((await c.sources.findOne({ kind: "crowd-request" }))?.enrichment?.gist).toBe("g");
+    expect((await c.sources.findOne({ kind: "worker-run" }))?.enrichment?.gist).toBe("g");
   });
 });
 
@@ -82,10 +75,10 @@ describe("metrics", () => {
       taskFixture("old", { status: "merged", attempt: 1, updatedAt: new Date("2026-09-26T09:00:00Z") }),
     ]);
     await c.sources.insertMany([
-      crowdFixture("run", { kind: "worker-run", tokens: { in: 1000, out: 100, cost: 0.01 }, createdAt: m1 }),
-      crowdFixture("run", { kind: "worker-run", tokens: { in: 3000, out: 100, cost: 0.01 }, createdAt: m2 }),
-      crowdFixture("gate", { kind: "gate", raw: { pass: false, reasons: ["x"] }, createdAt: m2 }),
-      crowdFixture("gate", { kind: "gate", raw: { pass: true, reasons: [] }, createdAt: m2 }),
+      sourceFixture("run", { kind: "worker-run", tokens: { in: 1000, out: 100, cost: 0.01 }, createdAt: m1 }),
+      sourceFixture("run", { kind: "worker-run", tokens: { in: 3000, out: 100, cost: 0.01 }, createdAt: m2 }),
+      sourceFixture("gate", { kind: "gate", raw: { pass: false, reasons: ["x"] }, createdAt: m2 }),
+      sourceFixture("gate", { kind: "gate", raw: { pass: true, reasons: [] }, createdAt: m2 }),
     ]);
 
     const m = await refreshMetrics(c, now);
@@ -118,7 +111,7 @@ describe("metrics", () => {
       stateFixture("b", { mergedAt: t("14:40:00"), score: 0, scoredAt: t("14:41:00") }),
     ]);
     const run = (steps: number, pass: boolean, at: string) =>
-      crowdFixture("run", { kind: "worker-run", raw: { steps: Array.from({ length: steps }, () => ({})), gate: { pass } }, createdAt: t(at) });
+      sourceFixture("run", { kind: "worker-run", raw: { steps: Array.from({ length: steps }, () => ({})), gate: { pass } }, createdAt: t(at) });
     await c.sources.insertMany([run(3, true, "14:25:00"), run(9, true, "14:40:00"), run(5, true, "14:41:00"), run(20, false, "14:50:00")]);
 
     const m = await refreshMetrics(c, now);
@@ -182,8 +175,8 @@ describe("invariants", () => {
     ];
     await c.tasks.insertOne(taskFixture("leak", { status: "blocked", blockReason: "x", hint: "the output is [[1, 2, 3], [4, 5, 6]]" }));
     await c.sources.insertMany([
-      crowdFixture("clean run: 1 2 3", { kind: "worker-run", key: "p1" }),
-      crowdFixture("rows:\n123\n456\n", { kind: "worker-run", key: "p1" }),
+      sourceFixture("clean run: 1 2 3", { kind: "worker-run", key: "p1" }),
+      sourceFixture("rows:\n123\n456\n", { kind: "worker-run", key: "p1" }),
     ]);
 
     const v = await checkInvariants(c, new Date(), needles);

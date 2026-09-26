@@ -54,7 +54,7 @@ src/
   context/   retrieve.ts ($rankFusion), assemble.ts (pinned plus passages into messages)
   worker/    loop.ts, claim.ts, run.ts (AI SDK tools), write.ts (source plus enrichment)
   planner/   lock.ts, reaper.ts, emit.ts, score.ts, reopen.ts, metrics.ts, plan.ts
-  seed/      goal.json, inputs loader, dev fakes
+  seed/      lens to goal, inputs loader, the live seed
   screen/    Next.js (after mockups)
 docs/
 ```

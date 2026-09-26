@@ -119,8 +119,6 @@ export const SourceKind = z.enum([
   "worker-run",
   "gate",
   "planner-turn",
-  "crowd-request",
-  "answer",
   "error",
 ]);
 
@@ -150,23 +148,6 @@ export const Source = z.object({
   text: z.string(),
   enrichment: Enrichment.nullable(),
   tokens: Tokens,
-  handled: z.boolean().optional(), // crowd-request only
-  outcome: z.string().optional(), // crowd-request only: task | recheck | proposal | parked
-  reason: z.string().optional(), // crowd-request only
-  createdAt: z.date(),
-});
-
-// ----------------------------------------------------------- questions
-
-export const Question = z.object({
-  _id: objectId,
-  kind: z.literal("approval"),
-  question: z.string(),
-  proposedDiff: GoalDiff,
-  evidence: z.array(objectId), // task ids
-  status: z.enum(["open", "approved", "rejected"]),
-  answeredBy: z.string().nullable(),
-  answeredAt: z.date().nullable(),
   createdAt: z.date(),
 });
 
@@ -199,7 +180,6 @@ export const Lessons = z.object({
   checks: z.array(z.object({ kind: z.string(), criterion: z.string(), fails: z.number().int(), passes: z.number().int() })), // worst first
   reasons: z.array(z.object({ text: z.string(), count: z.number().int(), keys: z.array(z.string()) })), // top normalized gate reasons
   blocked: z.array(z.object({ text: z.string(), count: z.number().int(), keys: z.array(z.string()) })), // top normalized block reasons
-  recentGuidelines: z.array(z.object({ version: z.number().int(), text: z.string(), resolved: z.number().int() })), // last approved diffs
   text: z.string().max(2000), // the digest rendered for prompts
 });
 
@@ -232,15 +212,6 @@ export const Metrics = z.object({
   lessons: Lessons,
 });
 
-// ---------------------------------------------------- planner outputs
-
-export const CrowdOutcome = z.discriminatedUnion("outcome", [
-  z.object({ outcome: z.literal("task"), key: z.string() }),
-  z.object({ outcome: z.literal("recheck"), key: z.string(), reason: z.string() }),
-  z.object({ outcome: z.literal("proposal"), guideline: z.string().min(1) }),
-  z.object({ outcome: z.literal("parked"), reason: z.string() }),
-]);
-
 // ------------------------------------------------------- worker tools
 
 export const BlockArgs = z.object({ reason: z.string().min(1) });
@@ -260,11 +231,9 @@ export type Source = z.infer<typeof Source>;
 export type SourceKind = z.infer<typeof SourceKind>;
 export type Enrichment = z.infer<typeof Enrichment>;
 export type Tokens = z.infer<typeof Tokens>;
-export type Question = z.infer<typeof Question>;
 export type Lock = z.infer<typeof Lock>;
 export type Metrics = z.infer<typeof Metrics>;
 export type Lessons = z.infer<typeof Lessons>;
-export type CrowdOutcome = z.infer<typeof CrowdOutcome>;
 
 // The check function contract, as implemented in usecase/checks.ts. The
 // harness is domain-agnostic: a check reads whatever it needs from `meta`.

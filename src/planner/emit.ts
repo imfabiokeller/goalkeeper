@@ -1,6 +1,6 @@
 // Emit: one task per scheduled input that has no state at any goal
 // version and no task in flight. A guideline approval never redoes solved
-// keys (the criteria did not change; applyDiff reopens the blocked ones).
+// keys (the criteria never change during a run).
 // Pure query, no model. The insert
 // itself is guarded: an upsert keyed on "this key has no open, claimed or
 // blocked task" so two planners can never queue the same key twice.

@@ -1,5 +1,5 @@
 // One way to group free-text reasons: lowercase, alphanumeric words only,
-// the first PREFIX_CHARS characters. Used by propose (block reasons) and
+// the first PREFIX_CHARS characters. Used by
 // by the lessons digest (gate reasons and block reasons) so both count
 // the same groups.
 

@@ -6,7 +6,7 @@ import { ObjectId } from "mongodb";
 import { MongoClient } from "mongodb";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { collections, ensureIndexes, type Collections } from "../shared/db.ts";
-import type { Goal, Input, Question, Source, State, Task } from "../shared/types.ts";
+import type { Goal, Input, Source, State, Task } from "../shared/types.ts";
 
 export type TestDb = { c: Collections; reset: () => Promise<void>; stop: () => Promise<void> };
 
@@ -96,17 +96,17 @@ export function stateFixture(key: string, over: Partial<State> = {}): State {
     key,
     version: 1,
     stateVersion: 1,
-    data: { revenue: 1 },
+    data: { key, rule: "r", program: "function transform(g){return g}" },
     taskId: new ObjectId(),
     mergedAt: new Date(),
     ...over,
   };
 }
 
-export function crowdFixture(text: string, over: Partial<Source> = {}): Source {
+export function sourceFixture(text: string, over: Partial<Source> = {}): Source {
   return {
     _id: new ObjectId(),
-    kind: "crowd-request",
+    kind: "worker-run",
     taskId: null,
     key: null,
     version: 1,
@@ -114,23 +114,8 @@ export function crowdFixture(text: string, over: Partial<Source> = {}): Source {
     text,
     enrichment: null,
     tokens: { in: 0, out: 0, cost: 0 },
-    handled: false,
     createdAt: new Date(),
     ...over,
   };
 }
 
-export function questionFixture(text: string, evidence: ObjectId[], over: Partial<Question> = {}): Question {
-  return {
-    _id: new ObjectId(),
-    kind: "approval",
-    question: `Adopt "${text}"?`,
-    proposedDiff: { op: "add-guideline", text },
-    evidence,
-    status: "open",
-    answeredBy: null,
-    answeredAt: null,
-    createdAt: new Date(),
-    ...over,
-  };
-}
