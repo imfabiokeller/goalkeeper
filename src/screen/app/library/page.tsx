@@ -67,7 +67,7 @@ function PerSolveChart({ d }: { d: LibraryPayload | null }) {
   const Y = (v: number) => h - ((v - min + span * 0.1) / span) * h;
   const labels = pts.length ? [pts[0], pts[Math.floor((pts.length - 1) / 3)], pts[Math.floor(((pts.length - 1) * 2) / 3)], pts[pts.length - 1]] : [];
   return (
-    <Panel style={{ padding: "16px 22px 10px", gap: 6 }}>
+    <Panel style={{ padding: "16px 22px 10px", gap: 6, height: 150, boxSizing: "border-box", overflow: "hidden" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
           <span style={{ fontFamily: MONO, fontSize: 24, lineHeight: 1 }}>{last ? compact(last.v, 0) : "-"}</span>
@@ -76,7 +76,7 @@ function PerSolveChart({ d }: { d: LibraryPayload | null }) {
         </div>
         <span style={{ fontSize: 12, color: falls ? GREEN : "#8f8f8f" }}>{falls ? "cheaper as it learns" : "per solve"}</span>
       </div>
-      <div style={{ position: "relative", flex: 1, borderBottom: "1px solid #333", minHeight: h }}>
+      <div style={{ position: "relative", flex: 1, borderBottom: "1px solid #333", minHeight: 0 }}>
         <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ position: "absolute", left: 0, bottom: 0, overflow: "visible" }} role="img" aria-label="tokens per solve over time">
           {pts.length > 1 ? <polyline points={pts.map((p, i) => `${X(i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(" ")} fill="none" stroke="#ededed" strokeWidth={2.5} strokeLinejoin="round" vectorEffect="non-scaling-stroke" /> : null}
           {last ? <circle cx={X(pts.length - 1)} cy={Y(last.v)} r={3} fill="#ededed" /> : null}
