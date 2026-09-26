@@ -17,7 +17,7 @@ export function FeedLine({ line, showKind = false }: FeedLineProps) {
     <div
       className="feed-line"
       data-outcome={line.outcome}
-      style={{ display: "grid", gridTemplateColumns: "5em 7em 6em 4.5em 1fr", gap: 8, fontFamily: "var(--mono)", fontSize: 12, lineHeight: 1.4, alignItems: "baseline" }}
+      style={{ display: "grid", gridTemplateColumns: "5.5em 7em 6em 7em 1fr", gap: 8, fontFamily: "var(--mono)", fontSize: 12, lineHeight: 1.4, alignItems: "baseline" }}
     >
       <span style={{ color: "var(--fg-dim)" }}>{hhmmss(line.at)}</span>
       <span style={{ color: tone ? TONE_VAR[tone] : "var(--fg)" }}>

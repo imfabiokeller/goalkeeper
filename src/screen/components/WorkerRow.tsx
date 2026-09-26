@@ -32,7 +32,7 @@ export function WorkerRow({ row, maxSteps = 20, showProgress = true }: WorkerRow
       data-alive={row.alive}
       style={{
         display: "grid",
-        gridTemplateColumns: "10px 4.5em 6em 1fr 4em",
+        gridTemplateColumns: "10px 7em 6em 1fr 4.5em",
         gap: 8,
         alignItems: "center",
         padding: "2px 4px",
