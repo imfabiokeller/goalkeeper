@@ -4,7 +4,7 @@
 // chip), example / expected / agent's try for the shown pair, pair dots
 // and the note, the lessons panel, the footer line and step.
 
-import { ATTEMPTS_MAX, agentName, attemptNumber, controlLine, footerLine, noteColor, noteLine, pairVerdicts, precedentKind, shownPair, stepLabel, type ControlResult } from "../lib/cards.ts";
+import { ATTEMPTS_MAX, agentName, attemptNumber, footerLine, noteColor, noteLine, pairVerdicts, precedentKind, shownPair, stepLabel } from "../lib/cards.ts";
 import type { Precedent, StageCard, UnitPayload } from "../lib/types.ts";
 import { Arrow, Cells, Dot, NoGrid, Thumb } from "./Cells.tsx";
 import { Chip, TONES } from "./Chip.tsx";
@@ -19,7 +19,7 @@ export function lessonsTitle(card: StageCard, precedents: Precedent[]): { title:
   return { title: "Lessons pulled from the library", note: "from other agents", arriving: false };
 }
 
-export function Card({ card: raw, unit, control, onOpen, flash, box = 109 }: { card: StageCard; unit: UnitPayload | null; control: ControlResult | undefined; onOpen: () => void; flash: "solved" | "retry" | null; box?: number }) {
+export function Card({ card: raw, unit, onOpen, flash, box = 109 }: { card: StageCard; unit: UnitPayload | null; onOpen: () => void; flash: "solved" | "retry" | null; box?: number }) {
   // The grid box scales with the card width; cells keep the mockup's ratio.
   const maxCell = Math.round((box * 17) / 109);
   const thumbCell = box > 130 ? 7 : 5;
@@ -40,7 +40,6 @@ export function Card({ card: raw, unit, control, onOpen, flash, box = 109 }: { c
     }),
   ].slice(0, 3);
   const foot = footerLine(card, pairs);
-  const ctrl = controlLine(control, pairs.length);
   const cls = flash === "solved" ? "solvedflash" : flash === "retry" ? "retryflash" : undefined;
 
   return (
@@ -100,12 +99,6 @@ export function Card({ card: raw, unit, control, onOpen, flash, box = 109 }: { c
           ))}
         </div>
         <span style={{ fontSize: 14, color: noteColor(card.status), whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{unit ? noteLine(card, pairs) : "loading"}</span>
-        {ctrl ? (
-          <span style={{ marginLeft: "auto", flexShrink: 0, display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--fg-dimmer)", whiteSpace: "nowrap" }}>
-            <span style={{ width: 12, borderTop: "1.5px dashed #6b6b6b" }} />
-            {ctrl}
-          </span>
-        ) : null}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "14px 14px 12px", borderRadius: 10, background: "#070707", border: "1px solid #161616" }}>

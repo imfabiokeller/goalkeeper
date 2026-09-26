@@ -1,12 +1,12 @@
 "use client";
 
 // The expanded card, the mockup's overlay body: every pair with the
-// agent's try, the rule, the precedents with their gist, the control
+// agent's try, the rule, the precedents with their gist,
 // comparison, what it read, the attempts, and the link to the task.
 // Used by the stage overlay (?open=key) and the standalone /unit/[key].
 
 import Link from "next/link";
-import { agentName, attemptNumber, controlOutcome, controlTries, pairVerdicts, precedentKind, shortGist, type ControlResult } from "../lib/cards.ts";
+import { agentName, attemptNumber, pairVerdicts, precedentKind, shortGist } from "../lib/cards.ts";
 import { compact, hhmm } from "../lib/format.ts";
 import { contextSections } from "../lib/transcript.ts";
 import type { CardStatus, StageCard, TaskPayload, UnitPayload, UnitTask } from "../lib/types.ts";
@@ -39,7 +39,7 @@ function attemptRow(t: UnitTask, solvedKey: boolean, isLast: boolean): { out: st
 const H: React.CSSProperties = { fontSize: 15, color: "#e6e6e6" };
 const SUB: React.CSSProperties = { fontSize: 13, color: "var(--fg-dimmer)" };
 
-export function Expanded({ card, unit, control, task, onClose, contextAvg }: { card: StageCard | null; unit: UnitPayload | null; control: ControlResult | undefined; task: TaskPayload | null; onClose?: () => void; contextAvg: number | null }) {
+export function Expanded({ card, unit, task, onClose, contextAvg }: { card: StageCard | null; unit: UnitPayload | null; task: TaskPayload | null; onClose?: () => void; contextAvg: number | null }) {
   if (!unit) {
     return (
       <div style={{ padding: 30, color: "var(--fg-dimmer)" }}>
@@ -58,7 +58,6 @@ export function Expanded({ card, unit, control, task, onClose, contextAvg }: { c
   const refuted = unit.latest?.refutedRules ?? [];
   const sections = contextSections(typeof task?.run?.raw.system === "string" ? task.run.raw.system : null).filter((s) => s.label !== "preamble");
   const readTokens = typeof task?.run?.raw.contextTokens === "number" ? task.run.raw.contextTokens : sections.reduce((n, s) => n + s.tokens, 0);
-  const ctrl = controlOutcome(control);
   const ours = (() => {
     const matched = pairs.filter((p) => p.state === "match").length;
     if (status === "solved") return { text: `Solved on attempt ${attempt}`, c: "#6fbf8e" };
@@ -74,14 +73,6 @@ export function Expanded({ card, unit, control, task, onClose, contextAvg }: { c
     const r = attemptRow(t, status === "solved", t.id === last?.id);
     return { c: r.c, b: r.c };
   });
-  const ctrlN = controlTries(control);
-  const ctrlTries = tryDots(ctrlN, control?.score === 1 || control?.solvedAt2 ? "#4a8f67" : "#c29a3a");
-  const cmpNote =
-    control === undefined || control === null
-      ? "Same puzzle, same model: the difference is the library and the tools. The control has not reached this puzzle yet."
-      : status === "solved" && !(control.score === 1 || control.solvedAt2)
-        ? `goalkeeper solved it on attempt ${attempt}; the control starts every try from a blank page.`
-        : "Same puzzle, same model: the difference is the library and the tools.";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24, height: "100%", minHeight: 0 }}>
@@ -171,54 +162,6 @@ export function Expanded({ card, unit, control, task, onClose, contextAvg }: { c
         </div>
 
         <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 22, minHeight: 0, overflow: "auto" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 14, border: "1px solid #1f1f1f", borderRadius: 14, background: "#050505", padding: "18px 20px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              <span style={{ fontSize: 17, fontWeight: 500 }}>Compared with the control</span>
-              <span style={SUB}>same puzzle, same model, same two attempts on the hidden test · the control agent has no library and never runs its program</span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: 14, border: "1px solid #1f2a23", borderRadius: 10, background: "#08100b" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ width: 16, borderTop: "2px solid #6fbf8e" }} />
-                  <span style={{ fontSize: 14, color: "#ededed" }}>goalkeeper · with the library</span>
-                </div>
-                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  {pairs[0]?.actual ? <Cells grid={pairs[0].actual} diff={pairs[0].expected} box={79} max={12} /> : <NoGrid box={79} text="no try yet" />}
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 0 }}>
-                    <span style={{ fontSize: 15, lineHeight: 1.35, color: ours.c }}>{ours.text}</span>
-                    <div style={{ display: "flex", gap: 4 }}>
-                      {[...oursTries, ...tryDots(0, "", 5)].slice(0, 5).map((d, i) => (
-                        <div key={i} style={{ width: 12, height: 12, borderRadius: 3, background: d.c, boxShadow: `inset 0 0 0 1px ${d.b}` }} />
-                      ))}
-                    </div>
-                    <span style={{ fontSize: 12, color: "var(--fg-dimmer)" }}>
-                      read {precedents.length} {precedents.length === 1 ? "lesson" : "lessons"}
-                      {readTokens ? ` · ${compact(readTokens)} tokens this try` : contextAvg ? ` · ${compact(contextAvg)} tokens a try` : ""}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: 14, border: "1px solid #1f1f1f", borderRadius: 10, background: "#0a0a0a" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ width: 16, borderTop: "2px dashed #8f8f8f" }} />
-                  <span style={{ fontSize: 14, color: "#a1a1a1" }}>control · no library</span>
-                </div>
-                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <NoGrid box={79} text={control ? "no grid kept" : "no try yet"} />
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 0 }}>
-                    <span style={{ fontSize: 15, lineHeight: 1.35, color: "#a1a1a1" }}>{ctrl.text}</span>
-                    <div style={{ display: "flex", gap: 4 }}>
-                      {ctrlTries.map((d, i) => (
-                        <div key={i} style={{ width: 12, height: 12, borderRadius: 3, background: d.c, boxShadow: `inset 0 0 0 1px ${d.b}` }} />
-                      ))}
-                    </div>
-                    <span style={{ fontSize: 12, color: "var(--fg-dimmer)" }}>{ctrl.sub ?? "reads only the puzzle"}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <span style={{ fontSize: 14, lineHeight: 1.45, color: "var(--fg-dim)" }}>{cmpNote}</span>
-          </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>

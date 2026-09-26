@@ -10,7 +10,6 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { Card } from "../components/Card.tsx";
 import { Expanded } from "../components/Expanded.tsx";
 import { Hero } from "../components/Hero.tsx";
-import type { ControlResult } from "../lib/cards.ts";
 import { compact } from "../lib/format.ts";
 import { usePoll } from "../lib/poll.ts";
 import type { StageCard, StagePayload, TaskPayload, UnitPayload } from "../lib/types.ts";
@@ -26,13 +25,11 @@ type BaselineTotals = { solveRate?: number; solveRateAt2?: number | null; n?: nu
 
 const STAGE_POLL_MS = 2000;
 const UNIT_POLL_MS = 3000;
-const CONTROL_POLL_MS = 30_000;
 const BASELINE_POLL_MS = 60_000;
 const TOAST_MS = 30_000;
 const KILL_N = 5;
 
 const unitUrl = (key: string) => `/api/unit/${key}`;
-const controlUrl = (key: string) => `/api/baseline?key=${key}`;
 const taskUrl = (id: string) => `/api/task/${id}`;
 
 function Kpi({ value, note, color }: { value: React.ReactNode; note: string; color?: string }) {
@@ -73,7 +70,6 @@ function Stage() {
   const keys = useMemo(() => cards.flatMap((c) => (c ? [c.key] : [])), [cards]);
   const allKeys = useMemo(() => (openKey && !keys.includes(openKey) ? [...keys, openKey] : keys), [keys, openKey]);
   const units = useMany<UnitPayload>(allKeys, unitUrl, UNIT_POLL_MS);
-  const controls = useMany<ControlResult>(allKeys, controlUrl, CONTROL_POLL_MS);
 
   // A card flashes when it turns solved or retrying while on screen.
   const prev = useRef<Map<string, StageCard["status"]>>(new Map());
@@ -174,7 +170,7 @@ function Stage() {
       <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: "repeat(2, minmax(0, 1fr))", gap: 18 }}>
         {cards.slice(0, slotCount).map((c, i) =>
           c ? (
-            <Card key={c.key} card={c} unit={units[c.key] ?? null} control={controls[c.key]} onOpen={() => open(c.key)} flash={flashes[c.key] ?? null} box={box} />
+            <Card key={c.key} card={c} unit={units[c.key] ?? null} onOpen={() => open(c.key)} flash={flashes[c.key] ?? null} box={box} />
           ) : (
             <div key={`empty-${i}`} style={{ border: "1px dashed #1a1a1a", borderRadius: 14 }} />
           ),
@@ -196,7 +192,7 @@ function Stage() {
       {openKey ? (
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }} onClick={close}>
           <div onClick={(e) => e.stopPropagation()} style={{ width: 1480, height: 1010, border: "1px solid #262626", borderRadius: 18, background: "#0a0a0a", padding: "30px 36px", boxShadow: "0 30px 80px rgba(0,0,0,.8)", overflow: "hidden" }}>
-            <Expanded card={openCard} unit={openUnit} control={controls[openKey]} task={openTaskId ? task.data : null} onClose={close} contextAvg={totals?.contextLast20Avg ?? null} />
+            <Expanded card={openCard} unit={openUnit} task={openTaskId ? task.data : null} onClose={close} contextAvg={totals?.contextLast20Avg ?? null} />
           </div>
         </div>
       ) : null}
