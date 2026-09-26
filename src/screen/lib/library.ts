@@ -180,6 +180,7 @@ export async function buildLibrary(c: Collections): Promise<LibraryPayload> {
     attempted: b.attempted,
     merged: b.merged,
     solved: b.solved,
+    finished: typeof (b as { finished?: unknown }).finished === "number" ? ((b as { finished?: number }).finished ?? null) : null,
     tokens: tokensAt(b.bucket.getTime() + BUCKET_MS),
   }));
 

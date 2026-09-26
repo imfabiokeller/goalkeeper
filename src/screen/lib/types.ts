@@ -226,7 +226,7 @@ export type LibraryPayload = {
   // the whole library and the curves against library size.
   runStart: string | null; // goal.history[0].at, or the first solve when earlier
   goalVersion: number | null;
-  solveRate: Array<{ bucket: string; attempted: number; merged: number; solved: number; tokens: number }>; // tokens: library tokens up to the bucket's end
+  solveRate: Array<{ bucket: string; attempted: number; merged: number; solved: number; finished?: number | null; tokens: number }>; // tokens: library tokens up to the bucket's end
   notSolved: number; // puzzles without state.score 1
   solves: LibrarySolve[];
   rows: LibraryRow[]; // the newest LIBRARY_ROWS records

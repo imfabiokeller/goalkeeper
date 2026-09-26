@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { ARC_PALETTE } from "../../lib/arc.tsx";
 import type { BaselinePayload } from "../../lib/baseline.ts";
+import { bucketFinished } from "../../lib/curve.ts";
 import { agentLabel, compact, hhmm, pct } from "../../lib/format.ts";
 import { usePoll } from "../../lib/poll.ts";
 import type { Grid, LibraryPayload, LibraryRow, LibraryRowKind, SolvePayload } from "../../lib/types.ts";
@@ -22,8 +23,6 @@ const LIBRARY_POLL_MS = 5000;
 const BASELINE_POLL_MS = 60_000;
 const FONTS = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap";
 const BUCKET_MS = 10 * 60_000;
-const TILE = 16;
-const PITCH = 18;
 const PLOT_H = 236;
 const MONO = "var(--gk-mono)";
 
@@ -55,7 +54,7 @@ function Panel({ children, style }: { children: ReactNode; style?: CSSProperties
 
 // Solve rate against library tokens; the control as a flat dashed line.
 function RateChart({ d, base }: { d: LibraryPayload | null; base: BaselinePayload }) {
-  const pts = (d?.solveRate ?? []).filter((b) => b.attempted > 0).map((b) => ({ x: b.tokens, y: b.solved / b.attempted }));
+  const pts = (d?.solveRate ?? []).filter((b) => bucketFinished(b) > 0).map((b) => ({ x: b.tokens, y: b.solved / bucketFinished(b) }));
   const last = pts.at(-1);
   const baseRate = base ? (base.solveRateAt2 ?? base.solveRate) : null;
   const w = 580;
@@ -71,8 +70,14 @@ function RateChart({ d, base }: { d: LibraryPayload | null; base: BaselinePayloa
         <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
           <span style={{ fontFamily: MONO, fontSize: 24, lineHeight: 1, color: GREEN }}>{last ? pct(last.y) : "-"}</span>
           <span style={{ fontSize: 14, color: "#a1a1a1" }}>solved</span>
-          <span style={{ fontFamily: MONO, fontSize: 17, color: "#8f8f8f", marginLeft: 8 }}>{baseRate === null ? "-" : pct(baseRate)}</span>
-          <span style={{ fontSize: 13, color: "#8f8f8f" }}>baseline, no library</span>
+          {baseRate === null ? (
+            <span style={{ fontSize: 13, color: "#8f8f8f", marginLeft: 8 }}>no control run yet</span>
+          ) : (
+            <>
+              <span style={{ fontFamily: MONO, fontSize: 17, color: "#8f8f8f", marginLeft: 8 }}>{pct(baseRate)}</span>
+              <span style={{ fontSize: 13, color: "#8f8f8f" }}>baseline, no library</span>
+            </>
+          )}
         </div>
         <span style={{ fontSize: 12, color: "#8f8f8f" }}>vs library tokens</span>
       </div>
@@ -133,19 +138,23 @@ function PerSolveChart({ d }: { d: LibraryPayload | null }) {
 
 type Tile = { key: string; x: number; y: number; at: number; thumb: Grid | null };
 
-// Every solve in its ten-minute bucket from the run's start to now.
-function layoutTiles(solves: LibraryPayload["solves"], start: number, now: number, width: number): { tiles: Tile[]; buckets: number; colW: number } {
+// Every solve in its ten-minute bucket from the run's start to now. Tiles
+// are 16 px like the mockup once the run is long; a short run with wide
+// buckets gets bigger ones so the row reads from across the room.
+function layoutTiles(solves: LibraryPayload["solves"], start: number, now: number, width: number): { tiles: Tile[]; buckets: number; tile: number } {
   const buckets = Math.max(6, Math.ceil((now - start) / BUCKET_MS) + 1);
   const colW = width / buckets;
-  const perCol = Math.max(1, Math.floor((colW - 2) / PITCH));
+  const tile = buckets <= 12 ? 24 : buckets <= 24 ? 20 : 16;
+  const pitch = tile + 2;
+  const perCol = Math.max(1, Math.floor((colW - 2) / pitch));
   const fill: number[] = new Array(buckets).fill(0);
   const tiles = solves.map((s) => {
     const at = new Date(s.at).getTime();
     const b = Math.min(buckets - 1, Math.max(0, Math.floor((at - start) / BUCKET_MS)));
     const i = fill[b]++;
-    return { key: s.key, at, thumb: s.thumb, x: Math.round(b * colW + 1 + (i % perCol) * PITCH), y: PLOT_H - PITCH - Math.floor(i / perCol) * PITCH };
+    return { key: s.key, at, thumb: s.thumb, x: Math.round(b * colW + 1 + (i % perCol) * pitch), y: PLOT_H - pitch - Math.floor(i / perCol) * pitch };
   });
-  return { tiles, buckets, colW };
+  return { tiles, buckets, tile };
 }
 
 function hourTicks(start: number, now: number, width: number): Array<{ t: string; x: number }> {
@@ -162,7 +171,7 @@ function Timeline({ d, sel, solve, onPick }: { d: LibraryPayload | null; sel: st
   const now = d ? new Date(d.at).getTime() : Date.now();
   const start = d?.runStart ? new Date(d.runStart).getTime() : now - 3600_000;
   const plotW = Math.max(300, width);
-  const { tiles, buckets } = useMemo(() => layoutTiles(d?.solves ?? [], start, now, plotW), [d?.solves, start, now, plotW]);
+  const { tiles, buckets, tile: TILE } = useMemo(() => layoutTiles(d?.solves ?? [], start, now, plotW), [d?.solves, start, now, plotW]);
   const byKey = new Map(tiles.map((t) => [t.key, t]));
   const selected = sel ? byKey.get(sel) : undefined;
   const targets = new Map<string, boolean>();
@@ -220,7 +229,7 @@ function Timeline({ d, sel, solve, onPick }: { d: LibraryPayload | null; sel: st
                 title={`${t.key} · ${hhmm(t.at)}`}
                 style={{ position: "absolute", left: t.x, top: t.y, width: TILE, height: TILE, padding: 0, border: 0, borderRadius: 3, background: "#10141a", boxShadow: ring, opacity: isSel || tg !== undefined || !sel ? 1 : 0.75, cursor: "pointer", overflow: "hidden" }}
               >
-                <Pixels grid={t.thumb} cell={2} size={TILE} />
+                <Pixels grid={t.thumb} cell={Math.floor(TILE / 7)} size={TILE} />
               </button>
             );
           })}
@@ -502,7 +511,8 @@ export default function LibraryPage() {
     url.searchParams.set("sel", key);
     window.history.replaceState(null, "", url);
   };
-  const solvePoll = usePoll<SolvePayload>(sel ? `/api/library/solve/${sel}` : "/api/library/solve/none", LIBRARY_POLL_MS);
+  // Before a key is selected the poll targets the library itself, so no request 404s.
+  const solvePoll = usePoll<SolvePayload>(sel ? `/api/library/solve/${sel}` : "/api/library", LIBRARY_POLL_MS);
   const solve = sel && solvePoll.data?.key === sel ? solvePoll.data : null;
   const solvedKeys = useMemo(() => new Set((d?.solves ?? []).map((s) => s.key)), [d?.solves]);
   const readsFrac = d?.contextAvg && d.tokens ? Math.max(0.004, d.contextAvg / d.tokens) : 0;
