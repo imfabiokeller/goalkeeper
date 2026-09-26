@@ -19,6 +19,17 @@ change it in the same commit as the code that changes it.
 - Keys live in `.env`, never in the repo. `RETRIEVAL_BENCH_ENV_FILE` style
   indirection is fine.
 
+## Git
+
+- Commit messages follow Conventional Commits: `type: summary`, with type
+  one of `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `planning`.
+- Before starting work, before committing, and before pushing, run
+  `git pull --rebase --autostash` so you build on the latest `origin/main`.
+- Push to `origin main` right after each commit so teammates see it.
+- Never force-push and never rewrite commits that are already on GitHub.
+- If a rebase conflicts, resolve it before any other work. If you cannot,
+  run `git rebase --abort` and ask a human.
+
 ## Layout (planned)
 
 ```
