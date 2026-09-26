@@ -11,7 +11,7 @@ import { synthesize, type Briefing, type SynthesizeArgs } from "../context/synth
 import { gate as realGate } from "../gate/gate.ts";
 import type { Collections } from "../shared/db.ts";
 import type { CheckInput, CheckState, Enrichment, GateResult, Goal, Input, Source, State, Task } from "../shared/types.ts";
-import { claim, heartbeat } from "./claim.ts";
+import { claim, heartbeat, stepDone } from "./claim.ts";
 import { runTask, type RunResult } from "./run.ts";
 import { enrich as realEnrich, enrichSource, writeErrorSource, writeGateSource, writeRun, type EnrichFn } from "./write.ts";
 
@@ -163,6 +163,8 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
     model: opts.model,
     abortSignal: abort,
     maxSteps: opts.maxSteps,
+    // Live progress on the task document, one write per finished step.
+    onStep: (entry) => stepDone(c, task._id, workerId, entry),
   });
 
   let gateResult: GateResult | null = null;

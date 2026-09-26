@@ -8,7 +8,7 @@ import { z } from "zod";
 import { inputPage, PAGE_CHARS } from "../context/assemble.ts";
 import type { Passage } from "../context/retrieve.ts";
 import { workerModel, workerProviderOptions } from "../shared/llm.ts";
-import { BlockArgs, SubmitArgs, type GateResult } from "../shared/types.ts";
+import { BlockArgs, PROGRESS_REASON_CHARS, PROGRESS_REASONS, SubmitArgs, type GateResult, type ProgressEntry } from "../shared/types.ts";
 
 export const MAX_STEPS = 20;
 // How many times a run that ended on plain text (no tool call) is asked again for a tool call.
@@ -32,7 +32,38 @@ export type RunCtx = {
   model?: LanguageModel;
   abortSignal?: AbortSignal;
   maxSteps?: number;
+  // Called once per finished step with the small live-progress entry the
+  // task document keeps. The caller writes it; a failure there never
+  // stops the run.
+  onStep?: (entry: ProgressEntry) => unknown;
 };
+
+const clip = (s: string) => (s.length > PROGRESS_REASON_CHARS ? s.slice(0, PROGRESS_REASON_CHARS) + "…" : s);
+
+// The progress entry for one finished step: the tool it called (the first
+// one, "text" for none) and, for a draft or a submit, the gate verdict on
+// it. Never the proposal itself: a rule sentence at most.
+export function progressEntry(
+  step: Pick<StepResult<never, never>, "toolCalls" | "toolResults">,
+  n: number,
+  dryRun: RunCtx["dryRun"],
+  at = new Date(),
+): ProgressEntry {
+  const call = step.toolCalls[0];
+  if (!call) return { at, step: n, tool: "text" };
+  const entry: ProgressEntry = { at, step: n, tool: call.toolName };
+  if (call.toolName !== "try_submit" && call.toolName !== "submit") return entry;
+  const proposal = (call.input as { proposal?: Record<string, unknown> } | undefined)?.proposal;
+  // try_submit already ran the gate: read its output. submit records only, so run the same dry gate.
+  const out = step.toolResults.find((r) => r.toolCallId === call.toolCallId)?.output as { pass?: boolean; reasons?: string[] } | undefined;
+  const verdict = call.toolName === "try_submit" && out && typeof out.pass === "boolean" ? out : proposal ? dryRun(proposal) : null;
+  if (verdict) {
+    entry.ok = verdict.pass === true;
+    entry.reasons = (verdict.reasons ?? []).slice(0, PROGRESS_REASONS).map(clip);
+  }
+  if (typeof proposal?.rule === "string") entry.rule = clip(proposal.rule);
+  return entry;
+}
 
 export type StepRecord = {
   text: string;
@@ -144,6 +175,15 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
       maxOutputTokens: 8000, // a proposal plus its working, never the model's default ceiling
       providerOptions: workerProviderOptions(),
       abortSignal: ctx.abortSignal,
+      // Live progress: step numbers continue across nudge calls.
+      onStepEnd: async (step) => {
+        if (!ctx.onStep) return;
+        try {
+          await ctx.onStep(progressEntry(step as unknown as StepResult<never, never>, steps.length + step.stepNumber + 1, ctx.dryRun));
+        } catch {
+          // The write is best effort; the run goes on.
+        }
+      },
     });
 
     steps.push(...result.steps.map((s) => recordStep(s as unknown as StepResult<never, never>)));

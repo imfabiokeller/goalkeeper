@@ -45,10 +45,26 @@ describe("reaper", () => {
     expect(await reap(c, 30_000)).toBe(1);
 
     const s = await c.tasks.findOne({ _id: stale._id });
-    expect(s).toMatchObject({ status: "open", worker: null, heartbeat: null, attempt: 3 });
+    expect(s).toMatchObject({ status: "open", worker: null, heartbeat: null, attempt: 3, lastWorker: "w-1" });
+    expect(s?.diedAt).toBeInstanceOf(Date);
+    expect(s?.progress).toHaveLength(1);
+    expect(s?.progress?.[0]).toMatchObject({ step: 0, tool: "reaper" });
     const f = await c.tasks.findOne({ _id: fresh._id });
     expect(f).toMatchObject({ status: "claimed", worker: "w-2", attempt: 1 });
     const m = await c.tasks.findOne({ _id: merged._id });
     expect(m?.status).toBe("merged");
+  });
+
+  it("the requeue appends to the worker's progress and keeps the last entries only", async (c) => {
+    const now = Date.now();
+    const progress = Array.from({ length: 25 }, (_, i) => ({ at: new Date(now - 60_000 + i * 1000), step: i + 1, tool: "read_input" }));
+    const stale = taskFixture("stale", { status: "claimed", worker: "w-9", heartbeat: new Date(now - 31_000), step: 25, progress });
+    await c.tasks.insertOne(stale);
+    expect(await reap(c, 30_000)).toBe(1);
+    const s = await c.tasks.findOne({ _id: stale._id });
+    expect(s?.lastWorker).toBe("w-9");
+    expect(s?.progress).toHaveLength(25);
+    expect(s?.progress?.at(-1)).toMatchObject({ step: 25, tool: "reaper" });
+    expect(s?.progress?.[0]?.step).toBe(2); // the oldest line fell off
   });
 });

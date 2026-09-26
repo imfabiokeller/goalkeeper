@@ -12,6 +12,7 @@ import { checkInput, checkState, iteration, MAX_ATTEMPTS, type IterationOptions 
 import { claim, heartbeat } from "./claim.ts";
 import { gate } from "../gate/gate.ts";
 import { MAX_NUDGES, NUDGE, runTask, type RunCtx } from "./run.ts";
+import type { ProgressEntry } from "../shared/types.ts";
 import { retrieve } from "../context/retrieve.ts";
 import { flattenRun, proposalLines } from "./write.ts";
 
@@ -169,6 +170,46 @@ describe("check input and state", () => {
   });
 });
 
+describe("run progress", () => {
+  it("calls onStep once per step: the tool name, and the gate verdict for a draft or a submit", async () => {
+    let calls = 0;
+    const model = mockModel(() => {
+      calls += 1;
+      if (calls === 1) return toolCallResult("read_input", { offset: 0 });
+      if (calls === 2) return textResult("thinking out loud");
+      if (calls === 3)
+        return toolCallResult("try_submit", {
+          proposal: { ...appleSample.proposal, key: "60c09cac", rule: "The output is the input.", program: "function transform(grid) { return grid; }" },
+        });
+      return toolCallResult("submit", { proposal: { ...appleSample.proposal, key: "60c09cac" } });
+    });
+    const seen: ProgressEntry[] = [];
+    const r = await runTask(runCtx(model, { onStep: (e) => void seen.push(e) }));
+    expect(r.outcome.type).toBe("submit");
+    expect(seen.map((e) => [e.step, e.tool])).toEqual([
+      [1, "read_input"],
+      [2, "text"],
+      [3, "try_submit"],
+      [4, "submit"],
+    ]);
+    expect(seen[0].ok).toBeUndefined();
+    expect(seen[2]).toMatchObject({ ok: false, rule: "The output is the input." });
+    expect(seen[2].reasons?.length).toBeLessThanOrEqual(3);
+    expect(seen[2].reasons?.[0]).toContain("pair 1: expected 6x6, got 3x3");
+    for (const reason of seen[2].reasons ?? []) expect(reason.length).toBeLessThanOrEqual(161);
+    expect(seen[3]).toMatchObject({ ok: true, reasons: [], rule: appleSample.proposal.rule });
+    expect(seen.every((e) => e.at instanceof Date)).toBe(true);
+    // Never the program or the proposal itself.
+    expect(JSON.stringify(seen)).not.toContain("function transform");
+  });
+
+  it("a throwing onStep does not stop the run", async () => {
+    const model = submitModel({ key: "60c09cac" });
+    const r = await runTask(runCtx(model, { onStep: () => Promise.reject(new Error("db down")) }));
+    expect(r.outcome.type).toBe("submit");
+  });
+});
+
 describe("run nudges", () => {
   it("a text-only step that hit the output ceiling gets a nudge, and the next call submits", async () => {
     let calls = 0;
@@ -263,6 +304,14 @@ describe("worker iteration", () => {
     const task = await c.tasks.findOne({ _id: taskId });
     expect(task?.status).toBe("merged");
     expect(task?.attempt).toBe(1);
+    // Live progress stayed on the task: one line per step, the drafts with their verdicts.
+    expect(task?.step).toBe(3);
+    expect(task?.progress?.map((e) => [e.step, e.tool, e.ok])).toEqual([
+      [1, "try_submit", false],
+      [2, "try_submit", true],
+      [3, "submit", true],
+    ]);
+    expect(task?.progress?.[0].reasons?.[0]).toContain("pair 1: expected 6x6, got 3x3");
     // Dry runs record no gate source and no outcome: only the run source exists.
     expect(await c.sources.countDocuments({ kind: "gate" })).toBe(0);
     const run = await c.sources.findOne({ kind: "worker-run" });
@@ -375,6 +424,10 @@ describe("worker iteration", () => {
     await c.tasks.updateOne({ key: "60c09cac" }, { $set: { hint: "read the table, not the prose" } });
 
     expect(await iteration(c, "w-2", { ...base, model: submitModel() })).toBe("merged");
+    // The second attempt's claim started its progress clean.
+    const task = await c.tasks.findOne({ key: "60c09cac" });
+    expect(task?.step).toBe(1);
+    expect(task?.progress?.map((e) => e.tool)).toEqual(["submit"]);
     const runs = await c.sources.find({ kind: "worker-run" }).sort({ createdAt: 1 }).toArray();
     expect(runs).toHaveLength(2);
     expect(runs[0].raw.system).not.toContain("refuted:");

@@ -61,9 +61,26 @@ flag stays so a later run can hold units back.
   blockReason: null | "...",
   hint: null | "...",               // planner hint: too specific, reopened, or a race redo
   createdBy: "planner",
-  createdAt, updatedAt
+  createdAt, updatedAt,
+  step: 0,                          // tool steps finished in the current attempt; the claim resets it to 0
+  progress: [                       // last 25 lines, oldest first; the claim resets it to []
+    { at: ISODate, step: 1, tool: "read_input" },
+    { at: ISODate, step: 2, tool: "try_submit", ok: false, reasons: ["pair 1: ..."], rule: "..." },
+    { at: ISODate, step: 2, tool: "reaper" }   // the worker died here, requeued
+  ],
+  lastWorker: null | "w-07",        // set by the reaper on a requeue, left as is by the next claim
+  diedAt: null | ISODate            // when the reaper requeued; the screen holds the dead row 30 s from here
 }
 ```
+
+`step` and `progress` are live: the worker writes both after every tool
+step (one `updateOne` with the heartbeat precondition, `$push` with
+`$slice: -25`), and the same write is an extra heartbeat. A `try_submit`
+or `submit` line carries the gate verdict (`ok`), the first three reasons
+clipped to 160 chars, and the draft's `rule` sentence; never the program
+or the proposal. The previous attempt's progress is history until the next
+claim wipes it. `lastWorker` and `diedAt` are the dead worker memory: the
+reaper sets both and appends a `reaper` line; the claim keeps them.
 
 Indexes: `{ status: 1, priority: -1, createdAt: 1 }` for the claim;
 `{ worker: 1, heartbeat: 1 }` for the reaper; `{ key: 1, status: 1 }` so
@@ -80,8 +97,9 @@ db.tasks.findOneAndUpdate(
 ```
 
 Heartbeat: `$set: { heartbeat: new Date() }` every 15 s. Reaper: claimed
-with `heartbeat < now - 30 s` goes back to `open`, `attempt + 1`. That is
-kill-and-resume. No other code.
+with `heartbeat < now - 30 s` goes back to `open`, `attempt + 1`, with
+`lastWorker`, `diedAt` and the `reaper` progress line set in the same
+pipeline update. That is kill-and-resume. No other code.
 
 ## state (one per merged key)
 
