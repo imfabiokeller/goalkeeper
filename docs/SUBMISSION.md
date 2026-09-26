@@ -35,6 +35,14 @@ of the solves came on a second or later attempt, after a refuted rule,
 a hidden-score hint or a library that had grown. The claim on screen:
 the library grows, the context does not, and the solve rate goes up.
 
+## Cost
+
+Same 108 puzzles, DeepSeek V4 Flash rates: the control spends 8.4k
+tokens and $0.0007 per puzzle (two blind samples), the harness 83k
+tokens and $0.018 per puzzle across all its attempts. Per solved puzzle:
+half a cent against two cents. Six times the solves for about ten times
+the tokens on a typical puzzle.
+
 ## Links
 
 - Live screen: https://goalkeeper-gamma.vercel.app (stage, click a card;

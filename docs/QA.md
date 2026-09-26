@@ -52,6 +52,17 @@ not just feedback plus retries, is the cause needs an ablation with
 retrieval off; we did not run it today. The curve of solve rate against
 library size over the day is the evidence we have.
 
+**How much more does the harness cost?**
+Measured on the same 108 finished puzzles that the control also ran,
+at DeepSeek V4 Flash rates. Control, two blind samples: 8.4k tokens per
+puzzle (median), $0.0007 per puzzle, $0.0056 per solved puzzle (14
+solved). Harness, all attempts: 83k tokens per puzzle (median, 335k
+mean, a few hard puzzles burn many long attempts), $0.018 per puzzle,
+$0.023 per solved puzzle (85 solved). So about 10x the tokens on a
+typical puzzle, six times the solves, and per solved puzzle two cents
+against half a cent. The whole afternoon: under a dollar for the harness,
+about thirty cents for the 400-puzzle control.
+
 **Two workers, same puzzle?**
 Cannot happen: the claim is one atomic update, the planner never emits a
 task for a busy key, and the state write has a version precondition. A
