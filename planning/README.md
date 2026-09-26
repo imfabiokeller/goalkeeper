@@ -62,3 +62,4 @@ Voyage AI:
   session; log in again from a terminal or set `ANTHROPIC_API_KEY`.
 - OpenRouter code (10:30 email), Codex credits (10:30 email), v0 code
   (10:30 email), Kiro credits form, Voyage account and key.
+- `judges.md`: who the six first-round judges are, what each will listen for, sources.
