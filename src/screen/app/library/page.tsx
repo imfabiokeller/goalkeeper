@@ -13,7 +13,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { ARC_PALETTE } from "../../lib/arc.tsx";
 import { useScale } from "../../lib/useScale.ts";
-import type { BaselinePayload } from "../../lib/baseline.ts";
 import { bucketFinished } from "../../lib/curve.ts";
 import { agentLabel, compact, hhmm, pct } from "../../lib/format.ts";
 import { usePoll } from "../../lib/poll.ts";
@@ -21,7 +20,6 @@ import type { Grid, LibraryPayload, LibraryRow, LibraryRowKind, SolvePayload } f
 import { useSize } from "../../lib/useSize.ts";
 
 const LIBRARY_POLL_MS = 5000;
-const BASELINE_POLL_MS = 60_000;
 const FONTS = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap";
 const BUCKET_MS = 10 * 60_000;
 const PLOT_H = 236;
@@ -53,50 +51,6 @@ function Panel({ children, style }: { children: ReactNode; style?: CSSProperties
   return <div style={{ border: "1px solid #1f1f1f", borderRadius: 14, background: "#0a0a0a", display: "flex", flexDirection: "column", minWidth: 0, ...style }}>{children}</div>;
 }
 
-// Solve rate against library tokens; the control as a flat dashed line.
-function RateChart({ d, base }: { d: LibraryPayload | null; base: BaselinePayload }) {
-  const pts = (d?.solveRate ?? []).filter((b) => bucketFinished(b) > 0).map((b) => ({ x: b.tokens, y: b.solved / bucketFinished(b) }));
-  const last = pts.at(-1);
-  const baseRate = base ? (base.solveRateAt2 ?? base.solveRate) : null;
-  const w = 580;
-  const h = 72;
-  const maxX = Math.max(1, ...pts.map((p) => p.x));
-  const maxY = Math.max(0.05, ...pts.map((p) => p.y), baseRate ?? 0) * 1.15;
-  const X = (x: number) => (x / maxX) * w;
-  const Y = (y: number) => h - (y / maxY) * h;
-  const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => compact(f * maxX, f === 0 ? 0 : 1));
-  return (
-    <Panel style={{ padding: "16px 22px 10px", gap: 6 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-          <span style={{ fontFamily: MONO, fontSize: 24, lineHeight: 1, color: GREEN }}>{last ? pct(last.y) : "-"}</span>
-          <span style={{ fontSize: 14, color: "#a1a1a1" }}>solved</span>
-          {baseRate === null ? (
-            <span style={{ fontSize: 13, color: "#8f8f8f", marginLeft: 8 }}>no control run yet</span>
-          ) : (
-            <>
-              <span style={{ fontFamily: MONO, fontSize: 17, color: "#8f8f8f", marginLeft: 8 }}>{pct(baseRate)}</span>
-              <span style={{ fontSize: 13, color: "#8f8f8f" }}>baseline, no library</span>
-            </>
-          )}
-        </div>
-        <span style={{ fontSize: 12, color: "#8f8f8f" }}>vs library tokens</span>
-      </div>
-      <div style={{ position: "relative", flex: 1, borderBottom: "1px solid #333", minHeight: h }}>
-        <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ position: "absolute", left: 0, bottom: 0, overflow: "visible" }} role="img" aria-label="solve rate against library tokens">
-          {baseRate !== null ? <line x1={0} x2={w} y1={Y(baseRate)} y2={Y(baseRate)} stroke="#8f8f8f" strokeWidth={1.8} strokeDasharray="5 4" vectorEffect="non-scaling-stroke" /> : null}
-          {pts.length > 1 ? <polyline points={pts.map((p) => `${X(p.x).toFixed(1)},${Y(p.y).toFixed(1)}`).join(" ")} fill="none" stroke={GREEN} strokeWidth={2.5} strokeLinejoin="round" vectorEffect="non-scaling-stroke" /> : null}
-          {last ? <circle cx={X(last.x)} cy={Y(last.y)} r={3} fill={GREEN} /> : null}
-        </svg>
-      </div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontFamily: MONO, fontSize: 11, color: "#6b6b6b" }}>
-        {ticks.map((t, i) => (
-          <span key={i}>{t}</span>
-        ))}
-      </div>
-    </Panel>
-  );
-}
 
 // Library tokens up to each bucket over the solves so far.
 function PerSolveChart({ d }: { d: LibraryPayload | null }) {
@@ -516,7 +470,6 @@ export default function LibraryPage() {
   // The rows filter is matched in the database (every record, not the newest 40).
   const [filter, setFilter] = useState<Filter>("all");
   const poll = usePoll<LibraryPayload>(filter === "all" ? "/api/library" : `/api/library?kind=${filter}`, LIBRARY_POLL_MS);
-  const base = usePoll<BaselinePayload>("/api/baseline", BASELINE_POLL_MS);
   const d = poll.data;
   const [sel, setSel] = useState<string | null>(null);
   useEffect(() => {
@@ -564,7 +517,7 @@ export default function LibraryPage() {
         </Link>
       </header>
 
-      <div style={{ height: 150, flexShrink: 0, display: "grid", gridTemplateColumns: "1fr 1.2fr 1fr", gap: 20 }}>
+      <div style={{ height: 150, flexShrink: 0, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
         <Panel style={{ padding: "18px 22px", justifyContent: "center", gap: 16 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
@@ -583,7 +536,6 @@ export default function LibraryPage() {
             </div>
           </div>
         </Panel>
-        <RateChart d={d} base={base.data ?? null} />
         <PerSolveChart d={d} />
       </div>
 
