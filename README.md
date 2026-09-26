@@ -8,7 +8,6 @@ statement two, long-horizon engineering.
 
 - Live dashboard: https://goalkeeper-gamma.vercel.app
 - The library view: https://goalkeeper-gamma.vercel.app/library
-- The pitch and the video script: [docs/PITCH.md](docs/PITCH.md)
 - The architecture as one page: [docs/architecture.html](docs/architecture.html)
 
 ![The stage view: six workers on six ARC puzzles, the solve rate curve, the control at 10%, and the library counter at 18.7M tokens](docs/screenshots/stage.png)
@@ -16,18 +15,6 @@ statement two, long-horizon engineering.
 ![The library view: every solve on a timeline, what one worker read before it solved its puzzle, and the whole append-only record](docs/screenshots/library.png)
 
 ![The architecture: a human writes the goal once; Atlas holds the task queue, the goal and the library; each stateless worker claims, assembles a 4k slice, runs, passes the gate and writes the raw run back; the planner is a function any idle worker runs](docs/screenshots/architecture.png)
-
-## What we were trying to fix
-
-If you have run an agent for a few hours you know the feeling. The
-context fills up with old tool output and abandoned attempts. The goal
-you wrote in the first message drifts out of view. Then the process
-crashes, and the agent starts over with none of what it learned. Running
-five agents in parallel gives you five copies of the same problem.
-
-We wanted an agent system where the opposite happens: the longer it runs,
-the better each next step gets. The trick we settled on is to keep
-nothing inside the agent and everything in a database.
 
 ## How it works
 
@@ -68,31 +55,6 @@ solves have landed in the library. Queries only. No model calls.
 Two things a worker never sees. The hidden test answer, which only the
 planner's `score()` reads. And any other worker. They coordinate through
 the library alone, the way ants coordinate through a trail.
-
-## What happened today
-
-We ran the 400 ARC-AGI-1 evaluation puzzles with DeepSeek V4 Flash and
-thinking switched off. With thinking on it already solves about 90% of
-them and there would be nothing to measure. Six workers on one VPS.
-
-| | |
-|---|---|
-| Control: same model, one shot per puzzle, no tools, no library, 40 puzzles | 10% solved, 12.5% with two attempts |
-| With the harness, of the puzzles it finished | 80% solved on the hidden test |
-| Puzzles solved by 16:30 | 74 |
-| Solves that came on a second or later attempt | 33 |
-| Puzzles reopened by the hidden score with a hint | 11 |
-| Puzzles reopened because the library had grown | 9 |
-| Tokens a worker reads per request | about 4k |
-| Library at 16:30 | 18.7M tokens, 343 records |
-| Cost | under a dollar |
-
-The control number matches what ARC Prize reports for this model without
-thinking (12 to 13% on the semi-private set). We are not claiming a
-benchmark result. The public evaluation set is probably in the training
-data, so every number here is a best case. The claim is the gap between
-the same model with and without the harness, measured the same way on
-the same day.
 
 ## Run it
 
@@ -216,7 +178,6 @@ docs/        the plan, the design, the database contract, the pitch
 
 ## Docs
 
-- [docs/PITCH.md](docs/PITCH.md): the pitch, the numbers, the video script.
 - [docs/architecture.html](docs/architecture.html): the architecture as
   one picture.
 - [docs/MVP.md](docs/MVP.md): the build plan and acceptance criteria. Wins
@@ -230,7 +191,8 @@ docs/        the plan, the design, the database contract, the pitch
   provide.
 - [docs/QA.md](docs/QA.md): the judges' questions and the answers.
 - [docs/PRIOR-ART.md](docs/PRIOR-ART.md): what exists and how this differs.
-- [docs/SUBMISSION.md](docs/SUBMISSION.md): the submission text.
+- [docs/PITCH.md](docs/PITCH.md) and [docs/SUBMISSION.md](docs/SUBMISSION.md):
+  the presentation and the submission text.
 
 ## Built during the event
 
