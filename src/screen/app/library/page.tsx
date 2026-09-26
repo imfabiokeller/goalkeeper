@@ -452,7 +452,7 @@ function WholeLibrary({ d, solvedKeys, onPick, filter, setFilter }: { d: Library
           <circle cx="7" cy="7" r="4.5" />
           <path d="M10.5 10.5L14 14" />
         </svg>
-        <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="search the newest records: rules, puzzles, agents" style={{ flex: 1, background: "transparent", border: 0, outline: "none", color: "#ededed", fontSize: 14, font: "inherit" }} />
+        <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="search these records: rules, puzzles, agents" style={{ flex: 1, background: "transparent", border: 0, outline: "none", color: "#ededed", fontSize: 14, font: "inherit" }} />
       </label>
       <div style={{ display: "grid", gridTemplateColumns: "52px 20px 86px 1fr 56px", gap: 10, fontSize: 12, color: "#6b6b6b", padding: "0 4px" }}>
         <span>time</span>
@@ -480,7 +480,7 @@ function WholeLibrary({ d, solvedKeys, onPick, filter, setFilter }: { d: Library
             </button>
           );
         })}
-        {d && !rows.length ? <span style={{ fontSize: 13, color: "#6b6b6b", padding: "8px 4px" }}>nothing in the newest {d.rows.length} records</span> : null}
+        {d && !rows.length ? <span style={{ fontSize: 13, color: "#6b6b6b", padding: "8px 4px" }}>nothing matches</span> : null}
       </div>
     </Panel>
   );
@@ -490,6 +490,29 @@ function selFromUrl(): string | null {
   if (typeof window === "undefined") return null;
   const v = new URLSearchParams(window.location.search).get("sel");
   return v && /^[a-z0-9_-]{1,64}$/i.test(v) ? v : null;
+}
+
+// The library's size over time: cumulative tokens, one point per minute.
+function GrowthLine({ growth }: { growth: Array<{ at: string; tokens: number }> }) {
+  const w = 400;
+  const h = 34;
+  const max = growth.length ? Math.max(...growth.map((g) => g.tokens), 1) : 1;
+  const pts = growth.map((g, i) => `${((i / Math.max(1, growth.length - 1)) * w).toFixed(1)},${(h - 2 - (g.tokens / max) * (h - 4)).toFixed(1)}`);
+  const first = growth[0]?.at ? hhmm(growth[0].at) : "";
+  const last = growth.at(-1)?.at ? hhmm(growth.at(-1)!.at) : "";
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ width: "100%", height: h, display: "block" }} aria-label="library size over time">
+        {pts.length > 1 ? <polygon points={`0,${h} ${pts.join(" ")} ${w},${h}`} fill="#1a1a1e" /> : null}
+        {pts.length > 1 ? <polyline points={pts.join(" ")} fill="none" stroke="#ededed" strokeWidth="1.5" vectorEffect="non-scaling-stroke" /> : null}
+      </svg>
+      <div style={{ display: "flex", justifyContent: "space-between", fontFamily: MONO, fontSize: 11, color: "#6b6b6b" }}>
+        <span>{first}</span>
+        <span>tokens in the library over time</span>
+        <span>{last}</span>
+      </div>
+    </div>
+  );
 }
 
 export default function LibraryPage() {
@@ -549,7 +572,7 @@ export default function LibraryPage() {
               <span style={{ fontSize: 14, color: "#a1a1a1" }}>library · {d ? `${d.entries.toLocaleString("en-US")} records` : ""}</span>
               <span style={{ fontFamily: MONO, fontSize: 24, lineHeight: 1 }}>{d ? compact(d.tokens) : "-"}</span>
             </div>
-            <div style={{ height: 12, borderRadius: 4, background: "#6a6a70" }} />
+            <GrowthLine growth={d?.growth ?? []} />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
