@@ -557,7 +557,7 @@ export default function LibraryPage() {
           <span style={{ fontSize: 20, color: "#a1a1a1" }}>Library</span>
           {poll.error ? <span className="gk-chip" style={{ color: "var(--gk-dead)", borderColor: "var(--gk-dead-bd)" }}>{poll.error}</span> : null}
         </div>
-        <Link href="/" style={{ height: 40, display: "flex", alignItems: "center", gap: 8, padding: "0 16px", border: "1px solid #333", borderRadius: 10, fontSize: 15 }}>
+        <Link href="/" style={{ height: 44, display: "flex", alignItems: "center", gap: 10, padding: "0 16px", border: "1px solid #333", borderRadius: 10, textDecoration: "none", fontSize: 15 }}>
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#ededed" strokeWidth="1.6" aria-hidden>
             <path d="M12 8H4M7 5L4 8l3 3" />
           </svg>
