@@ -30,6 +30,7 @@ export type IterationOptions = {
   deadlineMs?: number; // default 4 minutes
   heartbeatMs?: number; // default 15 s
   maxSteps?: number;
+  planEveryMs?: number; // default PLAN_EVERY_MS (env PLAN_EVERY_MS)
 };
 
 // A failed gate reopens the task with attempt + 1 while attempt is below
@@ -85,7 +86,26 @@ async function tryPlan(c: Collections, workerId: string, opts: IterationOptions)
   }
 }
 
+// With more open tasks than workers no worker is ever idle, so the
+// planner would never run again after the first turn: nothing scored,
+// metrics stale. Before each claim: if the last planner turn is older
+// than PLAN_EVERY_MS and the lock is free, plan. The lock's acquire keeps
+// it one worker at a time; two cheap reads keep the others from trying.
+export const PLAN_EVERY_MS = 60_000;
+
+export async function planDue(c: Collections, everyMs: number, now = new Date()): Promise<boolean> {
+  const [lock, turn] = await Promise.all([
+    c.locks.findOne({ _id: "planner" }, { projection: { until: 1 } }),
+    c.sources.findOne({ kind: "planner-turn" }, { sort: { createdAt: -1 }, projection: { createdAt: 1 } }),
+  ]);
+  if (lock && lock.until.getTime() > now.getTime()) return false;
+  return !turn || turn.createdAt.getTime() < now.getTime() - everyMs;
+}
+
 export async function iteration(c: Collections, workerId: string, opts: IterationOptions = {}): Promise<IterationOutcome> {
+  const everyMs = opts.planEveryMs ?? Number(process.env.PLAN_EVERY_MS ?? PLAN_EVERY_MS);
+  if (opts.plan !== null && (await planDue(c, everyMs))) await tryPlan(c, workerId, opts);
+
   const task = await claim(c, workerId);
   if (!task) {
     await tryPlan(c, workerId, opts);

@@ -8,7 +8,7 @@ import type { LanguageModelV3CallOptions, LanguageModelV3GenerateResult } from "
 import { collections, ensureIndexes, type Collections } from "../shared/db.ts";
 import { goalFromLens } from "../shared/goal.ts";
 import type { Goal, Task } from "../shared/types.ts";
-import { checkInput, checkState, iteration, MAX_ATTEMPTS, type IterationOptions } from "./loop.ts";
+import { checkInput, checkState, iteration, MAX_ATTEMPTS, planDue, type IterationOptions } from "./loop.ts";
 import { claim, heartbeat } from "./claim.ts";
 import { gate } from "../gate/gate.ts";
 import { MAX_NUDGES, NUDGE, runTask, type RunCtx } from "./run.ts";
@@ -539,6 +539,58 @@ describe("worker iteration", () => {
     expect(await heartbeat(c, hot, "w-1")).toBe(true);
     expect(await heartbeat(c, hot, "w-2")).toBe(false);
     expect(await heartbeat(c, old, "w-1")).toBe(false);
+  });
+});
+
+describe("periodic planning", () => {
+  async function seedTurn(ageMs: number) {
+    await c.sources.insertOne({
+      _id: new ObjectId(),
+      kind: "planner-turn",
+      taskId: null,
+      key: null,
+      version: goal.version,
+      raw: {},
+      text: "planner turn",
+      enrichment: null,
+      tokens: { in: 0, out: 0, cost: 0 },
+      createdAt: new Date(Date.now() - ageMs),
+    });
+  }
+
+  it("a fresh planner turn: two busy iterations never plan", async () => {
+    await seedTurn(1000);
+    for (const k of ["p-1", "p-2"]) {
+      await seedInput(k);
+      await seedTask(k);
+    }
+    let plans = 0;
+    const plan = async () => void (plans += 1);
+    expect(await iteration(c, "w-1", { ...base, model: submitModel(), plan, planEveryMs: 60_000 })).toBe("merged");
+    expect(await iteration(c, "w-1", { ...base, model: submitModel(), plan, planEveryMs: 60_000 })).toBe("merged");
+    expect(plans).toBe(0);
+  });
+
+  it("an old planner turn: the busy iteration plans first, then the fresh turn holds the next one", async () => {
+    await seedTurn(90_000);
+    for (const k of ["p-1", "p-2"]) {
+      await seedInput(k);
+      await seedTask(k);
+    }
+    let plans = 0;
+    const plan = async () => {
+      plans += 1;
+      await seedTurn(0);
+    };
+    expect(await iteration(c, "w-1", { ...base, model: submitModel(), plan, planEveryMs: 60_000 })).toBe("merged");
+    expect(plans).toBe(1);
+    expect(await iteration(c, "w-1", { ...base, model: submitModel(), plan, planEveryMs: 60_000 })).toBe("merged");
+    expect(plans).toBe(1);
+    // No turn at all counts as due; a held lock is never due.
+    await c.sources.deleteMany({ kind: "planner-turn" });
+    expect(await planDue(c, 60_000)).toBe(true);
+    await c.locks.insertOne({ _id: "planner", holder: "w-9", until: new Date(Date.now() + 20_000) });
+    expect(await planDue(c, 60_000)).toBe(false);
   });
 });
 
