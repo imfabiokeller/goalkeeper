@@ -13,6 +13,7 @@ import { acquire, release } from "./lock.ts";
 import { refreshMetrics } from "./metrics.ts";
 import { propose, type DecideGuideline } from "./propose.ts";
 import { reap } from "./reaper.ts";
+import { previousMergedCount, reopenOnGrowth, type ReopenReport } from "./reopen.ts";
 import { defaultScore, scoreStates, type ScoreReport } from "./score.ts";
 import { writeError, writeSource, ZERO_TOKENS } from "./sources.ts";
 
@@ -35,6 +36,7 @@ export type PlanReport = {
   reaped: number;
   emitted: number;
   score: ScoreReport;
+  reopen: ReopenReport;
   crowd: ClassifyResult[];
   proposed: number;
   backfilled: number;
@@ -50,6 +52,7 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
     reaped: 0,
     emitted: 0,
     score: { scored: 0, solved: 0, reopened: 0, skipped: 0 },
+    reopen: { merged: 0, previous: 0, reopened: 0 },
     crowd: [],
     proposed: 0,
     backfilled: 0,
@@ -95,6 +98,9 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
         report.proposed = await propose(c, g, opts.decideGuideline, report.tokens, lessons);
       });
     }
+    await step("reopen", async () => {
+      report.reopen = await reopenOnGrowth(c, await previousMergedCount(c));
+    });
     await step("metrics", async () => {
       lessons = (await refreshMetrics(c)).lessons.text;
     });
@@ -119,6 +125,9 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
           reaped: report.reaped,
           emitted: report.emitted,
           score: report.score,
+          // The merged count the next run compares against for reopen-on-growth.
+          merged: report.reopen.merged,
+          reopened: report.reopen.reopened,
           crowd: report.crowd.map((r) => ({ sourceId: r.sourceId, outcome: r.outcome, reason: r.reason })),
           proposed: report.proposed,
           backfilled: report.backfilled,
@@ -129,7 +138,7 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
           version: goal?.version ?? 0,
           tokens: { ...report.tokens },
           text: [
-            `planner ${holder}: reaped ${report.reaped}, emitted ${report.emitted}, scored ${report.score.scored} (solved ${report.score.solved}, reopened ${report.score.reopened}), proposed ${report.proposed}, backfilled ${report.backfilled}`,
+            `planner ${holder}: reaped ${report.reaped}, emitted ${report.emitted}, scored ${report.score.scored} (solved ${report.score.solved}, reopened ${report.score.reopened}), proposed ${report.proposed}, merged ${report.reopen.merged} (reopened on growth ${report.reopen.reopened}), backfilled ${report.backfilled}`,
             ...outcomes,
             ...report.errors,
             ...(lessons ? ["", lessons] : []),
