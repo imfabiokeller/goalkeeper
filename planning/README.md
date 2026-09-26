@@ -23,6 +23,9 @@ MongoDB (markdown exports of the official docs, `.md` appended to the URL):
   skills now installed under `.claude/skills/`.
 - `mongodb-mcp-server-get-started.md`, `mongodb-mcp-server-configuration.md`,
   `mongodb-mcp-options.md`: the MCP server wired in `.mcp.json`.
+- `mongodb-search-docs.md`: the MongoDB Search landing page (full-text
+  search, analyzers, scoring) and the index of every page in that section.
+  The text side of the briefing query.
 - `mongodb-rankfusion.md`, `mongodb-hybrid-search-overview.md`,
   `mongodb-hybrid-vector-fulltext.md`: the briefing query.
 - `mongodb-vector-search-index.md`, `mongodb-vectorsearch-stage.md`,
