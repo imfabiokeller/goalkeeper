@@ -24,21 +24,20 @@ changes them.
 - Keys live in `.env`, never in the repo.
 - No UI implementation until the design mockups exist (docs/SCREEN-BRIEF.md
   is the brief). The screen stream starts from the mockups.
+- Stay inside your stream's folders. Two streams never edit the same file;
+  if you need a change in `src/shared/`, make it minimal and additive.
 
 ## Git
 
 - Commit messages follow Conventional Commits: `type: summary`, with type
   one of `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `planning`.
-- Work on a branch per stream (`s1-checks`, `s2-worker`, ...). Push the
-  branch after every commit so others see it. Open a pull request early
-  and keep pushing to it.
-- Nothing lands on `main` without Fabio's review. Do not merge your own
-  pull request.
-- Before starting work and before opening a pull request, run
-  `git fetch origin && git rebase origin/main` so you build on the latest
-  `main`. Resolve conflicts before any other work; if you cannot, ask a
-  human.
-- Never force-push a branch someone else has pulled. Never rewrite `main`.
+- Everyone commits to `main`. Before starting work, before committing, and
+  before pushing, run `git pull --rebase --autostash` so you build on the
+  latest `origin/main`. Push right after each commit so others see it.
+- Only commit when `npm run typecheck` and `npm test` pass.
+- If a rebase conflicts, resolve it before any other work. If you cannot,
+  run `git rebase --abort` and ask a human.
+- Never force-push and never rewrite commits that are already on GitHub.
 
 ## Layout
 

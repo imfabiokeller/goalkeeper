@@ -13,8 +13,8 @@ only the rules and the cuts.
 
 ## Rules
 
-- Nothing lands on `main` without Fabio's review. Every stream is a branch
-  and a pull request, pushed often so others see it.
+- Everyone commits to `main`, rebase before, push right after, so others
+  see it. Fabio reviews on `main`.
 - Nothing on stage waits for an agent. Everything is already running when
   the slot starts; a recorded replay is the fallback.
 - Single worker loop first; many is starting it N times.

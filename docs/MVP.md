@@ -84,8 +84,8 @@ open, question `approved`.
 | S4 seed | agent | `seed/` goal from `usecase/lens.json`, inputs loader, dev fakes | S0 types |
 | S5 screen | after mockups | `screen/` Next.js against the dev database | mockups, S0 types, S4 dev fakes |
 
-Every stream is a branch and a pull request. Fabio reviews and merges.
-Nothing lands on `main` without a human.
+Every stream commits straight to `main` (pull with rebase first, push
+right after). Fabio reviews on `main`.
 
 ## Acceptance criteria
 
