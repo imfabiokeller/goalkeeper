@@ -109,7 +109,7 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
     }),
     block: tool({
       description:
-        "Give up on this task with a short reason a human can act on (missing data, ambiguity, out of scope). Only after several refuted attempts. Call it once, as the last step.",
+        "Give up on this task, only after three different rules were refuted by try_submit. The reason lists the hypotheses you tried and why each failed; the unit is reopened later once the library has grown. Call it once, as the last step.",
       inputSchema: BlockArgs,
       execute: async ({ reason }) => {
         if (outcome) return "already recorded";

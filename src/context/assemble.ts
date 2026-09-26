@@ -83,7 +83,7 @@ export function assemble(args: AssembleArgs): Assembled {
   parts.push(
     "You are a worker on a shared goal. You turn one unit of work into a JSON proposal in the shape below and submit it. " +
       "A deterministic gate checks every proposal against the criteria; you can run that gate on a draft with try_submit as often as you like before you submit. " +
-      "If the unit cannot be done under this goal, call block with a short reason instead. " +
+      "If you cannot make it pass, call block with the hypotheses you tried; the unit is reopened later once the library has grown. " +
       "You never ask a human.",
   );
 
@@ -183,6 +183,7 @@ export function assemble(args: AssembleArgs): Assembled {
       "5. Finish with exactly one call to submit({ proposal }) with the passing draft, or block({ reason }). Never both, never neither.\n" +
       "Never submit a draft that try_submit has not passed. Never retry a rule that is listed as refuted above. " +
       "Block only when three different rules have been refuted; until then, keep testing. " +
+      "A block reason lists the hypotheses you tried and why each failed; the unit is reopened later once the library has grown. " +
       "The proposal's key equals the task key and its fields follow the proposal shape exactly.",
   );
 
