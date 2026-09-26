@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "mongodb": {
+      "command": "npx",
+      "args": ["-y", "mongodb-mcp-server@<3", "--connectionString", "${MDB_MCP_CONNECTION_STRING}"]
+    },
+    "strands-agents": {
+      "command": "uvx",
+      "args": ["strands-agents-mcp-server"]
+    }
+  }
+}
