@@ -18,7 +18,10 @@ changes them.
   or block. If a change breaks one of these, it is wrong, however
   convenient.
 - The worker's agent loop is the Vercel AI SDK (`generateText` with tools
-  and a step budget). No direct provider SDK calls.
+  and a step budget). No direct provider SDK calls. All models go through
+  OpenRouter and are cheap open-weight models (DeepSeek, Qwen, Kimi,
+  MiniMax). Never Claude or any other frontier model, in code, env
+  defaults or docs.
 - Every write that two processes could race on is one `findOneAndUpdate`
   with a precondition. No read-then-write.
 - Keys live in `.env`, never in the repo.
