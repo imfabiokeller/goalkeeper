@@ -61,7 +61,7 @@ export function runProgram(program: string, grid: Grid): RunResult {
     process.execPath,
     ["--permission", "--disable-proto=throw", "--max-old-space-size=256", "--stack-size=984", "-e", CHILD],
     {
-      env: {},
+      env: {} as NodeJS.ProcessEnv, // empty on purpose; the cast keeps the screen's Next.js types (NODE_ENV required) happy
       input: JSON.stringify({ program, grid }),
       timeout: TIMEOUT_MS,
       maxBuffer: MAX_OUTPUT_BYTES,

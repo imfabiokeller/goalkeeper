@@ -1,0 +1,19 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0d10;
+  --fg: #d7dbe0;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, sans-serif;
+}
+
+code,
+pre {
+  font-family: var(--mono);
+}
