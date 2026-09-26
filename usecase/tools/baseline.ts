@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import { generateText, Output, type LanguageModel } from "ai";
 import { z } from "zod";
 import { CHECK_KINDS, checks, score, type CheckKind, type Input, type State } from "../checks.ts";
-import { costUsd, workerModel } from "../../src/shared/llm.ts";
+import { costUsd, workerModel, workerProviderOptions } from "../../src/shared/llm.ts";
 
 const usecase = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -137,6 +137,7 @@ export async function sampleOnce(entry: IndexEntry, text: string, model: Languag
   try {
     const result = await generateText({
       model,
+      providerOptions: workerProviderOptions(),
       output: Output.object({ schema: Answer, name: "answer" }),
       system: SYSTEM,
       prompt: text,

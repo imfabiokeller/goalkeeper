@@ -7,7 +7,7 @@ import { generateText, hasToolCall, stepCountIs, tool, type LanguageModel, type 
 import { z } from "zod";
 import { inputPage, PAGE_CHARS } from "../context/assemble.ts";
 import type { Passage } from "../context/retrieve.ts";
-import { workerModel } from "../shared/llm.ts";
+import { workerModel, workerProviderOptions } from "../shared/llm.ts";
 import { BlockArgs, SubmitArgs, type GateResult } from "../shared/types.ts";
 
 export const MAX_STEPS = 20;
@@ -125,7 +125,8 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
     messages: ctx.messages,
     tools,
     stopWhen: [stepCountIs(ctx.maxSteps ?? MAX_STEPS), hasToolCall("submit"), hasToolCall("block")],
-    maxOutputTokens: 4000, // a proposal plus reasoning, never the model's default ceiling
+    maxOutputTokens: 4000, // a proposal plus its working, never the model's default ceiling
+    providerOptions: workerProviderOptions(),
     abortSignal: ctx.abortSignal,
   });
 

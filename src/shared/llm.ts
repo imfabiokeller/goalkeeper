@@ -6,6 +6,7 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { createVoyage } from "voyage-ai-provider";
 import { embed, type EmbeddingModel, type LanguageModel } from "ai";
+import type { SharedV4ProviderOptions } from "@ai-sdk/provider";
 import { env } from "./db.ts";
 
 export function workerModel(): LanguageModel {
@@ -13,7 +14,16 @@ export function workerModel(): LanguageModel {
   return openrouter(env("WORKER_MODEL", "deepseek/deepseek-v4-pro"));
 }
 
-// Cheap and fast: ingest enrichment, crowd classification, briefing synthesis.
+// Reasoning effort for the worker model, as OpenRouter provider options.
+// Default "none": the model thinks only through the tool loop, so the
+// library, not hidden chain-of-thought, is what raises the solve rate.
+// WORKER_REASONING=low|medium|high turns thinking on.
+export function workerProviderOptions(): SharedV4ProviderOptions {
+  const effort = process.env.WORKER_REASONING ?? "none";
+  return { openrouter: { reasoning: effort === "none" ? { enabled: false } : { effort } } };
+}
+
+// Cheap and fast: ingest enrichment and briefing synthesis.
 export function enrichModel(): LanguageModel {
   const openrouter = createOpenRouter({ apiKey: env("OPENROUTER_API_KEY") });
   return openrouter(env("ENRICH_MODEL", "deepseek/deepseek-v4-flash"));
