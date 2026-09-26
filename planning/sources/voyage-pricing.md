@@ -1,0 +1,77 @@
+Voyage model pricing is usage-based, with charges billed to the account linked to the API key used for access.
+
+# Text Embeddings
+
+We charge for requests to the Voyage text embedding endpoint based on the number of tokens in the documents/queries. The first 200 million tokens for voyage-4-large, voyage-4, voyage-4-lite, voyage-context-4, and voyage-code-3, or the first 50 million tokens for voyage-multilingual-2, voyage-finance-2, voyage-law-2, and voyage-code-2, are free for every account. Subsequent usage is priced per token, as shown in the following table.
+
+ModelPrice per thousand tokensPrice per million tokensNumber of free tokens
+voyage-4-large$0.00012$0.12200 million
+voyage-4$0.00006$0.06200 million
+voyage-4-lite$0.00002$0.02200 million
+voyage-context-4$0.00012$0.12200 million
+voyage-code-4$0.00012$0.12200 million
+voyage-finance-2voyage-law-2voyage-code-2$0.00012$0.1250 million
+
+# Multimodal Embeddings
+
+We charge for requests to the Voyage multimodal endpoint based on the number of tokens in the text and the number of pixels in images and videos. The first 200M text tokens and 150B pixels for voyage-multimodal-3.5 and voyage-multimodal-3 are free for every account. Subsequent usage is priced per token and per pixel, as shown in the following table. For pricing purposes, each video frame is considered an image.
+
+ModelPrice per million tokensPrice per billion pixelsNumber of free tokens and pixels
+voyage-multimodal-3.5voyage-multimodal-3$0.12$0.60200M text tokens and 150B pixels
+
+Images with fewer than 50,000 pixels will be upscaled, processed, and charged as a 50,000-pixel image. Images containing over 2 million pixels will be downsampled and charged as 2 million-pixel images. Therefore, the minimum and maximum costs per image are $0.00003 and $0.0012, respectively. The following table provides examples of image pricing.
+
+Image resolutionNumber of pixelsPrice per imagePrice per thousand images
+200px x 200px40,000$0.00003$0.03
+1000px x 1000px1 million$0.0006$0.60
+2000px x 2000px4 million$0.0012$1.20
+4000px x 4000px16 million$0.0012$1.20
+
+For example, the cost to vectorize a single input with 1000 text tokens ($0.00012) and two 4 million-pixel images (2 x $0.0012) would be $0.00252.
+
+# Rerankers
+
+Pricing for the Voyage reranker endpoint is based on the total number of processed tokens, calculated as “(the number of query tokens × the number of documents) + sum of the number of tokens in all documents.” The first 200 million tokens for rerank-2.5, rerank-2.5-lite, rerank-2, and rerank-2-lite are free for each account. Subsequent usage is priced per token, as shown in the following table.
+
+ModelPrice per thousand tokensPrice per million tokensEstimated price per request*Number of free tokens
+rerank-3$0.00005$0.05$0.0025200 million
+rerank-3-lite$0.00002$0.02$0.001200 million
+rerank-2.5$0.00005$0.05$0.00250
+rerank-2.5-lite$0.00002$0.02$0.0010
+
+- This price estimate assumes each request includes 100 documents and that the sum of the number of tokens in the query and the number of tokens in each document is 500.
+
+# Batch and Files API
+
+Our Batch API provides a simple way to process multiple requests efficiently to our current models. It offers a 12-hour completion window and a 33% discount compared to our standard endpoints.
+
+Free token credits do not apply to Batch API usage. All successfully processed Batch API tokens are billed at the applicable discounted batch rate and do not deduct from your free token balance.
+
+Our Files API provides access to a lightweight file storage service to upload batch processing requests, download results, and manage related files. You can store an unlimited number of files, each retained for 30 days before automatic deletion. Storage is priced at $0.05 per GB per month.
+
+## Older models
+
+The following table shows the pricing for older models. Please note that we do not offer free tokens for them.
+
+ModelPrice per thousand tokensPrice per million tokens
+voyage-context-3$0.00018$0.18
+voyage-code-3$0.00018$0.18
+voyage-3-large$0.00018$0.18
+voyage-3.5$0.00006$0.06
+voyage-3.5-lite$0.00002$0.02
+voyage-multilingual-2voyage-large-2-instructvoyage-large-2$0.00012$0.12
+voyage-01voyage-lite-01voyage-lite-01-instructvoyage-02voyage-lite-02-instructvoyage-2$0.0001$0.1
+voyage-3$0.00006$0.06
+rerank-1rerank-2$0.00005$0.05
+voyage-3-litererank-lite-1rerank-2-lite$0.00002$0.02
+
+# Fine-tuned models
+
+For fine-tuned models with dedicated instances and support channels, please get in touch with our sales team.
+
+Updated about 1 month ago 
+
+Did this page help you?Yes
+No
+
+Copy Page

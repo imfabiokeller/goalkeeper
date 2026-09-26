@@ -1,0 +1,11 @@
+# Skill evaluation/benchmark workspaces
+*-workspace/
+
+# User-specific Claude settings
+.claude/settings.local.json
+.score_cache/
+
+# Node tooling dependencies
+node_modules/
+
+.DS_Store

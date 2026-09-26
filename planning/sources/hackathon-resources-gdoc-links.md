@@ -1,0 +1,39 @@
+# Links from the resource guide (extracted)
+
+- MongoDB Agent Skills: https://www.mongodb.com/docs/agent-skills/
+- MongoDB MCP Server: https://www.mongodb.com/docs/mcp-server/get-started/
+- Natural Language to MongoDB Queries: https://www.mongodb.com/docs/manual/natural-language-to-mongodb/
+- Sample Movie Dataset: https://www.mongodb.com/docs/atlas/sample-data/sample-mflix
+- Data Modeling in MongoDB: https://www.mongodb.com/docs/manual/data-modeling/#data-modeling
+- Vector Search: https://www.mongodb.com/products/platform/atlas-vector-search
+- Atlas Search: https://www.mongodb.com/docs/atlas/atlas-search/
+- Automated Embeddings: https://www.mongodb.com/company/blog/product-release-announcements/unlocking-ai-search-introducing-automated-embedding-in-mongodb-vector-search
+- Embedding and Reranking API: https://www.mongodb.com/docs/api/doc/atlas-embedding-and-reranking-api/
+- Building an Agent with Memory and Function Calling: https://www.mongodb.com/developer/products/atlas/interactive-rag-mongodb-atlas-function-calling-api/
+- Adding Memory to a Chat Application (Python): https://www.mongodb.com/developer/products/atlas/advanced-rag-langchain-mongodb/
+- Adding Memory to a Chat Application (JavaScript): https://www.mongodb.com/developer/products/atlas/add-memory-to-javascript-rag-application-mongodb-langchain/
+- Build an AI Agent with LangGraph and MongoDB Atlas: https://www.mongodb.com/docs/atlas/ai-integrations/langgraph/build-agents/
+- State & Persistence: The Problem of Agent Reliability: https://www.mongodb.com/company/blog/technical/state-persistence-the-problem-of-agent-reliability
+- Build AI Agents with MongoDB: https://www.mongodb.com/docs/atlas/ai-agents/
+- GraphRAG with MongoDB and LangChain: https://www.mongodb.com/docs/atlas/ai-integrations/langchain/graph-rag/
+- GenAI Showcase: https://github.com/mongodb-developer/GenAI-Showcase/tree/main
+- MongoDB and Python Quickstart: https://github.com/mongodb-developer/mongodb-atlas-python-quickstart/blob/main/quickstart-1-getting-started-atlas-python.ipynb
+- MERN Starter Application: https://github.com/mongodb-developer/mern-stack-example
+- MongoDB for Startups: https://www.mongodb.com/startups
+- ElevenLabs Hacker Guide: https://docs.google.com/document/d/1mCh5MtOzBw0aJpurQVUmIVFfPMAHW3MjNemE-LNiMto/edit?tab=t.0
+- Redeem credits: https://airtable.com/appzjKToipPcn2dKI/pagTsO0Ld3edczsrV/form
+- LangChain hacker resources: https://app.notion.com/p/Hackathon-Resources-from-LangChain-34f808527b1780c8a82bd0b8f0c322a2
+- LangGraph docs: https://docs.langchain.com/oss/python/langgraph/overview
+- Deep Agents quickstart: https://docs.langchain.com/oss/python/deepagents/quickstart
+- Kiro IDE: https://kiro.dev/
+- Kiro CLI: https://kiro.dev/cli/
+- Kiro Crew: https://kiro.dev/crew/
+- Voyage AI: https://www.voyageai.com/
+- Create a Voyage AI Account: https://dashboard.voyageai.com/
+- Generate an API Key: https://dashboard.voyageai.com/organization/api-keys
+- Add a Payment Method: https://dashboard.voyageai.com/organization/billing
+- rate limits page: https://docs.voyageai.com/docs/rate-limits
+- API Key & Python Client Setup: https://docs.voyageai.com/docs/api-key-and-installation
+- Quickstart Tutorial: https://docs.voyageai.com/docs/quickstart-tutorial
+- Pricing & Free Credits: https://docs.voyageai.com/docs/pricing
+- Usage Dashboard: https://dashboard.voyageai.com/organization/usage

@@ -1,0 +1,117 @@
+> For the complete MongoDB documentation index, see www.mongodb.com/docs/llms.txt
+
+# MongoDB MCP Server Configuration Options
+
+The MCP Server has various options that you can set to connect to a MongoDB cluster and control MCP Server operations. You can set the options in a JSON configuration file, through a command line, or using operating system environment variables.
+
+## Options List
+
+Use the following configuration options to configure the MCP Server.
+
+**Important:**
+
+If you're a MongoDB Enterprise or MongoDB Atlas user and you require a specific authentication mechanism, see the [MongoDB MCP Server Security](https://www.mongodb.com/docs/mcp-server/local-mcp/security.md#std-label-mcp-server-security) section to learn about the configuration options for your authentication method.
+
+| CLI Option Name | OS Environment Variable Name | Type | Default | Description |
+| --- | --- | --- | --- | --- |
+| `allowRequestOverrides` | `MDB_MCP_ALLOW_REQUEST_OVERRIDES` | boolean | `false` | Flag that indicates if users can override MCP Server configurations per-request with request headers and query parameters. For the specific override behavior of each configuration option, see the [Override Behavior Table](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/options.md#std-label-mcp-config-override-behavior-table) below. |
+| `apiClientId` | `MDB_MCP_API_CLIENT_ID` | string | Not set | Atlas API client ID for authentication. |
+| `apiClientSecret` | `MDB_MCP_API_CLIENT_SECRET` | string | Not set | Atlas API client secret for authentication. |
+| `config` | `MDB_MCP_CONFIG` | string | Not set | Full path to the JSON configuration file. Using the `MDB_MCP_CONFIG` environment variable is recommended over using the `--config` command line option. |
+| `connectionString` | `MDB_MCP_CONNECTION_STRING` | string | Not set | Connection string for a direct database connection. Sets the connection string at runtime to allow the client to directly connect to a cluster. **Important:** The `--connectionString` CLI argument is deprecated. Use the `MDB_MCP_CONNECTION_STRING` environment variable instead. If environment variables are not an option, use the first [positional argument.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/options.md#std-label-mcp-positional-arguments) Typically, avoid providing the connection string at runtime because you expose the connection credentials to the large language model. The connection string is used if the client has never connected before, or the client switches the connection to a new cluster if the client was previously connected. After the client calls the connect or switch connection tool, the client reuses the same connection for subsequent operations. Therefore, you only need to call the connect or switch connection tool once or if you need to switch to a different connection. |
+| `disableServerSideJs` | `MDB_MCP_DISABLE_SERVER_SIDE_JS` | boolean | `true` | The MCP Server disables server-side JavaScript functions (`$where`, `$function`, and `$accumulator`) by default to prevent unintended behavior. These functions are deprecated in MongoDB 8.0 and later. To learn more, see [Server-Side JavaScript.](https://www.mongodb.com/docs/manual/core/server-side-javascript/) To re-enable this option, see [Enabling Server-Side JavaScript Functions.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/enable-or-disable-features.md#std-label-mcp-server-configuration-server-side-js) |
+| `dryRun` | `MDB_MCP_DRY_RUN` | boolean | `false` | Use the dry-run option to examine your MCP Server configuration. When you enable the dry-run option, the MCP Server returns the MCP Server configuration settings and the list of enabled [MongoDB MCP Server Tools.](https://www.mongodb.com/docs/mcp-server/tools.md#std-label-mcp-server-tools) To enable the dry-run option, set `--dryRun` in the configuration file or command line, or set the `MDB_MCP_DRY_RUN` operating system environment variable to `true`. For more information, see [Enabling MCP Server Dry-Run Mode.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/enable-or-disable-features.md#std-label-mcp-server-configuration-dry-run-mode) |
+| `externallyManagedSessions` | `MDB_MCP_EXTERNALLY_MANAGED_SESSIONS` | boolean | `false` | Enables clients to skip session initialization. When enabled, clients can call tools directly with a self-generated session ID. Those sessions are implicitly created on the server and kept alive until `idleTimeoutMS` expires. This is generally useful for integrations with AWS Bedrock where the AgentCore framework manages sessions internally and spawns MCP servers on demand for each session. **Important:** To enhance session security, ensure that sessions IDs are unique and non-predictable. |
+| `loggers` | `MDB_MCP_LOGGERS` | string | `disk mcp` | Path where the MCP Server sends the logs. Set `loggers` to one or more of the following options: `disk`, which writes logs to disk files located in the path specified in the `logPath` option.; `mcp`, which sends the logs to the AI client, if the client supports logging and transport protocol.; `stderr`, which sends the logs to the standard error output. This setting is useful for debugging or when running MCP in a container. For example, to set `loggers` to `mcp` and `stderr` in the AI client JSON configuration file or the operating system command line, use `--loggers mcp stderr`. To set the `MDB_MCP_LOGGERS` operating system environment variable to `disk` and `stderr`, use `export
+                MDB_MCP_LOGGERS="disk,stderr"`. For more information about the logging options, see [Troubleshoot MongoDB MCP Server.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/troubleshooting.md#std-label-mcp-server-configuration-troubleshooting) |
+| `logPath` | `MDB_MCP_LOG_PATH` | string | Depends on the operating system | Directory that stores the MCP Server logs. **Note:** Lock down the directory so the user running the MCP server owns it with read/write permission. This prevents any other process from accessing the server directories or files. For more information about the log path and operating system specifics, see [Troubleshoot MongoDB MCP Server.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/troubleshooting.md#std-label-mcp-server-configuration-troubleshooting) |
+| `disabledTools` | `MDB_MCP_DISABLED_TOOLS` | array | Not set | Array of MCP tool names, operation types, or tool categories to disable. For more information, see [Disabling MCP Server Tools.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/enable-or-disable-features.md#std-label-mcp-server-configuration-disable-tools) |
+| `readOnly` | `MDB_MCP_READ_ONLY` | boolean | `false` | Flag that determines if write operations are permitted. To disable cluster write operations, set `--readOnly` in the configuration file or command line, or set the `MDB_MCP_READ_ONLY` operating system environment variable to `true`. **Default is to allow cluster write operations. Typically, always enable read-only mode.** For more information, see [Enabling MCP Server Read-Only Mode.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/enable-or-disable-features.md#std-label-mcp-server-configuration-read-only-mode) |
+| `indexCheck` | `MDB_MCP_INDEX_CHECK` | boolean | `false` | Flag that indicates if indexes are required for queries. If `true`, enforces that query operations must use an index and rejects queries that perform collection scans. For more information, see [Enabling Index Check.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/enable-or-disable-features.md#std-label-mcp-server-configuration-index-check) |
+| `telemetry` | `MDB_MCP_TELEMETRY` | string | `enabled` | Flag that indicates if usage data is collected by the MCP Server. If `disabled`, MCP Server usage data collection is stopped. For more information, see [Disabling MCP Server Telemetry.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/enable-or-disable-features.md#std-label-mcp-server-configuration-telemetry) |
+| `transport` | `MDB_MCP_TRANSPORT` | string | `stdio` | Transport protocol for communications with the MCP Server. Set `transport` to one of the following options: `stdio`, which is the default. Uses the standard input and output for communications with the MCP Server. `stdio` is suitable for most AI clients.; `http`, which enables HTTP communications with the MCP Server. You can then use HTTP to interact with the MCP Server from a Web client or communicate with the MCP Server on a specific HTTP IP port.**Warning:**HTTP transport is **NOT** recommended for production use without implementing proper authentication and security measures. |
+| `httpPort` | `MDB_MCP_HTTP_PORT` | integer | `3000` | IP port number for HTTP communications with the MCP Server. |
+| `httpHost` | `MDB_MCP_HTTP_HOST` | string | `127.0.0.1` | IP address for HTTP communications with the MCP Server. With Streamable HTTP, the MCP Server is bound to `localhost
+                (127.0.0.1)` by default. This ensures the MCP Server only accepts connections that originate on the same computer. **Warning:** Binding to `0.0.0.0` exposes the MCP Server to the entire local network, which allows other devices on the same network to potentially access the MCP Server. This is a security risk and could allow unauthorized access to your database context. If you must expose the MCP Server outside of `localhost`, implement strong [security authentication.](https://www.mongodb.com/docs/mcp-server/local-mcp/security.md#std-label-mcp-server-security) To learn more, see [Remote Connections.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/standalone-service.md#std-label-mcp-remote-connections) |
+| `httpBodyLimit` | `MDB_MCP_HTTP_BODY_LIMIT` | integer | `102400` | Maximum size of the HTTP request body in bytes. Only applies to HTTP transport. |
+| `httpResponseType` | `MDB_MCP_HTTP_BODY_RESPONSE_TYPE` | string | `sse` | Controls the response of the MCP server. Valid values are `sse` or `json`. In cases where clients are unable to establish an `sse` connection, they may opt to use the `json` response type. When you choose the `json` response type, the server can't initiate communication with the client (for example, notifications or logs). |
+| `maxSessions` | `MDB_MCP_MAX_SESSIONS` | integer | `1000` | Maximum number of concurrent sessions that the HTTP transport holds in memory. Each session holds a full server instance, transport, and timers. Set this value based on your deployment's available memory. Only applies to HTTP transport. |
+| `healthCheckHost` | `MDB_MCP_HEALTH_CHECK_HOST` | string | Not set | Host address for the separate healthCheck HTTP server. This is an HTTP endpoint that Kubernetes and Docker can use to check the health of the MCP process. Only applies to HTTP transport. If provided, setting `healthCheckPort` is required. |
+| `healthCheckPort` | `MDB_MCP_HEALTH_CHECK_PORT` | integer | Not set | Port number for the separate healthCheck HTTP server. This is an HTTP endpoint that Kubernetes and Docker can use to check the health of the MCP process. Only applies to HTTP transport. If provided, setting `healthCheckHost` is required. |
+| `idleTimeoutMs` | `MDB_MCP_IDLE_TIMEOUT_MS` | integer | `600000` | Idle timeout for a client to disconnect. Only applies to HTTP transport. |
+| `maxTimeMS` | `MDB_MCP_MAX_TIME_M_S` | integer | Not set | Maximum time in milliseconds that operations can run for on the MongoDB server. If you set this option, the MCP server passes this value as the `maxTimeMS` option to read operations like `find()`, `aggregate()`, and `count()`. |
+| `notificationTimeoutMs` | `MDB_MCP_NOTIFICATION_TIMEOUT_MS` | integer | `540000` | Notification timeout for a client to be aware of disconnect. Only applies to HTTP transport. |
+| `authenticationMechanism` | `MDB_MCP_AUTHENTICATION_MECHANISM` | string | `SCRAM-SHA-256` | Authentication mechanism to used when connecting to your MongoDB deployments with the MongoDB MCP Server. SCRAM is the default authentication mechanism for MongoDB. To connect using other authentication methods, see the following pages: [Connect with OpenID Connect (OIDC)](https://www.mongodb.com/docs/mcp-server/local-mcp/security/connect-with-oidc.md#std-label-mcp-server-oidc); [Connect with LDAP](https://www.mongodb.com/docs/mcp-server/local-mcp/security/connect-with-ldap.md#std-label-mcp-server-ldap); [Connect with Kerberos](https://www.mongodb.com/docs/mcp-server/local-mcp/security/connect-with-kerberos.md#std-label-mcp-server-kerberos); [Connect with X.509 Certificates](https://www.mongodb.com/docs/mcp-server/local-mcp/security/connect-with-x509.md#std-label-mcp-server-x509); [Connect with Proxy](https://www.mongodb.com/docs/mcp-server/local-mcp/security/connect-with-proxy.md#std-label-mcp-server-proxy) |
+| `exportsPath` | `MDB_MCP_EXPORTS_PATH` | string | Depends on the operating system | Directory that stores exported data files. **Note:** Lock down the directory so the user running the MCP server owns it with read/write permission. This prevents any other process from accessing the exported directories or files. For more information about the export path and operating system specifics, see [Export Data from MongoDB MCP Server.](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/export-data.md#std-label-mcp-server-configuration-export-data) |
+| `exportTimeoutMs` | `MDB_MCP_EXPORT_TIMEOUT_MS` | integer | `300000` | Time in milliseconds after which exported data files are eligible for deletion by the MCP Server cleanup process. |
+| `exportCleanupIntervalMs` | `MDB_MCP_EXPORT_CLEANUP_INTERVAL_MS` | integer | `120000` | Time period in milliseconds between automatic executions of the MCP Server cleanup process that deletes expired export data files. The cleanup process is run automatically. |
+| `voyageApiKey` | `MDB_MCP_VOYAGE_API_KEY` | string | Not set | Voyage AI API key used to enable native autoembeddings in Atlas Vector Search. The Voyage AI API key is only used when creating an Atlas Local deployment. For details, see [Voyage AI API Keys in Atlas.](https://www.mongodb.com/docs/atlas/atlas-vector-search/crud-embeddings/create-embeddings-automatic/#voyage-api-keys) To learn more about Voyage AI, see the [Voyage AI documentation.](https://docs.voyageai.com/docs/embeddings) |
+
+### Configuration Option Override Behaviors
+
+The following table describes the override behavior of each configuration option. These override behaviors apply only if the `allowRequestOverrides` configuration option is set to `true`. If a user attempts to override a configuration option that prohibits overrides, the MCP server declines the connection.
+
+| Config Key | Override behavior | Additional condition |
+| --- | --- | --- |
+| `apiBaseUrl` | Prohibited | |
+| `apiClientId` | Prohibited | |
+| `apiClientSecret` | Prohibited | |
+| `allowRequestOverrides` | Prohibited | |
+| `connectionString` | Prohibited | |
+| `config` | Prohibited | |
+| `loggers` | Prohibited | |
+| `logPath` | Prohibited | |
+| `disabledTools` | Merge | Disables tools in addition to those in the existing configuration. |
+| `confirmationRequiredTools` | Merge | Requires confirmation for tools in addition to those in the existing configuration. |
+| `readOnly` | Conditional | Can only override an existing `false` configuration to `true`. |
+| `indexCheck` | Conditional | Can only override an existing `false` configuration to `true`. |
+| `telemetry` | Prohibited | |
+| `transport` | Prohibited | |
+| `httpPort` | Prohibited | |
+| `httpHost` | Prohibited | |
+| `httpHeaders` | Prohibited | |
+| `healthCheckHost` | Prohibited | |
+| `healthCheckPort` | Prohibited | |
+| `idleTimeoutMs` | Conditional | Can only override with a lower timeout than the existing configuration. |
+| `maxTimeMS` | Prohibited | |
+| `notificationTimeoutMs` | Conditional | Can only override with a lower timeout than the existing configuration. |
+| `maxBytesPerQuery` | Prohibited | |
+| `maxDocumentsPerQuery` | Prohibited | |
+| `exportsPath` | Prohibited | |
+| `exportTimeoutMs` | Conditional | Can only override with a lower timeout than the existing configuration. |
+| `exportCleanupIntervalMs` | Prohibited | |
+| `atlasTemporaryDatabaseUserLifetimeMs` | Conditional | Can only override with a lower lifetime than the existing configuration. |
+| `voyageApiKey` | Prohibited | |
+| `embeddingsValidation` | Conditional | Can only override an existing `false` configuration to `true`. |
+| `vectorSearchDimensions` | Override | |
+| `vectorSearchSimilarityFunction` | Override | |
+| `previewFeatures` | Conditional | Can only disable features in the existing configuration, not add additional features. |
+
+## Positional Arguments
+
+The MCP Server accepts a positional argument that can be provided without specifying a CLI flag. The first positional argument is interpreted as the connection string for your MongoDB deployment.
+
+As a security best practice, use the `MDB_MCP_CONNECTION_STRING` environment variable to set the connection string. If environment variables are not an option, use the first positional argument. For example:
+
+```json
+"args": [
+   "-y",
+   "mongodb-mcp-server",
+   "mongodb+srv://<user-name>:<password>@<cluster-name>.mongodb.net/",
+   "--readOnly"
+]
+```
+
+## Learn More
+
+- [MongoDB MCP Server Configuration Methods](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/methods.md#std-label-mcp-server-configuration-methods)
+
+- [Enable or Disable MongoDB MCP Server Features](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/enable-or-disable-features.md#std-label-mcp-server-configuration-enable-or-disable-features)
+
+- [Export Data from MongoDB MCP Server](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/export-data.md#std-label-mcp-server-configuration-export-data)
+
+- [Start MongoDB MCP Server as a Standalone Service](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/standalone-service.md#std-label-mcp-server-configuration-standalone-service)
+
+- [MongoDB MCP Server Memory Overflow](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/memory-overflow.md#std-label-mcp-server-configuration-memory-overflow)
+
+- [Troubleshoot MongoDB MCP Server](https://www.mongodb.com/docs/mcp-server/local-mcp/configuration/troubleshooting.md#std-label-mcp-server-configuration-troubleshooting)
