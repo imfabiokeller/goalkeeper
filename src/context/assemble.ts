@@ -176,9 +176,10 @@ export function assemble(args: AssembleArgs): Assembled {
   parts.push(
     "# How to work\n" +
       "1. Read the input. Call read_input({ offset }) to page through the rest when this page is not the whole input.\n" +
-      "2. State the rule you believe explains the unit, in one sentence, then write the draft proposal that applies it. " +
+      "2. Think briefly: at most ten lines of text, never a cell-by-cell walk through the grids. State the rule you believe explains the unit in one sentence, then write the draft proposal that applies it. " +
       "Call read_state({ key }) or search_library({ query }) only if they help.\n" +
-      "3. Test your draft with try_submit({ proposal }). It runs the gate and returns pass, reasons and the per-check verdicts; nothing is recorded.\n" +
+      "3. Test your draft with try_submit({ proposal }) right away, within your first reply. It runs the gate and returns pass, reasons and the per-check verdicts; nothing is recorded. " +
+      "The gate is faster and more reliable than reasoning about the grids by hand: let it tell you where the draft is wrong.\n" +
       "4. If it fails, read the reasons, fix the draft (or state a different rule when the reasons refute this one) and test again. Repeat until try_submit passes.\n" +
       "5. Finish with exactly one call to submit({ proposal }) with the passing draft, or block({ reason }). Never both, never neither.\n" +
       "Never submit a draft that try_submit has not passed. Never retry a rule that is listed as refuted above. " +
@@ -193,7 +194,7 @@ export function assemble(args: AssembleArgs): Assembled {
   const messages: ModelMessage[] = [
     {
       role: "user",
-      content: `Work on ${task.key} (${input.name}). Read what you need, then call submit or block.`,
+      content: `Work on ${task.key} (${input.name}). Keep your text short and call try_submit with a first draft in this reply; then submit or block.`,
     },
   ];
 
