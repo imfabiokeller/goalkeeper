@@ -8,7 +8,7 @@ import type { LanguageModelV3CallOptions, LanguageModelV3GenerateResult } from "
 import { collections, ensureIndexes, type Collections } from "../shared/db.ts";
 import { goalFromLens } from "../shared/goal.ts";
 import type { Goal, Task } from "../shared/types.ts";
-import { checkInput, checkState, iteration, type IterationOptions } from "./loop.ts";
+import { checkInput, checkState, iteration, MAX_ATTEMPTS, type IterationOptions } from "./loop.ts";
 import { claim, heartbeat } from "./claim.ts";
 import { retrieve } from "../context/retrieve.ts";
 
@@ -252,7 +252,7 @@ describe("worker iteration", () => {
     expect(source?.raw.blockReason).toBe("two GAAP revenue figures, restated and original");
   });
 
-  it("a gate failure on attempt 1 reopens with attempt 2, on attempt 2 blocks", async () => {
+  it("a gate failure reopens with attempt + 1 until MAX_ATTEMPTS, then blocks with the reasons", async () => {
     await seedInput("aapl-2026-07-30");
     const taskId = await seedTask("aapl-2026-07-30");
     const model = submitModel({ revenue: 999999000000 }); // not in any quote
@@ -268,11 +268,31 @@ describe("worker iteration", () => {
     expect(await c.sources.countDocuments({ kind: "gate", "raw.gate.pass": false })).toBe(1);
     expect(await c.sources.countDocuments({ kind: "worker-run" })).toBe(1);
 
-    expect(await iteration(c, "w-2", { ...base, model })).toBe("blocked");
+    // Attempts 2, 3 and 4 fail and reopen; the third failure does not block.
+    for (let attempt = 2; attempt < MAX_ATTEMPTS; attempt++) {
+      expect(await iteration(c, `w-${attempt}`, { ...base, model })).toBe("reopened");
+      task = await c.tasks.findOne({ _id: taskId });
+      expect(task?.status).toBe("open");
+      expect(task?.attempt).toBe(attempt + 1);
+    }
+
+    // Attempt 5 (MAX_ATTEMPTS) fails and blocks.
+    expect(await iteration(c, "w-last", { ...base, model })).toBe("blocked");
     task = await c.tasks.findOne({ _id: taskId });
     expect(task?.status).toBe("blocked");
+    expect(task?.attempt).toBe(MAX_ATTEMPTS);
     expect(task?.blockReason).toContain("revenue");
-    expect(await c.sources.countDocuments({ kind: "gate" })).toBe(2);
+    expect(await c.sources.countDocuments({ kind: "gate" })).toBe(MAX_ATTEMPTS);
+  });
+
+  it("a run that never submits on the last attempt blocks with the run reason", async () => {
+    await seedInput("aapl-2026-07-30");
+    const taskId = await seedTask("aapl-2026-07-30", { attempt: MAX_ATTEMPTS });
+    const model = mockModel(() => toolCallResult("read_input", { offset: 0 }));
+    expect(await iteration(c, "w-1", { ...base, model, maxSteps: 2 })).toBe("blocked");
+    const task = await c.tasks.findOne({ _id: taskId });
+    expect(task?.status).toBe("blocked");
+    expect(task?.blockReason).toBe("no submit or block within the step budget");
   });
 
   it("a run that never submits or blocks reopens the task", async () => {

@@ -32,6 +32,9 @@ export type IterationOptions = {
   maxSteps?: number;
 };
 
+// A failed gate reopens the task with attempt + 1 while attempt is below
+// this; the attempt that reaches it blocks with the reasons.
+export const MAX_ATTEMPTS = 5;
 // Errors (provider down, credits out) reopen a task this many times, then block it.
 export const MAX_ERROR_ATTEMPTS = 5;
 
@@ -184,25 +187,7 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
       }
     } else {
       await writeGateSource(c, { task, gate: gateResult, proposal, worker: workerId, enrich: enrichFn });
-      if (task.attempt <= 1) {
-        await c.tasks.findOneAndUpdate(claimed(task, workerId), {
-          $set: { status: "open", worker: null, heartbeat: null, attempt: 2, proposal, gate: gateResult, updatedAt: now() },
-        });
-        outcome = "reopened";
-      } else {
-        await c.tasks.findOneAndUpdate(claimed(task, workerId), {
-          $set: {
-            status: "blocked",
-            worker: null,
-            heartbeat: null,
-            proposal,
-            gate: gateResult,
-            blockReason: gateResult.reasons.join("; "),
-            updatedAt: now(),
-          },
-        });
-        outcome = "blocked";
-      }
+      outcome = await failGate(c, workerId, task, gateResult, proposal);
     }
   } else if (run.outcome.type === "block") {
     await c.tasks.findOneAndUpdate(claimed(task, workerId), {
@@ -213,17 +198,7 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
     // No submit or block within the budget: same path as a gate failure.
     gateResult = { pass: false, reasons: [run.outcome.reason], checks: { run: { pass: false, reasons: [run.outcome.reason] } } };
     await writeGateSource(c, { task, gate: gateResult, proposal: null, worker: workerId, enrich: enrichFn });
-    if (task.attempt <= 1) {
-      await c.tasks.findOneAndUpdate(claimed(task, workerId), {
-        $set: { status: "open", worker: null, heartbeat: null, attempt: 2, gate: gateResult, updatedAt: now() },
-      });
-      outcome = "reopened";
-    } else {
-      await c.tasks.findOneAndUpdate(claimed(task, workerId), {
-        $set: { status: "blocked", worker: null, heartbeat: null, gate: gateResult, blockReason: run.outcome.reason, updatedAt: now() },
-      });
-      outcome = "blocked";
-    }
+    outcome = await failGate(c, workerId, task, gateResult, null);
   }
 
   await writeRun(c, {
@@ -244,6 +219,29 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
   });
 
   return outcome;
+}
+
+// A failed gate (or a run that never submitted): reopen with attempt + 1
+// below MAX_ATTEMPTS, block with the reasons at MAX_ATTEMPTS. The failed
+// proposal stays on the task so the screen and the next attempt see it.
+async function failGate(
+  c: Collections,
+  workerId: string,
+  task: Task,
+  gateResult: GateResult,
+  proposal: Record<string, unknown> | null,
+): Promise<IterationOutcome> {
+  const updatedAt = new Date();
+  if (task.attempt < MAX_ATTEMPTS) {
+    await c.tasks.findOneAndUpdate(claimed(task, workerId), {
+      $set: { status: "open", worker: null, heartbeat: null, attempt: task.attempt + 1, proposal, gate: gateResult, updatedAt },
+    });
+    return "reopened";
+  }
+  await c.tasks.findOneAndUpdate(claimed(task, workerId), {
+    $set: { status: "blocked", worker: null, heartbeat: null, proposal, gate: gateResult, blockReason: gateResult.reasons.join("; "), updatedAt },
+  });
+  return "blocked";
 }
 
 // Upsert with a precondition: absent, or stateVersion equal to what this
