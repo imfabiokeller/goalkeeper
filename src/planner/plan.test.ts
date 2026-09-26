@@ -1,6 +1,6 @@
-import { describe, expect } from "vitest";
+import { describe, expect, test as pureTest } from "vitest";
 import { withDb } from "./harness.ts";
-import { checkInvariants } from "./invariants.ts";
+import { answerNeedles, checkInvariants } from "./invariants.ts";
 import { refreshMetrics } from "./metrics.ts";
 import { plan } from "./plan.ts";
 import { crowdFixture, goalFixture, inputFixture, stateFixture, taskFixture } from "./testdb.ts";
@@ -162,5 +162,57 @@ describe("invariants", () => {
     expect(v.join("\n")).toMatch(/state orphan has no merged task/);
     expect(v.join("\n")).toMatch(/cites unknown criteria c9/);
     expect(v.join("\n")).toMatch(/\(stale\) claimed by w-3/);
+  });
+
+  it("flags a solved key with an open task, a bad score, and answer text in hints or sources", async (c) => {
+    await c.goal.insertOne(goalFixture());
+    const merged = (key: string) => taskFixture(key, { status: "merged" });
+    const ma = merged("a");
+    const mb = merged("b");
+    const mc = merged("c");
+    await c.tasks.insertMany([ma, mb, mc, taskFixture("a", { status: "open" }), taskFixture("b", { status: "open" })]);
+    await c.state.insertMany([
+      stateFixture("a", { taskId: ma._id, score: 1 }),
+      stateFixture("b", { taskId: mb._id, score: 0 }), // wrong once, open again: fine
+      stateFixture("c", { taskId: mc._id, score: 2 as unknown as 1 }),
+    ]);
+    const needles = [
+      { key: "p1", needle: "[[1,2,3],[4,5,6]]" },
+      { key: "p1", needle: "123\n456" },
+    ];
+    await c.tasks.insertOne(taskFixture("leak", { status: "blocked", blockReason: "x", hint: "the output is [[1, 2, 3], [4, 5, 6]]" }));
+    await c.sources.insertMany([
+      crowdFixture("clean run: 1 2 3", { kind: "worker-run", key: "p1" }),
+      crowdFixture("rows:\n123\n456\n", { kind: "worker-run", key: "p1" }),
+    ]);
+
+    const v = await checkInvariants(c, new Date(), needles);
+    expect(v).toHaveLength(4);
+    expect(v.join("\n")).toMatch(/state a scored 1 but has an open task/);
+    expect(v.join("\n")).toMatch(/state c has score 2/);
+    expect(v.join("\n")).toMatch(/\(leak\) hint contains the answer of p1/);
+    expect(v.join("\n")).toMatch(/source .* \(worker-run, p1\) contains the answer of p1/);
+
+    // No needles (answers folder absent): the leak checks are skipped.
+    const without = await checkInvariants(c, new Date(), []);
+    expect(without).toHaveLength(2);
+  });
+
+  pureTest("answerNeedles reads every grid of every answers file and skips a missing folder", async () => {
+    const { mkdtempSync, writeFileSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const { join } = await import("node:path");
+    const dir = mkdtempSync(join(tmpdir(), "answers-"));
+    writeFileSync(join(dir, "one.json"), JSON.stringify([[[1, 2, 3, 4], [5, 6, 7, 8]]])); // one test output, wrapped
+    writeFileSync(join(dir, "two.json"), JSON.stringify([[7, 7, 7, 7, 7]])); // a bare grid
+    writeFileSync(join(dir, "tiny.json"), JSON.stringify([[[3]]])); // too short to be a needle
+    writeFileSync(join(dir, "notes.txt"), "ignored");
+    const needles = answerNeedles(dir);
+    expect(needles).toEqual([
+      { key: "one", needle: "[[1,2,3,4],[5,6,7,8]]" },
+      { key: "one", needle: "1234\n5678" },
+      { key: "two", needle: "[[7,7,7,7,7]]" },
+    ]);
+    expect(answerNeedles(join(dir, "missing"))).toEqual([]);
   });
 });
