@@ -41,8 +41,10 @@ and the other doc gets fixed.
 
 One worker iteration:
 
-1. `claim()`: atomic `findOneAndUpdate` on `tasks`, open to claimed.
-   Nothing to claim: try the planner lock, run `plan()`, sleep 2 s.
+1. `plan()` if due: when the last planner turn is older than 60 s and the
+   lock is free, this worker runs the planner first (one at a time).
+   Then `claim()`: atomic `findOneAndUpdate` on `tasks`, open to claimed.
+   Nothing to claim: sleep 2 s.
 2. `assemble()`: goal (fresh), input text, current state for the key, last
    gate failures on the key (with the rules already tried, marked
    refuted), the lessons digest, and a briefing synthesized from
@@ -50,7 +52,10 @@ One worker iteration:
 3. `run()`: AI SDK loop. Tools: `read_input`, `read_state`,
    `search_library`, `try_submit(proposal)` (runs the gate, returns
    reasons, records nothing), `submit`, `block`. Heartbeat every 15 s.
-   Deadline 4 minutes.
+   Every finished step writes `step` and a `progress` line on the task
+   (what tool, pass or fail, the rule tried) so the screen shows drafts
+   live. A text-only step that ends without a tool call is nudged back to
+   `try_submit`, at most three times. Deadline 4 minutes.
 4. `gate()`: pure. Runs the checks named by the task's criteria.
 5. Write: pass means `state` upsert with a version precondition and task
    `merged`. Fail means task `open` with attempt + 1 until
