@@ -116,25 +116,13 @@ function Stage() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  // Phones in portrait get a tall artboard: the header stacks and the
-  // cards run two per row, so the stage is not a thin strip.
-  const [portrait, setPortrait] = useState(false);
-  useEffect(() => {
-    const update = () => setPortrait(window.innerWidth < 900 && window.innerHeight > window.innerWidth);
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-  const artW = portrait ? ART_H : ART_W;
-  const artH = portrait ? ART_W : ART_H;
-  const fit = useScale(artW, artH);
+  const fit = useScale(ART_W, ART_H);
   // One card slot per worker, two rows; recent solved and retrying cards
   // fill only the slots no live card holds. 8 workers give the mockup's
   // 4x2; 6 give 3x2 with the grids scaled up in the same proportion.
   const slotCount = Math.max(2, s?.workers.target || DEFAULT_SLOTS);
-  const cols = portrait ? 2 : Math.ceil(slotCount / 2);
-  const rows = Math.ceil(slotCount / cols);
-  const box = portrait ? 120 : Math.round(CARD_BOX * Math.min(1.6, 4 / cols));
+  const cols = Math.ceil(slotCount / 2);
+  const box = Math.round(CARD_BOX * Math.min(1.6, 4 / cols));
   const totals = s?.metrics.totals ?? null;
   const solved = s?.counts.solved ?? 0;
   const alive = s?.workers.alive ?? 0;
@@ -144,8 +132,8 @@ function Stage() {
 
   return (
     <div style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#000" }}>
-    <main style={{ position: "absolute", left: fit.left, top: fit.top, transformOrigin: "top left", transform: `scale(${fit.scale})`, width: artW, height: artH, padding: portrait ? "36px 32px" : "36px 48px", display: "flex", flexDirection: "column", gap: 24, background: "#000", color: "var(--fg)", overflow: "hidden" }}>
-      <header style={{ height: portrait ? "auto" : 60, flexShrink: 0, display: "flex", flexDirection: portrait ? "column" : "row", alignItems: portrait ? "flex-start" : "center", justifyContent: "space-between", gap: 40 }}>
+    <main style={{ position: "absolute", left: fit.left, top: fit.top, transformOrigin: "top left", transform: `scale(${fit.scale})`, width: ART_W, height: ART_H, padding: "36px 48px", display: "flex", flexDirection: "column", gap: 24, background: "#000", color: "var(--fg)", overflow: "hidden" }}>
+      <header style={{ height: 60, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 40 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 18, minWidth: 0 }}>
           <svg width="24" height="24" viewBox="0 0 22 22" fill="none" stroke="#ededed" strokeWidth="1.6">
             <circle cx="11" cy="11" r="9" />
@@ -156,7 +144,7 @@ function Stage() {
           <span style={{ fontSize: 20, color: "var(--fg-dim)", whiteSpace: "nowrap" }}>Solve {s?.counts.units ?? 400} ARC puzzles</span>
           {stage.error ? <span style={{ fontSize: 12, color: "var(--status-blocked)" }}>stale: {stage.error}</span> : null}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 28, flexShrink: 0, flexWrap: portrait ? "wrap" : "nowrap", rowGap: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 28, flexShrink: 0 }}>
           <Hero solveRate={s?.metrics.solveRate ?? []} perMinute={s?.metrics.perMinute ?? []} libraryTokens={totals?.libraryTokens ?? null} controlRate={controlRate} width={300} height={44} />
           <Kpi
             value={
@@ -179,7 +167,7 @@ function Stage() {
         </div>
       </header>
 
-      <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`, gap: 18 }}>
+      <div style={{ flex: 1, minHeight: 0, display: "grid", gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: "repeat(2, minmax(0, 1fr))", gap: 18 }}>
         {cards.slice(0, slotCount).map((c, i) =>
           c ? (
             <Card key={c.key} card={c} unit={units[c.key] ?? null} onOpen={() => open(c.key)} flash={flashes[c.key] ?? null} box={box} />
@@ -203,7 +191,7 @@ function Stage() {
 
       {openKey ? (
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }} onClick={close}>
-          <div onClick={(e) => e.stopPropagation()} style={{ width: portrait ? 1020 : 1480, height: portrait ? 1840 : 1010, border: "1px solid #262626", borderRadius: 18, background: "#0a0a0a", padding: "30px 36px", boxShadow: "0 30px 80px rgba(0,0,0,.8)", overflow: "hidden" }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ width: 1480, height: 1010, border: "1px solid #262626", borderRadius: 18, background: "#0a0a0a", padding: "30px 36px", boxShadow: "0 30px 80px rgba(0,0,0,.8)", overflow: "hidden" }}>
             <Expanded card={openCard} unit={openUnit} task={openTaskId ? task.data : null} onClose={close} contextAvg={totals?.contextLast20Avg ?? null} />
           </div>
         </div>
