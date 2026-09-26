@@ -5,6 +5,11 @@ event's resource guide, the partners' messages and the docs we will build
 against, saved as-is so the agents working in this repo can read them
 without going online.
 
+## judges.md
+
+Who the six first-round judges are, what each will likely listen for, and
+the sources behind it.
+
 ## sources/
 
 Event:
@@ -62,4 +67,3 @@ Voyage AI:
   session; log in again from a terminal or set `ANTHROPIC_API_KEY`.
 - OpenRouter code (10:30 email), Codex credits (10:30 email), v0 code
   (10:30 email), Kiro credits form, Voyage account and key.
-- `judges.md`: who the six first-round judges are, what each will listen for, sources.
