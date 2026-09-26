@@ -5,7 +5,9 @@ written. Every screen below is required.
 
 ## What the product is
 
-goalkeeper is a runtime for long-running AI agent work. A human approves a
+goalkeeper is a runtime for long-running AI agent work. The use case it
+runs is not decided yet; every screen must work for any pure-state use
+case (units of text in, a small JSON record with quotes out). A human approves a
 small goal document. Twenty disposable, stateless workers claim units of
 work from a queue in MongoDB, build a context from a raw library of
 everything that ever happened, produce a JSON result, and pass it through a
@@ -42,7 +44,7 @@ quality is going up over time.
 - **Goal**: statement, version number, criteria (three, each with a short
   label), guidelines (short list), out of scope (short list), history of
   approved changes.
-- **Unit**: one item of work with a key (for example `aapl-2026-07-30`), a
+- **Unit**: one item of work with a key (a short slug), a
   display name, a status, and once merged a small record (a few numbers
   and one quote per number) with the sentence it came from highlighted in
   the source text.
@@ -75,7 +77,7 @@ The main screen. Five regions, all live.
   (142/200), the two counters large. A small QR code for `/request` in the
   corner.
 - **Units grid**: the biggest region. One cell per scheduled unit (200 to
-  500), status colored, key or ticker inside if space allows. Blue cells
+  500), status colored, key inside if space allows. Blue cells
   pulse. Hovering or tapping shows the unit's name, status, attempt and
   the last reason. Reserve (unscheduled) units are shown dimmed at the end
   so "add X" visibly lights one up.

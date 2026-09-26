@@ -60,9 +60,8 @@ by a deterministic gate, so nothing drifts.
   proposals, applyDiff.
 - [docs/GOAL.md](docs/GOAL.md): the goal document, version 1.
 - [docs/USE-CASE.md](docs/USE-CASE.md): what a demo use case must provide.
-- [usecase/README.md](usecase/README.md): a candidate use case (headline
-  earnings from press releases), the development fixture until a use case
-  is chosen.
+- `usecase/`: the interface a use case ships in (see docs/GOAL.md). The
+  use case is not decided; the folder holds a development fixture.
 - [docs/SCREEN-BRIEF.md](docs/SCREEN-BRIEF.md): the design brief for every
   screen.
 - [docs/DAY-PLAN.md](docs/DAY-PLAN.md): the rules and the cuts.

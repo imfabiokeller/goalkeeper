@@ -13,17 +13,16 @@ Every document that a goal version matters for carries `version`.
 {
   _id: "goal",
   version: 2,
-  statement: "Build a table of headline quarterly results for S&P 500 companies from their own earnings press releases ...",
+  statement: "<two sentences, human-written>",
   criteria: [
-    { id: "c1", kind: "all-units", text: "Every value is backed by a verbatim quote that contains it", check: { kind: "grounded", params: {} } },
-    { id: "c2", kind: "all-units", text: "The figures agree with each other and with the filing",   check: { kind: "consistent", params: {} } },
-    { id: "c3", kind: "all-units", text: "Exactly the twelve fields, typed, whole US dollars",      check: { kind: "schema", params: {} } }
+    { id: "c1", kind: "all-units", text: "<what the check verifies>", check: { kind: "<kind in usecase/checks.ts>", params: {} } },
+    { id: "c2", kind: "all-units", text: "...", check: { kind: "...", params: {} } }
   ],
-  guidelines: ["Prefer GAAP figures over adjusted ones.", "...", "Banks report net revenue; take that as revenue."],
-  outOfScope: ["Guidance and forecasts.", "Any ranking or investment opinion.", "..."],
+  guidelines: ["<taste line>", "...", "<guideline added by an approved proposal>"],
+  outOfScope: ["<what gets parked>", "..."],
   history: [
     { version: 1, at: ISODate, by: "seed", diff: null },
-    { version: 2, at: ISODate, by: "fabio", diff: { op: "add-guideline", text: "Banks report net revenue; take that as revenue." }, questionId: ObjectId }
+    { version: 2, at: ISODate, by: "fabio", diff: { op: "add-guideline", text: "<guideline>" }, questionId: ObjectId }
   ]
 }
 ```
@@ -36,21 +35,22 @@ later; today every criterion is `all-units`.
 ## inputs (one per unit of work)
 
 ```js
-{ _id: "aapl-2026-07-30", key: "aapl-2026-07-30", company: "Apple Inc.", ticker: "AAPL",
-  sector: "Information Technology", filedAt: "2026-07-30", source: "https://www.sec.gov/...",
+{ _id: "<key>", key: "<key>", name: "<display name>",
+  meta: { ... },                     // extra fields from inputs.json, passed to the checks as-is
+  source: "https://...",             // where the input came from, optional
   text: "...", chars: 30667, scheduled: true, scheduledBy: "seed" | "crowd:<sourceId>", createdAt }
 ```
 
 `scheduled: false` units are loaded but not emitted until the crowd asks
-for them. That is what makes "add company X" real work.
+for them. That is what makes "add unit X" real work.
 
 ## tasks (the queue and its history)
 
 ```js
 {
   _id: ObjectId,
-  key: "aapl-2026-07-30",
-  criteria: ["c1", "c2", "c3"],
+  key: "<key>",
+  criteria: ["c1", "c2"],
   version: 2,                       // goal version the task runs under
   status: "open" | "claimed" | "merged" | "blocked" | "parked",
   priority: 0 | 1,                  // 1 for crowd tasks
@@ -87,8 +87,8 @@ kill-and-resume. No other code.
 ## state (one per merged key)
 
 ```js
-{ _id: "aapl-2026-07-30", key: "aapl-2026-07-30", version: 2, stateVersion: 3,
-  data: { revenue: 109417000000, netIncome: 29789000000, dilutedEps: 2.02, ..., quotes: { revenue: "..." } },
+{ _id: "<key>", key: "<key>", version: 2, stateVersion: 3,
+  data: { ...the proposal as submitted... },
   taskId: ObjectId, mergedAt }
 ```
 
@@ -103,7 +103,7 @@ re-emits the key; that is the whole drift correction.
 {
   _id: ObjectId,
   kind: "worker-run" | "gate" | "planner-turn" | "crowd-request" | "answer" | "error",
-  taskId: ObjectId | null, key: "aapl-2026-07-30" | null, version: 2,
+  taskId: ObjectId | null, key: "<key>" | null, version: 2,
   raw: { messages: [...], steps: [...], proposal: {...}, gate: {...}, ... },   // never edited
   text: "...",                       // flattened raw for the text index
   enrichment: null | { gist: "...", entities: { keys: [...], fields: [...] }, labels: [...], embedding: [...] },
@@ -149,8 +149,8 @@ Pinned, not retrieved: goal; input text; state for the key; last three
 ## questions (proposed goal changes)
 
 ```js
-{ _id, kind: "approval", question: "12 tasks are blocked because banks report net revenue, not total revenue. Adopt this guideline?",
-  proposedDiff: { op: "add-guideline", text: "Banks report net revenue; take that as revenue." },
+{ _id, kind: "approval", question: "12 tasks are blocked for the same reason: <reason>. Adopt this guideline?",
+  proposedDiff: { op: "add-guideline", text: "<guideline>" },
   evidence: [taskId, ...], status: "open" | "approved" | "rejected",
   answeredBy: null | "fabio", answeredAt: null | ISODate, createdAt }
 ```

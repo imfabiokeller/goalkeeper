@@ -1,68 +1,58 @@
-# The goal, version 1
+# The goal document
 
-The first goal document. Seeded before the swarm starts; changed only by
-approved diffs afterwards. The machine-readable form is
-`usecase/lens.json` (the seed converts it to the `goal` document); this is
-the readable one.
+**The use case is not decided.** We are building the infrastructure and the
+bootstrap around an unknown pure-state use case. Nothing in `src/` or in
+these docs may depend on a specific domain. This file describes the shape
+of the goal document, not its content.
 
-**No use case has been chosen yet.** We are still looking for a pure-state
-use case that fits [USE-CASE.md](USE-CASE.md). The `usecase/` folder holds
-one candidate (headline earnings from press releases) that is used to
-build and test the harness until the decision is made. The text below is
-that candidate, not the decision. The harness does not care which domain
-it is: it reads `usecase/lens.json`, `usecase/inputs.json`,
-`usecase/inputs/` and `usecase/checks.ts`, so a different use case in that
-shape drops in without code changes.
+## Shape
 
-## Statement
+The goal is one document in Atlas, seeded at version 1 from
+`usecase/lens.json` and changed afterwards only by approved diffs.
 
-Build a table of headline quarterly results for S&P 500 companies from
-their own earnings press releases: revenue, net income and diluted EPS for
-the quarter just reported. Every figure carries the sentence or table row
-it came from, so anyone can check it in two seconds.
+```
+Statement     two sentences, prose, human-written
+Criteria      at most three, each with a check kind the gate can run:
+              { id, text, check: { kind, params } }
+Guidelines    a few lines of taste, appended to by approved proposals
+Out of scope  what gets parked, with the reason shown on screen
+Version       1 at seed, +1 per approved diff
+History       one entry per version: at, by, diff, questionId
+```
 
-## Criteria
+The readable form of a criterion must say what the check verifies in plain
+words; the check kind must exist in `usecase/checks.ts`.
 
-1. Every value is backed by a quote that appears word for word in the
-   release and contains that value at the precision it was written.
-   Check: `grounded`.
-2. The figures agree with each other and with the filing: net income never
-   exceeds revenue, EPS carries the sign of net income, stated growth
-   matches the two revenue figures within one point, period ends at most
-   120 days before filing.
-   Check: `consistent`.
-3. Exactly the twelve fields of the proposal shape, correctly typed,
-   amounts in whole US dollars, key not already merged.
-   Check: `schema`.
+## What any use case must ship
 
-## Guidelines
+The `usecase/` folder is the interface between the use case and the
+harness. A use case is exactly these files:
 
-- Prefer GAAP figures over adjusted or non-GAAP ones.
-- Prefer the quarter just ended over year-to-date or full-year figures.
-- Never estimate or derive a missing number. Leave it null with no quote.
-- Convert every amount to whole US dollars; per-share figures stay as
-  written.
-- If the release gives two GAAP figures for the same item, block with the
-  reason instead of choosing.
+- `lens.json`: the goal document above (`goal`, `criteria`, `guidelines`,
+  `outOfScope`).
+- `inputs.json`: the index of units: `key`, `name`, `file`, plus any extra
+  fields the checks need (stored as `meta`).
+- `inputs/<file>`: one plain-text input per unit.
+- `checks.ts`: `export const checks: Record<string, Check>` where
+  `Check = (proposal, input, state) => { pass, reasons }` and `input` is
+  `{ key, name, text, meta }`. Pure, no I/O, milliseconds.
+- `samples/`: hand-written proposals with expected outcomes per check.
 
-## Out of scope
+The harness reads only this folder. A different use case in this shape
+replaces the current one by re-seeding.
 
-Guidance and forecasts. Non-GAAP measures, margins, ratios. Segment and
-regional breakdowns. Balance sheet, cash flow, dividends, buybacks. Any
-ranking, comparison or investment opinion. Companies not in the inputs.
+## What is in `usecase/` right now
 
-## Inputs
+A development fixture so the harness can be built and tested before the
+decision. It is not the use case and it is not a candidate. When the use
+case is decided, the fixture is replaced.
 
-395 press releases as plain text, keyed `<ticker>-<filing date>`. The
-first 200 are scheduled; the rest are the reserve the audience can pull
-from.
+## What the audience can request (any use case)
 
-## What the audience can request
-
-- A company from the reserve: becomes a priority task.
-- A recheck of a merged record: becomes a priority task, the old record
-  stays until the new one merges.
-- A guideline ("banks report net revenue, take that"): becomes a proposal
-  in the inbox.
-- Anything else (new fields, rankings, companies not in the inputs):
-  parked with a reason on screen.
+- A unit from the unscheduled reserve: becomes a priority task. Load more
+  units than you schedule so this is real work.
+- A recheck of a merged unit: becomes a priority task, the old state stays
+  until the new one merges.
+- A guideline: becomes a proposal in the inbox.
+- Anything else, including new fields, rankings and units not in the
+  inputs: parked with a reason on screen.

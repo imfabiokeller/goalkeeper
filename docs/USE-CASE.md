@@ -48,7 +48,7 @@ worker is shown and everything it does is stored raw in the library.
 - Its task: key, criterion, check kind.
 - The last failures on this key, pinned.
 - A short briefing synthesized from retrieved library passages: precedents
-  from other units ("company X reports in thousands of tonnes").
+  from other units ("unit X reports its figures in thousands").
 - Five tools: `read_input`, `read_state`, `search_library`, and one of
   `submit(proposal)` or `block(reason)`.
 - A step budget of about 20 tool calls.
@@ -104,13 +104,13 @@ Answer yes to all of these or pick another one.
 - Can the audience suggest additions that hit all three crowd paths?
 - Does the result matter to someone outside the room?
 
-## Status: still looking
+## Status: not decided
 
-No use case has been chosen. `usecase/` holds one candidate (headline
-quarterly results from earnings press releases, [usecase/README.md](../usecase/README.md))
-in the exact shape the harness reads: `lens.json`, `inputs.json`,
-`inputs/`, `checks.ts`, `samples/`. Any replacement must ship in that
-shape. The candidate stays as the development fixture until then.
+The use case is not decided. `usecase/` holds a development fixture in the
+exact shape the harness reads (`lens.json`, `inputs.json`, `inputs/`,
+`checks.ts`, `samples/`, see [GOAL.md](GOAL.md)) so the harness can be
+built and tested now. The fixture is not the use case. Any use case must
+ship in that shape.
 
 ## What to hand back
 

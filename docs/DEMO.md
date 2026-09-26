@@ -18,7 +18,7 @@ context it was given, the passages retrieved from the library, the
 proposal, the gate.
 
 **1:00 to 2:15.** The live round. Crowd requests land as cards and move to
-their outcome within seconds: a company from the pool gets queued and
+their outcome within seconds: a unit from the reserve gets queued and
 lights up, a recheck runs, a guideline becomes a proposal in the inbox, a
 "rank the greenest" gets parked with its reason. Approve the proposal on
 the phone: goal version ticks to 2, the red blocked cells go grey, blue,

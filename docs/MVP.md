@@ -18,8 +18,9 @@ disagrees with this one, this one wins and the other doc gets fixed.
 - The goal changes only through an approved diff proposed by the planner.
   One diff operation today: `add-guideline`.
 - The gate is a registry of pure check functions. No model reviews work.
-- No use case has been chosen yet; we are still looking for a pure-state
-  one. `usecase/` holds a candidate as the development fixture and is the
+- The use case is not decided. We build the infrastructure and the
+  bootstrap around an unknown pure-state use case; nothing in `src/` is
+  domain-specific. `usecase/` holds a development fixture and is the
   interface:
   `lens.json` (the goal), `inputs.json` and `inputs/` (the units),
   `checks.ts` (the check functions, `(proposal, input, state) -> { pass,
