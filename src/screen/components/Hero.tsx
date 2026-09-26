@@ -74,7 +74,10 @@ export function Hero({ solveRate, perMinute, libraryTokens, controlRate, width =
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <span style={{ fontFamily: "var(--mono)", fontSize: 26, lineHeight: 1, color: "#6fbf8e" }}>{pct(rate)}</span>
-        <span style={{ fontSize: 13, color: "var(--fg-dimmer)" }}>solved{wasRate !== null ? ` · was ${pct(wasRate)}` : ""}</span>
+        <span style={{ fontSize: 13, color: "var(--fg-dimmer)" }}>
+          {last ? `${last.solved} of ${last.finished} finished` : "solved"}
+          {wasRate !== null ? ` · was ${pct(wasRate)}` : ""}
+        </span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 2, paddingLeft: 14, borderLeft: "1px solid #262626" }}>
         {controlRate !== null ? (

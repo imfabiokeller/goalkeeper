@@ -76,7 +76,7 @@ export type StagePayload = {
   metrics: {
     at: string | null;
     totals: Metrics["totals"] | null;
-    solveRate: Array<{ bucket: string; attempted: number; merged: number; solved: number }>;
+    solveRate: Array<{ bucket: string; attempted: number; merged: number; solved: number; finished?: number | null }>;
     perMinute: Array<{
       minute: string;
       merged: number;
