@@ -69,6 +69,26 @@ by a deterministic gate, so nothing drifts.
 - [docs/QA.md](docs/QA.md): the judges' questions and the answers.
 - [docs/PRIOR-ART.md](docs/PRIOR-ART.md): what exists and how this differs.
 
+## Run and deploy
+
+Local: `cp .env.example .env`, fill the keys, `npm install`,
+`npm run indexes`, `npm run seed -- --db live`, `npm run worker`.
+
+Workers run on the VPS as a Dokploy Compose service built from this repo
+(branch `main`, compose path `compose.yaml`), with the `.env` contents as
+the service's environment. `WORKER_REPLICAS` sets the swarm size (8 by
+default, 20 for the afternoon). Redeploy after a push from the Dokploy UI,
+or enable auto-deploy on push. There is nothing to route: workers make
+outbound connections only, and their heartbeat in Atlas is the health
+signal.
+
+The kill moment: scale the service down by five and back up, or stop
+individual containers from the Dokploy UI; the reaper requeues their tasks
+within 30 seconds.
+
+The screen is a separate Next.js project deployed on Vercel, reading Atlas
+directly (polling, since Vercel functions cannot hold change streams open).
+
 ## Built during the event
 
 Everything in `src/`. Atlas, the Vercel AI SDK, OpenRouter, Voyage,

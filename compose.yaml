@@ -1,10 +1,21 @@
+# Workers only. No ports, no routing, no volumes: the workers hold no state
+# and make outbound connections only (Atlas, OpenRouter, Voyage). Health is
+# the heartbeat in Atlas; recovery is the reaper. Deployed as a Dokploy
+# Compose service built from this repo (see README, Deploy).
 services:
   worker:
     build: .
     env_file: .env
     environment:
       ROLE: worker
-      WORKERS_TARGET: ${WORKERS_TARGET:-8}
-    restart: always
+    restart: unless-stopped
     deploy:
-      replicas: 8
+      replicas: ${WORKER_REPLICAS:-8}
+      resources:
+        limits:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
