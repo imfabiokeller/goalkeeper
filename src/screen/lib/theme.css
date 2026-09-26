@@ -1,0 +1,70 @@
+/* The screen's tokens: status colors from docs/SCREEN-BRIEF.md, background,
+   text, one mono and one sans stack, and the activity pulse. Dark only.
+   The ARC ten-color palette lives in lib/arc.tsx and is used by grids alone. */
+
+:root {
+  color-scheme: dark;
+
+  /* surfaces and text */
+  --bg: #0b0d10;
+  --bg-raised: #12161b;
+  --line: #222831;
+  --fg: #d7dbe0;
+  --fg-dim: #8a929c;
+  --accent: #e8c547;
+
+  /* status: color is status */
+  --status-open: #4a525c;
+  --status-working: #3b82f6;
+  --status-merged: #14b8a6;
+  --status-solved: #22c55e;
+  --status-retrying: #f59e0b;
+  --status-blocked: #ef4444;
+  --status-dead: #7f1d1d;
+  --status-parked: #6b7280;
+
+  /* type */
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+  /* motion */
+  --pulse-duration: 2.4s;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.pulse {
+  animation: pulse var(--pulse-duration) ease-in-out infinite;
+}
+
+@keyframes flash {
+  0% {
+    filter: brightness(2.2);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.flash {
+  animation: flash 900ms ease-out 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse,
+  .flash {
+    animation: none;
+  }
+  .pulse {
+    outline: 1px solid var(--fg);
+    outline-offset: -1px;
+  }
+}

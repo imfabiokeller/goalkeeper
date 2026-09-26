@@ -1,19 +1,48 @@
-:root {
-  color-scheme: dark;
-  --bg: #0b0d10;
-  --fg: #d7dbe0;
-  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-}
+@import "../lib/theme.css";
 
 html,
 body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
-  font-family: system-ui, sans-serif;
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
 }
 
 code,
-pre {
+pre,
+.mono {
   font-family: var(--mono);
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 2px 8px 2px 0;
+  vertical-align: top;
+}
+
+th {
+  color: var(--fg-dim);
+  font-weight: 500;
 }
