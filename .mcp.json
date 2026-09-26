@@ -2,11 +2,16 @@
   "mcpServers": {
     "mongodb": {
       "command": "sh",
-      "args": ["-c", "set -a; [ -f .env ] && . ./.env; set +a; exec npx -y mongodb-mcp-server@<3"]
+      "args": [
+        "-c",
+        "set -a; [ -f .env ] && . ./.env; set +a; exec npx -y 'mongodb-mcp-server@<3'"
+      ]
     },
     "strands-agents": {
       "command": "uvx",
-      "args": ["strands-agents-mcp-server"]
+      "args": [
+        "strands-agents-mcp-server"
+      ]
     }
   }
 }
