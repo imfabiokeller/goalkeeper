@@ -222,6 +222,75 @@ export type LibraryPayload = {
   lessonsAt: string | null;
   contextAvg: number | null; // tokens an agent reads, metrics.totals.contextLast20Avg
   newest: Array<{ id: string; at: string; kind: string; key: string | null; gist: string }>;
+  // The timeline view (docs/mockups/library): every solve, the rows of
+  // the whole library and the curves against library size.
+  runStart: string | null; // goal.history[0].at, or the first solve when earlier
+  goalVersion: number | null;
+  solveRate: Array<{ bucket: string; attempted: number; merged: number; solved: number; tokens: number }>; // tokens: library tokens up to the bucket's end
+  notSolved: number; // puzzles without state.score 1
+  solves: LibrarySolve[];
+  rows: LibraryRow[]; // the newest LIBRARY_ROWS records
+  kindCounts: { all: number; worked: number; dead: number; gate: number; run: number };
+};
+
+export type LibrarySolve = {
+  key: string;
+  at: string; // state.scoredAt, else mergedAt
+  who: string | null; // the worker whose run merged
+  rule: string | null;
+  thumb: Grid | null; // the first train input, downsampled to at most 6x6
+};
+
+// A record's kind on screen: worked (a run whose gate passed), dead (a
+// failed gate verdict with a rule), gate (a failed verdict without one),
+// run (a run whose gate did not pass), then the planner and error kinds.
+export type LibraryRowKind = "worked" | "dead" | "gate" | "run" | "planner" | "error";
+
+export type LibraryRow = {
+  id: string;
+  at: string;
+  kind: LibraryRowKind;
+  key: string | null;
+  text: string;
+  tokens: number; // in plus out, 0 for a verdict
+};
+
+// One solved puzzle in full: where the tokens went per attempt, what it
+// read and who read it. GET /api/library/solve/[key].
+export type SolveAttempt = {
+  n: number;
+  taskId: string | null;
+  sourceId: string;
+  who: string | null;
+  at: string;
+  read: number; // raw.contextTokens, else the sections' estimate
+  write: number; // tokens.out: thinking plus the program
+  tests: number; // try_submit calls
+  total: number; // tokens.in plus tokens.out
+  ok: boolean; // the gate passed
+  outcome: string; // "solved", "passed examples", or the first reason
+  sections: Array<{ label: string; tokens: number }>; // raw.system split on "\n# "
+};
+
+export type SolvePrecedent = {
+  id: string;
+  key: string | null;
+  gist: string;
+  kind: "worked" | "dead";
+  at: string;
+  own: boolean; // one of this puzzle's own earlier refuted tries
+};
+
+export type SolvePayload = {
+  key: string;
+  at: string;
+  who: string | null;
+  rule: string | null;
+  thumb: Grid | null; // full first train input
+  total: number;
+  attempts: SolveAttempt[];
+  read: SolvePrecedent[]; // the last attempt's cited records, own refuted tries first
+  used: Array<{ key: string; at: string; solved: boolean; sourceId: string }>; // later runs on other puzzles that cited one of this key's records
 };
 
 // One puzzle's control result off /api/baseline?key= (null when the
