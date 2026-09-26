@@ -156,6 +156,7 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
     inputText: input.text,
     readState: async (key) => (await c.state.findOne({ _id: key }))?.data ?? null,
     search: async (query): Promise<Passage[]> => (await retrieveFn(c, query, { excludeKey: task.key })).passages,
+    dryRun: (proposal) => gateFn(goal, task, proposal, checkInput(input), checkState(task)),
     model: opts.model,
     abortSignal: abort,
     maxSteps: opts.maxSteps,

@@ -164,6 +164,35 @@ describe("worker iteration", () => {
     expect(sources[0].enrichment).toBeNull();
   });
 
+  it("try_submit runs the gate on a draft and records nothing; the run still submits", async () => {
+    await seedInput("aapl-2026-07-30");
+    const taskId = await seedTask("aapl-2026-07-30");
+    let calls = 0;
+    const model = mockModel((o) => {
+      calls += 1;
+      const key = keyOf(o);
+      if (calls === 1) return toolCallResult("try_submit", { proposal: { ...appleSample.proposal, key, revenue: 999999000000 } });
+      if (calls === 2) return toolCallResult("try_submit", { proposal: { ...appleSample.proposal, key } });
+      return toolCallResult("submit", { proposal: { ...appleSample.proposal, key } });
+    });
+
+    expect(await iteration(c, "w-1", { ...base, model })).toBe("merged");
+    expect(calls).toBe(3);
+    const task = await c.tasks.findOne({ _id: taskId });
+    expect(task?.status).toBe("merged");
+    expect(task?.attempt).toBe(1);
+    // Dry runs record no gate source and no outcome: only the run source exists.
+    expect(await c.sources.countDocuments({ kind: "gate" })).toBe(0);
+    const run = await c.sources.findOne({ kind: "worker-run" });
+    const steps = run?.raw.steps as Array<{ toolCalls: Array<{ name: string }>; toolResults: Array<{ name: string; output: unknown }> }>;
+    expect(steps.map((s) => s.toolCalls[0]?.name)).toEqual(["try_submit", "try_submit", "submit"]);
+    const dry = steps.filter((s) => s.toolResults[0]?.name === "try_submit").map((s) => s.toolResults[0].output as { pass: boolean; reasons: string[] });
+    expect(dry).toHaveLength(2);
+    expect(dry[0].pass).toBe(false);
+    expect(dry[0].reasons.join(" ")).toContain("revenue");
+    expect(dry[1].pass).toBe(true);
+  });
+
   it("two workers over ten tasks never hold the same task at once", async () => {
     const keys = Array.from({ length: 10 }, (_, i) => `unit-${i}`);
     for (const k of keys) {

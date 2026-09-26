@@ -8,7 +8,7 @@ import { z } from "zod";
 import { inputPage, PAGE_CHARS } from "../context/assemble.ts";
 import type { Passage } from "../context/retrieve.ts";
 import { workerModel } from "../shared/llm.ts";
-import { BlockArgs, SubmitArgs } from "../shared/types.ts";
+import { BlockArgs, SubmitArgs, type GateResult } from "../shared/types.ts";
 
 export const MAX_STEPS = 20;
 
@@ -23,6 +23,9 @@ export type RunCtx = {
   inputText: string;
   readState: (key: string) => Promise<unknown | null>;
   search: (query: string) => Promise<Passage[]>;
+  // The gate on a draft: same checks, same input and state as the real
+  // gate after submit. Records nothing.
+  dryRun: (proposal: Record<string, unknown>) => GateResult;
   model?: LanguageModel;
   abortSignal?: AbortSignal;
   maxSteps?: number;
@@ -84,8 +87,19 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
         return { passages: passages.map((p) => ({ kind: p.kind, key: p.key, gist: p.gist, excerpt: p.excerpt })) };
       },
     }),
+    try_submit: tool({
+      description:
+        "Test a draft proposal against the gate: runs the same deterministic checks submit will face and returns { pass, reasons, checks }. " +
+        "Records nothing, so call it as often as needed; fix the draft until it passes, then call submit with the passing draft.",
+      inputSchema: SubmitArgs,
+      execute: async ({ proposal }) => {
+        const r = ctx.dryRun(proposal);
+        return { pass: r.pass, reasons: r.reasons, checks: r.checks };
+      },
+    }),
     submit: tool({
-      description: "Submit the finished proposal for this task. Call it once, as the last step.",
+      description:
+        "Submit the finished proposal for this task; the gate runs on it and the outcome is recorded. Call it once, as the last step, after try_submit passes.",
       inputSchema: SubmitArgs,
       execute: async ({ proposal }) => {
         if (outcome) return "already recorded";
@@ -94,7 +108,8 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
       },
     }),
     block: tool({
-      description: "Give up on this task with a short reason a human can act on (missing data, ambiguity, out of scope). Call it once, as the last step.",
+      description:
+        "Give up on this task with a short reason a human can act on (missing data, ambiguity, out of scope). Only after several refuted attempts. Call it once, as the last step.",
       inputSchema: BlockArgs,
       execute: async ({ reason }) => {
         if (outcome) return "already recorded";

@@ -71,9 +71,8 @@ export function assemble(args: AssembleArgs): Assembled {
   const parts: string[] = [];
 
   parts.push(
-    "You are a worker on a shared goal. You extract one unit of work into a JSON proposal and submit it. " +
-      "You never estimate, derive or guess a value: every value you submit is backed by a verbatim quote from the input that contains it. " +
-      "If the input does not support a value, leave it null and give no quote. " +
+    "You are a worker on a shared goal. You turn one unit of work into a JSON proposal in the shape below and submit it. " +
+      "A deterministic gate checks every proposal against the criteria; you can run that gate on a draft with try_submit as often as you like before you submit. " +
       "If the unit cannot be done under this goal, call block with a short reason instead. " +
       "You never ask a human.",
   );
@@ -163,12 +162,15 @@ export function assemble(args: AssembleArgs): Assembled {
 
   parts.push(
     "# How to work\n" +
-      "1. Read the input. Call read_input({ offset }) to page through the rest when the values you need are not on this page (the headline numbers are usually near the start, the tables follow).\n" +
-      "2. Call read_state({ key }) or search_library({ query }) only if they help.\n" +
-      "3. Finish with exactly one call to submit({ proposal }) or block({ reason }). Never both, never neither.\n" +
-      "Rules for a proposal: every value has a verbatim quote copied character for character from the input (a sentence or a table row, at most 400 characters) that contains the value at the precision written. " +
-      "Amounts are whole US dollars (a table in millions is multiplied out). Never estimate; a value the input does not state is null with no quote. " +
-      "The proposal's key equals the task key.",
+      "1. Read the input. Call read_input({ offset }) to page through the rest when this page is not the whole input.\n" +
+      "2. State the rule you believe explains the unit, in one sentence, then write the draft proposal that applies it. " +
+      "Call read_state({ key }) or search_library({ query }) only if they help.\n" +
+      "3. Test your draft with try_submit({ proposal }). It runs the gate and returns pass, reasons and the per-check verdicts; nothing is recorded.\n" +
+      "4. If it fails, read the reasons, fix the draft (or state a different rule when the reasons refute this one) and test again. Repeat until try_submit passes.\n" +
+      "5. Finish with exactly one call to submit({ proposal }) with the passing draft, or block({ reason }). Never both, never neither.\n" +
+      "Never submit a draft that try_submit has not passed. Never retry a rule that is listed as refuted above. " +
+      "Block only when three different rules have been refuted; until then, keep testing. " +
+      "The proposal's key equals the task key and its fields follow the proposal shape exactly.",
   );
 
   let system = parts.join("\n\n");
