@@ -4,6 +4,7 @@
 
 import type { Collections } from "../shared/db.ts";
 import type { Metrics } from "../shared/types.ts";
+import { computeLessons } from "./lessons.ts";
 
 type MetricsMinute = Metrics["perMinute"][number];
 
@@ -134,6 +135,7 @@ export async function refreshMetrics(c: Collections, now = new Date()): Promise<
   const done = goal ? await c.state.countDocuments({ version: goal.version }) : 0;
   const perCriterion: Metrics["perCriterion"] = {};
   for (const cr of goal?.criteria ?? []) perCriterion[cr.id] = { done, total: scheduled };
+  const lessons = await computeLessons(c, goal, now);
 
   const metrics: Metrics = {
     _id: "metrics",
@@ -149,6 +151,7 @@ export async function refreshMetrics(c: Collections, now = new Date()): Promise<
     },
     perCriterion,
     versions: (goal?.history ?? []).map((h) => ({ version: h.version, at: h.at })),
+    lessons,
   };
   await c.metrics.replaceOne({ _id: "metrics" }, metrics, { upsert: true });
   return metrics;

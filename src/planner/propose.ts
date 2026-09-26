@@ -7,25 +7,19 @@ import { ObjectId } from "mongodb";
 import { z } from "zod";
 import type { Collections } from "../shared/db.ts";
 import type { Goal, Task, Tokens } from "../shared/types.ts";
+import { readLessons } from "./lessons.ts";
 import { structured } from "./model.ts";
+import { normalizeReason, PREFIX_CHARS } from "./normalize.ts";
 import { writeError } from "./sources.ts";
 
 export const Guideline = z.object({ guideline: z.string() });
 export type DecideGuideline = (prompt: string) => Promise<{ guideline: string }>;
 
 export const MIN_GROUP = 3;
-export const PREFIX_CHARS = 40;
+export { normalizeReason, PREFIX_CHARS };
 
 export function aiDecideGuideline(tokens?: Tokens): DecideGuideline {
   return (prompt) => structured(Guideline, prompt, tokens);
-}
-
-export function normalizeReason(reason: string): string {
-  return reason
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim()
-    .slice(0, PREFIX_CHARS);
 }
 
 export function groupBlocked(tasks: Task[]): Map<string, Task[]> {
@@ -41,7 +35,7 @@ export function groupBlocked(tasks: Task[]): Map<string, Task[]> {
   return groups;
 }
 
-export function buildPrompt(goal: Goal, reasons: string[]): string {
+export function buildPrompt(goal: Goal, reasons: string[], lessons?: string | null): string {
   const lines: string[] = [];
   lines.push("Workers pursuing a goal got stuck on several units for the same reason.");
   lines.push("Write one guideline, a single sentence, that would let them proceed consistently.");
@@ -54,6 +48,10 @@ export function buildPrompt(goal: Goal, reasons: string[]): string {
   for (const g of goal.guidelines) lines.push(`- ${g}`);
   lines.push("Out of scope:");
   for (const o of goal.outOfScope) lines.push(`- ${o}`);
+  if (lessons) {
+    lines.push("");
+    lines.push(lessons);
+  }
   lines.push("");
   lines.push(`BLOCK REASONS (${reasons.length}):`);
   for (const r of reasons) lines.push(`- ${r.slice(0, 500)}`);
@@ -65,10 +63,12 @@ export async function propose(
   goal: Goal,
   decide?: DecideGuideline,
   tokens?: Tokens,
+  lessons?: string | null, // undefined: read the metrics doc; null: none
 ): Promise<number> {
   const blocked = await c.tasks.find({ status: "blocked", blockReason: { $ne: null } }).toArray();
   const groups = [...groupBlocked(blocked).values()].filter((g) => g.length >= MIN_GROUP);
   if (groups.length === 0) return 0;
+  if (lessons === undefined) lessons = await readLessons(c);
 
   const openQuestions = await c.questions.find({ status: "open" }).toArray();
   const cited = new Set(openQuestions.flatMap((q) => q.evidence.map((id) => id.toHexString())));
@@ -83,7 +83,7 @@ export async function propose(
     const reasons = group.map((t) => t.blockReason as string);
     let text: string;
     try {
-      text = (await (decide ?? aiDecideGuideline(tokens))(buildPrompt(goal, reasons))).guideline.trim();
+      text = (await (decide ?? aiDecideGuideline(tokens))(buildPrompt(goal, reasons, lessons))).guideline.trim();
     } catch (err) {
       await writeError(c, "propose", err, { taskIds: group.map((t) => t._id) }, goal.version);
       continue;

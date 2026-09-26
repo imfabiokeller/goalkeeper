@@ -38,11 +38,18 @@ decides, writes, exits. Holds nothing between runs.
    them: one model call produces a guideline text. Insert a question
    `{ kind: "approval", proposedDiff: { op: "add-guideline", text }, evidence: [taskIds] }`.
 5. **Metrics.** One aggregation over `sources` and `tasks` bucketed with
-   `$dateTrunc` per minute; write the `metrics` singleton.
+   `$dateTrunc` per minute, plus the lessons digest (`computeLessons`:
+   pass rate, fails per check kind, top gate reasons and block reasons
+   with example keys, recent guidelines and how many tasks they reopened,
+   over the last three hours, rendered to at most 2000 characters); write
+   the `metrics` singleton. The crowd and propose steps above put the
+   previous run's digest in their prompts; workers pin it into every
+   context. See docs/DATABASE.md, `metrics.lessons`.
 6. **Backfill.** Up to 20 `sources` with `enrichment: null`: enrich and
    embed.
 7. **Turn.** Write a `planner-turn` source: counts read, tasks emitted,
-   crowd outcomes, proposals, tokens.
+   crowd outcomes, proposals, tokens, and the lessons digest text from
+   step 5, so the digest of every run is in the library and retrievable.
 
 ## applyDiff
 

@@ -20,6 +20,7 @@ export const MAX_FAILURES = 3;
 export const MAX_REASON_CHARS = 400;
 export const MAX_STATE_CHARS = 4000;
 export const MAX_GOAL_LINE_CHARS = 600;
+export const MAX_LESSONS_CHARS = 2000; // the digest is capped at this size where it is computed
 // Hard ceiling on the system prompt so the estimate can never exceed 20k
 // tokens even if a cap above is raised carelessly.
 export const MAX_SYSTEM_CHARS = 64_000;
@@ -32,6 +33,7 @@ export type AssembleArgs = {
   failures: Array<Pick<Source, "raw" | "createdAt">>;
   passages: Passage[]; // the retrieved, expanded hits
   briefing?: Briefing | null; // synthesized from the hits; null or absent means show the hits
+  lessons?: string | null; // metrics.lessons.text, the digest of recent gate verdicts; absent means skip
   page?: number; // 0-based page of the input to pin, default 0
 };
 
@@ -86,6 +88,15 @@ export function assemble(args: AssembleArgs): Assembled {
   }
   if (goal.outOfScope.length) {
     parts.push("## Out of scope\n" + goal.outOfScope.map((g) => `- ${clip(g, MAX_GOAL_LINE_CHARS)}`).join("\n"));
+  }
+
+  // Derived from the gate's verdicts over the last hours: what fails, why,
+  // and what got blocked. Counts, not rules; the goal above is the rule.
+  if (args.lessons) {
+    parts.push(
+      "# Lessons from the record so far (counts derived from recent gate verdicts on all units; avoid the listed failure modes)\n" +
+        clip(args.lessons, MAX_LESSONS_CHARS),
+    );
   }
 
   const taskCriteria = task.criteria

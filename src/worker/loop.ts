@@ -122,7 +122,7 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
   const enrichFn = opts.enrich ?? realEnrich;
   const retrieveFn = opts.retrieve ?? retrieve;
 
-  const [goal, input, state, failures] = await Promise.all([
+  const [goal, input, state, failures, metrics] = await Promise.all([
     c.goal.findOne({ _id: "goal" }),
     c.inputs.findOne({ _id: task.key }),
     c.state.findOne({ _id: task.key }),
@@ -131,7 +131,11 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
       .sort({ createdAt: -1 })
       .limit(3)
       .toArray() as Promise<Source[]>,
+    // The lessons digest the planner derived from recent gate verdicts.
+    // Absent before the first planner run; then the section is skipped.
+    c.metrics.findOne({ _id: "metrics" }, { projection: { "lessons.text": 1 } }),
   ]);
+  const lessons = metrics?.lessons?.text ?? null;
   if (!goal) throw new Error("no goal document");
   if (!input) throw new Error(`no input for key ${task.key}`);
 
@@ -143,7 +147,7 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
   const synthesizeFn = opts.synthesize === undefined ? synthesize : opts.synthesize;
   const briefing = synthesizeFn ? await synthesizeFn({ goal, task, hits: retrieved.passages }) : null;
 
-  const ctx = assemble({ goal, task, input, state, failures, passages: retrieved.passages, briefing });
+  const ctx = assemble({ goal, task, input, state, failures, passages: retrieved.passages, briefing, lessons });
 
   const abort = AbortSignal.timeout(opts.deadlineMs ?? DEADLINE_MS);
   const run: RunResult = await runTask({

@@ -4,6 +4,7 @@
 // Every document is validated with its Zod schema before it is returned.
 
 import { ObjectId } from "mongodb";
+import { lessonsFrom } from "../planner/lessons.ts";
 import { EMBEDDING_DIMENSIONS } from "../shared/db.ts";
 import { goalFromLens } from "../shared/goal.ts";
 import {
@@ -732,7 +733,7 @@ export function makeDevData(inputs: Input[], lens: unknown, now: Date = new Date
 
   const locks: Lock[] = [Lock.parse({ _id: "planner", holder: r.pick(WORKERS), until: new Date(now.getTime() + 20_000) })];
 
-  const metrics = makeMetrics(tasks, sources, state, scheduled.length, now, v2At, t0);
+  const metrics = makeMetrics(tasks, sources, state, goal, scheduled.length, now, v2At, t0);
 
   const validated: DevData = {
     goal,
@@ -754,7 +755,7 @@ function median(xs: number[]): number | null {
   return s.length % 2 ? s[mid]! : (s[mid - 1]! + s[mid]!) / 2;
 }
 
-function makeMetrics(tasks: Task[], sources: Source[], state: State[], scheduledCount: number, now: Date, v2At: Date, t0: Date): Metrics {
+function makeMetrics(tasks: Task[], sources: Source[], state: State[], goal: Goal, scheduledCount: number, now: Date, v2At: Date, t0: Date): Metrics {
   const minuteOf = (d: Date) => Math.floor(d.getTime() / MINUTE) * MINUTE;
   const first = minuteOf(now) - 89 * MINUTE;
   const perMinute: Minute[] = [];
@@ -798,5 +799,7 @@ function makeMetrics(tasks: Task[], sources: Source[], state: State[], scheduled
       { version: 1, at: t0 },
       { version: 2, at: v2At },
     ],
+    // The same derivation the planner runs, over the fake record.
+    lessons: lessonsFrom({ tasks, gates, goal }, now),
   });
 }

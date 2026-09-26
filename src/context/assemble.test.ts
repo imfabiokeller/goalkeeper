@@ -101,6 +101,22 @@ describe("assemble", () => {
     expect(out.contextTokens).toBeGreaterThan(1000);
   });
 
+  it("pins the lessons digest after the goal and before the task, capped, and skips it when absent", () => {
+    const lessons = "Lessons from the record so far (last 3 h, 40 tasks finished, first-try pass rate 63%)\n- 7x quote not found verbatim";
+    const out = assemble({ ...heavy, input: baseInput, lessons });
+    const section = out.system.indexOf("# Lessons from the record so far");
+    expect(section).toBeGreaterThan(out.system.indexOf("## Out of scope"));
+    expect(section).toBeLessThan(out.system.indexOf("# Task"));
+    expect(out.system).toContain("7x quote not found verbatim");
+
+    const capped = assemble({ ...heavy, lessons: "L".repeat(10_000) });
+    expect(capped.contextTokens).toBeLessThan(20_000);
+    expect(capped.system).not.toContain("L".repeat(2001));
+
+    expect(assemble({ ...heavy, input: baseInput }).system).not.toContain("# Lessons");
+    expect(assemble({ ...heavy, input: baseInput, lessons: null }).system).not.toContain("# Lessons");
+  });
+
   it("extracts failure reasons from both raw shapes", () => {
     expect(failureReasons({ raw: { reasons: ["a", 1, "b"] } })).toEqual(["a", "b"]);
     expect(failureReasons({ raw: { gate: { reasons: ["c"] } } })).toEqual(["c"]);

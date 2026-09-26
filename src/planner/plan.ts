@@ -8,6 +8,7 @@ import type { Enrichment, Goal, Source, Tokens } from "../shared/types.ts";
 import { applyDiff } from "./applyDiff.ts";
 import { classifyPending, type ClassifyResult, type Decide } from "./classify.ts";
 import { emit } from "./emit.ts";
+import { readLessons } from "./lessons.ts";
 import { acquire, release } from "./lock.ts";
 import { refreshMetrics } from "./metrics.ts";
 import { propose, type DecideGuideline } from "./propose.ts";
@@ -51,6 +52,9 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
     tokens: { ...ZERO_TOKENS },
   };
   let goal: Goal | null = null;
+  // The digest from the previous run goes into this run's model prompts;
+  // the metrics step below recomputes it for the next one.
+  let lessons: string | null = null;
 
   const step = async (name: string, fn: () => Promise<void>): Promise<void> => {
     try {
@@ -68,6 +72,7 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
     await step("goal", async () => {
       goal = await c.goal.findOne({ _id: "goal" });
       if (!goal) throw new Error("no goal document, nothing to plan");
+      lessons = await readLessons(c);
     });
     if (goal) {
       const g: Goal = goal;
@@ -76,14 +81,14 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
         report.emitted = await emit(c, g, workersTarget);
       });
       await step("crowd", async () => {
-        report.crowd = await classifyPending(c, g, opts.crowdCap ?? 10, opts.decideCrowd, report.tokens);
+        report.crowd = await classifyPending(c, g, opts.crowdCap ?? 10, opts.decideCrowd, report.tokens, lessons);
       });
       await step("propose", async () => {
-        report.proposed = await propose(c, g, opts.decideGuideline, report.tokens);
+        report.proposed = await propose(c, g, opts.decideGuideline, report.tokens, lessons);
       });
     }
     await step("metrics", async () => {
-      await refreshMetrics(c);
+      lessons = (await refreshMetrics(c)).lessons.text;
     });
     if (opts.enrich) {
       const enrich = opts.enrich;
@@ -109,6 +114,7 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
           proposed: report.proposed,
           backfilled: report.backfilled,
           errors: report.errors,
+          lessons,
         },
         {
           version: goal?.version ?? 0,
@@ -117,6 +123,7 @@ export async function plan(c: Collections, holder: string, opts: PlanOptions = {
             `planner ${holder}: reaped ${report.reaped}, emitted ${report.emitted}, proposed ${report.proposed}, backfilled ${report.backfilled}`,
             ...outcomes,
             ...report.errors,
+            ...(lessons ? ["", lessons] : []),
           ].join("\n"),
         },
       );

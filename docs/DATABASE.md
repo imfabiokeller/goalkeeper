@@ -162,8 +162,31 @@ Created by `plan()`. Resolved by a human on `/inbox`. Approve calls
 
 - `locks`: `{ _id: "planner", holder: "w-07", until: ISODate }`. Acquired
   with `findOneAndUpdate({ _id: "planner", until: { $lt: now } })`.
-- `metrics`: `{ _id: "metrics", at, perMinute: [{ minute, merged, failed, blocked, firstTryPass, tokens, contextAvg }], totals: {...}, versions: [{ version, at }] }`.
+- `metrics`: `{ _id: "metrics", at, perMinute: [{ minute, merged, failed, blocked, firstTryPass, tokens, contextAvg }], totals: {...}, versions: [{ version, at }], lessons }`.
   Refreshed by `plan()`. The screen reads this instead of scanning sources.
+
+  `metrics.lessons` is the lessons digest, derived counts from the raw
+  record over the last three hours (DESIGN.md section 4, "Learning from
+  evaluation"):
+
+  ```js
+  lessons: {
+    at, window: { tasks, since },
+    firstTryPass: 0.64 | null,                                          // merged at attempt 1 over merged, in the window
+    checks: [{ kind: "grounded", criterion: "c1", fails: 9, passes: 31 }], // per check kind, worst first
+    reasons: [{ text: "<first reason of the group>", count: 7, keys: ["<up to 3 example keys>"] }], // top 12 gate reasons
+    blocked: [{ text, count, keys }],                                    // top 8 block reasons, same grouping
+    recentGuidelines: [{ version: 2, text: "<guideline>", resolved: 5 }], // last 3 approved diffs, tasks each reopened
+    text: "Lessons from the record so far ..."                           // rendered digest, at most 2000 characters
+  }
+  ```
+
+  Reasons are grouped the way `propose` groups block reasons (lowercase,
+  alphanumeric, first 40 characters). Workers read `lessons.text` with one
+  projected `findOne` and pin it into the context; `classify` and `propose`
+  put it in their prompts; the `planner-turn` source carries it in `raw`
+  and `text` so it is in the library. Nothing here is a rule: the goal is
+  the rule, and the raw record is the truth these counts come from.
 
 ## Live screen
 

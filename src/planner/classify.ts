@@ -7,6 +7,7 @@ import { ObjectId } from "mongodb";
 import type { Collections } from "../shared/db.ts";
 import { CrowdOutcome, type Goal, type Source, type Tokens } from "../shared/types.ts";
 import { insertTaskIfIdle } from "./emit.ts";
+import { readLessons } from "./lessons.ts";
 import { structured } from "./model.ts";
 import { writeError } from "./sources.ts";
 
@@ -29,6 +30,7 @@ export function buildPrompt(
   requestText: string,
   unscheduled: { key: string; name: string }[],
   stateKeys: string[],
+  lessons?: string | null,
 ): string {
   const lines: string[] = [];
   lines.push("You triage one request from the crowd for a fleet of workers pursuing a goal.");
@@ -40,6 +42,10 @@ export function buildPrompt(
   for (const g of goal.guidelines) lines.push(`- ${g}`);
   lines.push("Out of scope:");
   for (const o of goal.outOfScope) lines.push(`- ${o}`);
+  if (lessons) {
+    lines.push("");
+    lines.push(lessons);
+  }
   lines.push("");
   lines.push("REQUEST:");
   lines.push(requestText.slice(0, 4000));
@@ -64,6 +70,7 @@ export async function classify(
   request: Source,
   decide?: Decide,
   tokens?: Tokens,
+  lessons?: string | null, // undefined: read the metrics doc; null: none
 ): Promise<ClassifyResult | null> {
   // Claim the source. Whoever loses this race skips the request.
   const claimed = await c.sources.findOneAndUpdate(
@@ -80,7 +87,7 @@ export async function classify(
     .find({}, { projection: { key: 1 }, sort: { key: 1 }, limit: LIST_CAP })
     .map((s) => s.key)
     .toArray();
-  const prompt = buildPrompt(goal, request.text, unscheduled, stateKeys);
+  const prompt = buildPrompt(goal, request.text, unscheduled, stateKeys, lessons === undefined ? await readLessons(c) : lessons);
 
   let outcome: CrowdOutcome;
   try {
@@ -181,13 +188,15 @@ export async function classifyPending(
   cap = 10,
   decide?: Decide,
   tokens?: Tokens,
+  lessons?: string | null,
 ): Promise<ClassifyResult[]> {
   const pending = await c.sources
     .find({ kind: "crowd-request", handled: false }, { sort: { createdAt: 1 }, limit: cap })
     .toArray();
+  if (pending.length && lessons === undefined) lessons = await readLessons(c);
   const results: ClassifyResult[] = [];
   for (const request of pending) {
-    const r = await classify(c, goal, request, decide, tokens);
+    const r = await classify(c, goal, request, decide, tokens, lessons);
     if (r) results.push(r);
   }
   return results;

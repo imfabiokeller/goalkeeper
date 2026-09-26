@@ -182,6 +182,20 @@ export const MetricsMinute = z.object({
   secondsMedian: z.number().nullable(),
 });
 
+// The lessons digest: derived counts from the raw record over a recent
+// window, recomputed by every planner run and pinned into every worker and
+// planner call. Never a replacement for the raw record it is computed from.
+export const Lessons = z.object({
+  at: z.date(),
+  window: z.object({ tasks: z.number().int(), since: z.date() }),
+  firstTryPass: z.number().nullable(), // 0..1 over the merged tasks in the window
+  checks: z.array(z.object({ kind: z.string(), criterion: z.string(), fails: z.number().int(), passes: z.number().int() })), // worst first
+  reasons: z.array(z.object({ text: z.string(), count: z.number().int(), keys: z.array(z.string()) })), // top normalized gate reasons
+  blocked: z.array(z.object({ text: z.string(), count: z.number().int(), keys: z.array(z.string()) })), // top normalized block reasons
+  recentGuidelines: z.array(z.object({ version: z.number().int(), text: z.string(), resolved: z.number().int() })), // last approved diffs
+  text: z.string().max(2000), // the digest rendered for prompts
+});
+
 export const Metrics = z.object({
   _id: z.literal("metrics"),
   at: z.date(),
@@ -196,6 +210,7 @@ export const Metrics = z.object({
   }),
   perCriterion: z.record(z.string(), z.object({ done: z.number().int(), total: z.number().int() })),
   versions: z.array(z.object({ version: z.number().int(), at: z.date() })),
+  lessons: Lessons,
 });
 
 // ---------------------------------------------------- planner outputs
@@ -229,6 +244,7 @@ export type Tokens = z.infer<typeof Tokens>;
 export type Question = z.infer<typeof Question>;
 export type Lock = z.infer<typeof Lock>;
 export type Metrics = z.infer<typeof Metrics>;
+export type Lessons = z.infer<typeof Lessons>;
 export type CrowdOutcome = z.infer<typeof CrowdOutcome>;
 
 // The check function contract, as implemented in usecase/checks.ts. The

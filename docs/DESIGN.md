@@ -77,6 +77,22 @@ Two kinds of criteria: `all-units` (done when every unit passes) and
 `metric` (a measure over the whole state with a direction and a target;
 in the schema, not used today).
 
+**Learning from evaluation.** The gate's verdicts are the only signal
+about quality; no model grades itself. They flow back into the next
+inputs three ways. Pinned: the last gate failures on the same key go into
+the worker's context verbatim, so a redo starts from what failed.
+Retrieved: gate sources on other keys come back through the library
+briefing when they match the criterion's words and the input. Digested:
+the lessons digest (`metrics.lessons`), derived counts from the raw record
+over the last three hours: first-try pass rate, fails and passes per check
+kind, the top failure reasons and block reasons with example keys, the
+last approved guidelines and how many tasks each reopened. The planner
+recomputes it on every run from `tasks`, gate sources and `goal.history`,
+stores it on the metrics singleton and in its turn source, and every
+worker and planner call pins its text (under 2000 characters). It is a
+summary of counts, never a rule: it does not change the goal, and it is
+never a replacement for the raw record it is computed from.
+
 ## 5. Workers
 
 Stateless, disposable, identical. Per iteration: claim (atomic update),
