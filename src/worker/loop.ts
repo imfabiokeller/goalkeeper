@@ -95,6 +95,23 @@ async function tryPlan(c: Collections, workerId: string, opts: IterationOptions)
 // it one worker at a time; two cheap reads keep the others from trying.
 export const PLAN_EVERY_MS = 60_000;
 
+// The same check on a timer, so a worker deep in a long task still plans
+// on time (the reaper's 30 s promise depends on it). One at a time per
+// process; the lock keeps it one at a time across processes.
+let ticking = false;
+export async function planTick(c: Collections, workerId: string, opts: IterationOptions = {}): Promise<boolean> {
+  if (ticking || opts.plan === null) return false;
+  const everyMs = opts.planEveryMs ?? Number(process.env.PLAN_EVERY_MS ?? PLAN_EVERY_MS);
+  ticking = true;
+  try {
+    if (!(await planDue(c, everyMs))) return false;
+    await tryPlan(c, workerId, opts);
+    return true;
+  } finally {
+    ticking = false;
+  }
+}
+
 export async function planDue(c: Collections, everyMs: number, now = new Date()): Promise<boolean> {
   const [lock, turn] = await Promise.all([
     c.locks.findOne({ _id: "planner" }, { projection: { until: 1 } }),

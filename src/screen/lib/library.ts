@@ -106,7 +106,8 @@ export function classifyRow(d: RowDoc): { kind: LibraryRowKind; text: string } {
 export type RowFilter = "all" | "worked" | "dead" | "gate" | "run";
 export function rowFilterMatch(kind: RowFilter): Record<string, unknown> {
   if (kind === "worked") return { kind: "worker-run", "raw.gate.pass": true };
-  if (kind === "dead") return { "raw.gate.pass": false, "raw.proposal.rule": { $type: "string" } };
+  // A gate source carries no proposal; the refuted rule lives on the failed run.
+  if (kind === "dead") return { kind: "worker-run", "raw.gate.pass": false, "raw.proposal.rule": { $type: "string" } };
   if (kind === "gate") return { kind: "gate" };
   if (kind === "run") return { kind: "worker-run" };
   return {};

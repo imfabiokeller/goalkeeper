@@ -7,7 +7,7 @@ import { hostname } from "node:os";
 import { setTimeout as sleep } from "node:timers/promises";
 import { close, connect } from "../shared/db.ts";
 import type { Collections } from "../shared/db.ts";
-import { iteration } from "./loop.ts";
+import { planTick, iteration } from "./loop.ts";
 
 export function defaultWorkerId(): string {
   const host = hostname().replace(/[^a-z0-9]/gi, "").slice(-4).toLowerCase() || "node";
@@ -38,6 +38,13 @@ async function main(): Promise<void> {
   process.once("SIGTERM", () => stop("SIGTERM"));
   process.once("SIGINT", () => stop("SIGINT"));
 
+  // Plan on a timer too: a worker deep in a long task must still reap
+  // and score on time.
+  const PLAN_TICK_MS = 20_000;
+  const tick = setInterval(() => {
+    planTick(c, workerId).catch(() => undefined);
+  }, PLAN_TICK_MS);
+
   let n = 0;
   while (!stopping) {
     if (n % BUDGET_EVERY === 0 && Number.isFinite(budget)) {
@@ -61,6 +68,7 @@ async function main(): Promise<void> {
       console.log(`[${workerId}] ${outcome} in ${((Date.now() - started) / 1000).toFixed(1)} s`);
     }
   }
+  clearInterval(tick);
   await close();
   console.log(`[${workerId}] stopped`);
 }

@@ -8,12 +8,14 @@ services:
     env_file: .env
     environment:
       ROLE: worker
+      # V8 collects before the container limit kills the process.
+      NODE_OPTIONS: --max-old-space-size=600
     restart: unless-stopped
     deploy:
       replicas: ${WORKER_REPLICAS:-8}
       resources:
         limits:
-          memory: 512M
+          memory: 768M
     logging:
       driver: json-file
       options:
