@@ -45,7 +45,7 @@ describe("reaper", () => {
     expect(await reap(c, 30_000)).toBe(1);
 
     const s = await c.tasks.findOne({ _id: stale._id });
-    expect(s).toMatchObject({ status: "open", worker: null, heartbeat: null, attempt: 3, lastWorker: "w-1" });
+    expect(s).toMatchObject({ status: "open", worker: null, heartbeat: null, attempt: 2, lastWorker: "w-1" });
     expect(s?.diedAt).toBeInstanceOf(Date);
     expect(s?.progress).toHaveLength(1);
     expect(s?.progress?.[0]).toMatchObject({ step: 0, tool: "reaper" });

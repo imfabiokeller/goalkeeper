@@ -97,7 +97,7 @@ db.tasks.findOneAndUpdate(
 ```
 
 Heartbeat: `$set: { heartbeat: new Date() }` every 15 s. Reaper: claimed
-with `heartbeat < now - 30 s` goes back to `open`, `attempt + 1`, with
+with `heartbeat < now - 30 s` goes back to `open`, same `attempt` (a death is not a try), with
 `lastWorker`, `diedAt` and the `reaper` progress line set in the same
 pipeline update. That is kill-and-resume. No other code.
 

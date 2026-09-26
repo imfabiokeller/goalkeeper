@@ -8,7 +8,7 @@ step is a query.
 ## Steps, in order
 
 1. **Reaper.** `claimed` tasks with `heartbeat < now - 30 s` go back to
-   `open`, `attempt + 1`.
+   `open`, same `attempt` (a death is not a try).
 2. **Emit.** For every `inputs` doc with `scheduled: true`, no `state`
    document, and no task in `open`, `claimed` or `blocked`: insert one
    task with all criteria, `version: goal.version`, `createdBy:

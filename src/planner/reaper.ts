@@ -1,5 +1,6 @@
 // Kill-and-resume: a claimed task whose worker stopped heartbeating goes
-// back to the queue with attempt + 1. One updateMany, no other code. The
+// back to the queue. A death is not an attempt, so attempt is unchanged:
+// the next worker continues the same try. One updateMany, no other code. The
 // update is a pipeline so the task remembers who died (lastWorker, diedAt,
 // a "reaper" progress line) without a read: the screen holds the dead
 // worker's row for a while from diedAt.
@@ -20,7 +21,6 @@ export async function reap(c: Collections, staleMs = STALE_MS): Promise<number> 
         worker: null,
         heartbeat: null,
         updatedAt: now,
-        attempt: { $add: ["$attempt", 1] },
         progress: {
           $slice: [
             { $concatArrays: [{ $ifNull: ["$progress", []] }, [{ at: now, step: { $ifNull: ["$step", 0] }, tool: "reaper" }]] },
