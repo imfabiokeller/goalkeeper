@@ -177,3 +177,29 @@ export type SourcePayload = {
   createdAt: string;
   truncated: boolean;
 };
+
+// The library page: how big the raw record is right now.
+export type LibraryPayload = {
+  at: string;
+  entries: number;
+  tokens: number; // in plus out over every source
+  bytes: number; // sources storageSize on disk, 0 when $collStats is not permitted
+  byKind: Record<string, number>; // worker-run, gate, planner-turn, error
+  solvedRules: number; // state docs with score 1
+  refutedRules: number; // gate sources with a failed verdict
+  growth: Array<{ at: string; tokens: number }>; // cumulative tokens off metrics.perMinute
+  lessons: string | null; // the digest text pinned into every context
+  lessonsAt: string | null;
+  newest: Array<{ id: string; at: string; kind: string; key: string | null; gist: string }>;
+};
+
+// One puzzle's control result off /api/baseline?key= (null when the
+// control has not tried it).
+export type BaselinePuzzlePayload = {
+  key: string;
+  gatePass: boolean;
+  score: number;
+  solvedAt2: boolean | null;
+  firstReason: string | null;
+  attempts: Array<{ gatePass: boolean; score: number; firstReason: string | null }>;
+} | null;
