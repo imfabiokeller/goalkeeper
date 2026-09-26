@@ -1,0 +1,334 @@
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { setTimeout as sleep } from "node:timers/promises";
+import { MongoClient, ObjectId } from "mongodb";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import { MockLanguageModelV3 } from "ai/test";
+import type { LanguageModelV3CallOptions, LanguageModelV3GenerateResult } from "@ai-sdk/provider";
+import { collections, ensureIndexes, type Collections } from "../shared/db.ts";
+import { goalFromLens } from "../shared/goal.ts";
+import type { Goal, Task } from "../shared/types.ts";
+import { iteration, type IterationOptions } from "./loop.ts";
+import { claim, heartbeat } from "./claim.ts";
+import { retrieve } from "../context/retrieve.ts";
+
+const lens = JSON.parse(readFileSync(new URL("../../usecase/lens.json", import.meta.url), "utf8"));
+const goal: Goal = goalFromLens(lens);
+const appleText = readFileSync(new URL("../../usecase/inputs/aapl-2026-07-30.txt", import.meta.url), "utf8");
+const appleSample = JSON.parse(readFileSync(new URL("../../usecase/samples/01-apple-pass.json", import.meta.url), "utf8"));
+
+let mongod: MongoMemoryServer;
+let client: MongoClient;
+let c: Collections;
+
+beforeAll(async () => {
+  mongod = await MongoMemoryServer.create();
+  client = new MongoClient(mongod.getUri());
+  await client.connect();
+  c = collections(client.db("goalkeeper-test"));
+  await ensureIndexes(c);
+});
+
+afterAll(async () => {
+  await client.close();
+  await mongod.stop();
+});
+
+beforeEach(async () => {
+  await Promise.all(Object.values(c).map((col) => col.deleteMany({})));
+  await c.goal.insertOne(goal);
+});
+
+// ------------------------------------------------------------ helpers
+
+const noEnrich = async () => null;
+const noRetrieve = async () => ({ passages: [], degraded: true });
+// Never call real providers: no planner, no enrichment, no retrieval.
+const base: IterationOptions = { enrich: noEnrich, plan: null, retrieve: noRetrieve, heartbeatMs: 20 };
+
+async function seedInput(key: string) {
+  await c.inputs.insertOne({
+    _id: key,
+    key,
+    company: "Apple Inc.",
+    ticker: "AAPL",
+    sector: "Information Technology",
+    filedAt: "2026-07-30",
+    source: "https://www.sec.gov/",
+    text: appleText,
+    chars: appleText.length,
+    scheduled: true,
+    scheduledBy: "seed",
+    createdAt: new Date(),
+  });
+}
+
+async function seedTask(key: string, extra: Partial<Task> = {}): Promise<ObjectId> {
+  const _id = new ObjectId();
+  await c.tasks.insertOne({
+    _id,
+    key,
+    criteria: ["c1", "c2", "c3"],
+    version: goal.version,
+    status: "open",
+    priority: 0,
+    attempt: 1,
+    worker: null,
+    heartbeat: null,
+    proposal: null,
+    gate: null,
+    blockReason: null,
+    hint: null,
+    createdBy: "planner",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...extra,
+  });
+  return _id;
+}
+
+function keyOf(options: LanguageModelV3CallOptions): string {
+  const system = options.prompt.find((m) => m.role === "system");
+  const m = typeof system?.content === "string" ? /^key: (\S+)$/m.exec(system.content) : null;
+  if (!m) throw new Error("no task key in the system prompt");
+  return m[1];
+}
+
+function toolCallResult(toolName: string, input: unknown): LanguageModelV3GenerateResult {
+  return {
+    content: [{ type: "tool-call", toolCallId: `call-${Math.random().toString(36).slice(2)}`, toolName, input: JSON.stringify(input) }],
+    finishReason: { unified: "tool-calls", raw: "tool_calls" },
+    usage: {
+      inputTokens: { total: 1200, noCache: 1200, cacheRead: undefined, cacheWrite: undefined },
+      outputTokens: { total: 80, text: 80, reasoning: undefined },
+    },
+    warnings: [],
+  };
+}
+
+function mockModel(decide: (options: LanguageModelV3CallOptions) => Promise<LanguageModelV3GenerateResult> | LanguageModelV3GenerateResult) {
+  return new MockLanguageModelV3({ doGenerate: async (options) => decide(options) });
+}
+
+const submitModel = (patch: Record<string, unknown> = {}) =>
+  mockModel((o) => toolCallResult("submit", { proposal: { ...appleSample.proposal, key: keyOf(o), ...patch } }));
+
+// -------------------------------------------------------------- tests
+
+describe("worker iteration", () => {
+  it("merges one task: state doc, merged task, one worker-run source with tokens", async () => {
+    await seedInput("aapl-2026-07-30");
+    const taskId = await seedTask("aapl-2026-07-30");
+
+    const outcome = await iteration(c, "w-1", { ...base, model: submitModel() });
+    expect(outcome).toBe("merged");
+
+    const task = await c.tasks.findOne({ _id: taskId });
+    expect(task?.status).toBe("merged");
+    expect(task?.worker).toBeNull();
+    expect(task?.gate?.pass).toBe(true);
+    expect((task?.proposal as { revenue: number }).revenue).toBe(109417000000);
+
+    const state = await c.state.findOne({ _id: "aapl-2026-07-30" });
+    expect(state?.stateVersion).toBe(1);
+    expect(state?.version).toBe(goal.version);
+    expect(state?.taskId?.equals(taskId)).toBe(true);
+    expect((state?.data as { dilutedEps: number }).dilutedEps).toBe(2.02);
+
+    const sources = await c.sources.find({}).toArray();
+    expect(sources).toHaveLength(1);
+    expect(sources[0].kind).toBe("worker-run");
+    expect(sources[0].tokens.in).toBe(1200);
+    expect(sources[0].tokens.out).toBe(80);
+    expect(sources[0].tokens.cost).toBeGreaterThan(0);
+    expect(sources[0].raw.proposal).toBeDefined();
+    expect(sources[0].raw.gate).toMatchObject({ pass: true });
+    expect(sources[0].text).toContain("outcome: submit");
+    expect(sources[0].enrichment).toBeNull();
+  });
+
+  it("two workers over ten tasks never hold the same task at once", async () => {
+    const keys = Array.from({ length: 10 }, (_, i) => `unit-${i}`);
+    for (const k of keys) {
+      await seedInput(k);
+      await seedTask(k);
+    }
+    const held = new Set<string>();
+    let overlap = 0;
+    let maxConcurrent = 0;
+    const model = mockModel(async (o) => {
+      const key = keyOf(o);
+      if (held.has(key)) overlap += 1;
+      held.add(key);
+      maxConcurrent = Math.max(maxConcurrent, held.size);
+      await sleep(50);
+      held.delete(key);
+      return toolCallResult("submit", { proposal: { ...appleSample.proposal, key } });
+    });
+
+    const worker = async (id: string) => {
+      const outcomes: string[] = [];
+      for (;;) {
+        const o = await iteration(c, id, { ...base, model });
+        if (o === "idle") return outcomes;
+        outcomes.push(o);
+      }
+    };
+    const [a, b] = await Promise.all([worker("w-a"), worker("w-b")]);
+
+    expect(overlap).toBe(0);
+    expect(maxConcurrent).toBe(2);
+    expect(a.length + b.length).toBe(10);
+    expect(a.length).toBeGreaterThan(0);
+    expect(b.length).toBeGreaterThan(0);
+    expect(await c.tasks.countDocuments({ status: "merged" })).toBe(10);
+    expect(await c.tasks.countDocuments({ status: "claimed" })).toBe(0);
+    expect(await c.state.countDocuments({})).toBe(10);
+    expect(await c.sources.countDocuments({ kind: "worker-run" })).toBe(10);
+    // Each task was merged by exactly the worker that wrote its source.
+    for (const s of await c.sources.find({ kind: "worker-run" }).toArray()) {
+      expect(["w-a", "w-b"]).toContain(s.raw.worker);
+    }
+  });
+
+  it("a block call leaves a blocked task with the reason", async () => {
+    await seedInput("aapl-2026-07-30");
+    const taskId = await seedTask("aapl-2026-07-30");
+    const model = mockModel(() => toolCallResult("block", { reason: "two GAAP revenue figures, restated and original" }));
+
+    expect(await iteration(c, "w-1", { ...base, model })).toBe("blocked");
+    const task = await c.tasks.findOne({ _id: taskId });
+    expect(task?.status).toBe("blocked");
+    expect(task?.blockReason).toBe("two GAAP revenue figures, restated and original");
+    expect(task?.worker).toBeNull();
+    expect(await c.state.countDocuments({})).toBe(0);
+    const source = await c.sources.findOne({ kind: "worker-run" });
+    expect(source?.raw.blockReason).toBe("two GAAP revenue figures, restated and original");
+  });
+
+  it("a gate failure on attempt 1 reopens with attempt 2, on attempt 2 blocks", async () => {
+    await seedInput("aapl-2026-07-30");
+    const taskId = await seedTask("aapl-2026-07-30");
+    const model = submitModel({ revenue: 999999000000 }); // not in any quote
+
+    expect(await iteration(c, "w-1", { ...base, model })).toBe("reopened");
+    let task = await c.tasks.findOne({ _id: taskId });
+    expect(task?.status).toBe("open");
+    expect(task?.attempt).toBe(2);
+    expect(task?.worker).toBeNull();
+    expect(task?.gate?.pass).toBe(false);
+    expect(task?.gate?.reasons.join(" ")).toContain("revenue");
+    expect(await c.state.countDocuments({})).toBe(0);
+    expect(await c.sources.countDocuments({ kind: "gate", "raw.gate.pass": false })).toBe(1);
+    expect(await c.sources.countDocuments({ kind: "worker-run" })).toBe(1);
+
+    expect(await iteration(c, "w-2", { ...base, model })).toBe("blocked");
+    task = await c.tasks.findOne({ _id: taskId });
+    expect(task?.status).toBe("blocked");
+    expect(task?.blockReason).toContain("revenue");
+    expect(await c.sources.countDocuments({ kind: "gate" })).toBe(2);
+  });
+
+  it("a run that never submits or blocks reopens the task", async () => {
+    await seedInput("aapl-2026-07-30");
+    const taskId = await seedTask("aapl-2026-07-30");
+    const model = mockModel(() => toolCallResult("read_input", { offset: 0 }));
+
+    expect(await iteration(c, "w-1", { ...base, model, maxSteps: 3 })).toBe("reopened");
+    const task = await c.tasks.findOne({ _id: taskId });
+    expect(task?.status).toBe("open");
+    expect(task?.attempt).toBe(2);
+    expect(task?.gate?.reasons).toEqual(["no submit or block within the step budget"]);
+    const run = await c.sources.findOne({ kind: "worker-run" });
+    expect((run?.raw.steps as unknown[]).length).toBe(3);
+  });
+
+  it("a lost state race reopens the task with the proposal as hint", async () => {
+    await seedInput("aapl-2026-07-30");
+    const taskId = await seedTask("aapl-2026-07-30");
+    // Someone merges the key after the worker reads state and before it writes.
+    const model = mockModel(async (o) => {
+      await c.state.insertOne({
+        _id: "aapl-2026-07-30",
+        key: "aapl-2026-07-30",
+        version: goal.version,
+        stateVersion: 1,
+        data: { other: true },
+        taskId: new ObjectId(),
+        mergedAt: new Date(),
+      });
+      return toolCallResult("submit", { proposal: { ...appleSample.proposal, key: keyOf(o) } });
+    });
+
+    expect(await iteration(c, "w-1", { ...base, model })).toBe("raced");
+    const task = await c.tasks.findOne({ _id: taskId });
+    expect(task?.status).toBe("open");
+    expect(task?.attempt).toBe(1);
+    expect(JSON.parse(task?.hint ?? "null")).toMatchObject({ key: "aapl-2026-07-30", revenue: 109417000000 });
+    const state = await c.state.findOne({ _id: "aapl-2026-07-30" });
+    expect(state?.data).toEqual({ other: true });
+  });
+
+  it("a throw puts the task back to open with attempt + 1 and an error source", async () => {
+    await seedTask("missing-input");
+    expect(await iteration(c, "w-1", { ...base, model: submitModel() })).toBe("error");
+    const task = await c.tasks.findOne({ key: "missing-input" });
+    expect(task?.status).toBe("open");
+    expect(task?.attempt).toBe(2);
+    expect(task?.worker).toBeNull();
+    const err = await c.sources.findOne({ kind: "error" });
+    expect(err?.text).toContain("no input for key missing-input");
+  });
+
+  it("idle when nothing is open", async () => {
+    expect(await iteration(c, "w-1", base)).toBe("idle");
+  });
+
+  it("claim orders by priority then age, and heartbeat only touches its own claim", async () => {
+    const old = await seedTask("k-old", { createdAt: new Date(Date.now() - 10_000) });
+    const hot = await seedTask("k-hot", { priority: 1 });
+    const first = await claim(c, "w-1");
+    expect(first?._id.equals(hot)).toBe(true);
+    const second = await claim(c, "w-2");
+    expect(second?._id.equals(old)).toBe(true);
+    expect(await claim(c, "w-3")).toBeNull();
+    expect(await heartbeat(c, hot, "w-1")).toBe(true);
+    expect(await heartbeat(c, hot, "w-2")).toBe(false);
+    expect(await heartbeat(c, old, "w-1")).toBe(false);
+  });
+});
+
+describe("retrieve", () => {
+  it("degrades to plain queries when $rankFusion is unavailable", async () => {
+    const mk = (key: string, kind: "gate" | "worker-run", text: string, enriched: boolean) => ({
+      _id: new ObjectId(),
+      kind,
+      taskId: new ObjectId(),
+      key,
+      version: 1,
+      raw: {},
+      text,
+      enrichment: enriched ? { gist: `gist for ${key}`, entities: { keys: [key], fields: [] }, labels: [], embedding: [0.1] } : null,
+      tokens: { in: 0, out: 0, cost: 0 },
+      createdAt: new Date(),
+    });
+    await c.sources.insertMany([
+      mk("jpm-2026-07-15", "gate", "revenue quote missing: banks report net revenue", true),
+      mk("nvda-2026-08-27", "worker-run", "fiscal year runs ahead of the calendar", true),
+      mk("aapl-2026-07-30", "worker-run", "own key, must be excluded", true),
+      mk("meta-2026-07-29", "worker-run", "no enrichment but mentions revenue", false),
+    ]);
+    const r = await retrieve(c, "Every value is backed by a verbatim quote containing revenue", {
+      excludeKey: "aapl-2026-07-30",
+      embed: async () => [0.1],
+    });
+    expect(r.degraded).toBe(true);
+    const keys = r.passages.map((p) => p.key);
+    expect(keys).not.toContain("aapl-2026-07-30");
+    expect(keys).toContain("jpm-2026-07-15");
+    expect(keys).toContain("nvda-2026-08-27");
+    expect(keys).toContain("meta-2026-07-29"); // by the text regex
+    expect(new Set(keys).size).toBe(keys.length);
+    expect(r.passages[0].gist).toBeTruthy();
+  });
+});
