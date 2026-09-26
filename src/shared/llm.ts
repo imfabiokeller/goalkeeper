@@ -11,7 +11,7 @@ import { env } from "./db.ts";
 
 export function workerModel(): LanguageModel {
   const openrouter = createOpenRouter({ apiKey: env("OPENROUTER_API_KEY") });
-  return openrouter(env("WORKER_MODEL", "deepseek/deepseek-v4-pro"));
+  return openrouter(env("WORKER_MODEL", "deepseek/deepseek-v4-flash"));
 }
 
 // Reasoning effort for the worker model, as OpenRouter provider options.
@@ -42,7 +42,7 @@ export async function embedText(text: string): Promise<number[]> {
 // Rough USD cost per token pair for the counters. Override per model in
 // .env if the OpenRouter code is on a different tier.
 export function costUsd(model: "worker" | "enrich", tokensIn: number, tokensOut: number): number {
-  const rates = model === "worker" ? [0.35, 0.7] : [0.05, 0.1]; // USD per million tokens
+  const rates = model === "worker" ? [0.05, 0.1] : [0.05, 0.1]; // USD per million tokens
   const inRate = Number(process.env[`${model.toUpperCase()}_USD_PER_MTOK_IN`] ?? rates[0]);
   const outRate = Number(process.env[`${model.toUpperCase()}_USD_PER_MTOK_OUT`] ?? rates[1]);
   return (tokensIn * inRate + tokensOut * outRate) / 1_000_000;
