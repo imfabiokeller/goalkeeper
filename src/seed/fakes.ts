@@ -142,7 +142,8 @@ export type Proposal = {
 // A plausible passing proposal for a unit, shaped like usecase/samples/01
 // and 02 with the numbers varied per key.
 export function fakeProposal(r: Rng, input: Input): Proposal {
-  const filed = new Date((input.filedAt ?? "2026-08-01") + "T00:00:00Z");
+  const filedAt = typeof input.meta.filedAt === "string" ? input.meta.filedAt : "2026-08-01";
+  const filed = new Date(filedAt + "T00:00:00Z");
   const end = lastDayOfMonth(filed.getUTCFullYear(), filed.getUTCMonth() - 1 - (r.chance(0.2) ? 1 : 0));
   const q = ((end.getUTCMonth() / 3) | 0) + 1;
   const fy = end.getUTCFullYear() + (r.chance(0.15) ? 1 : 0);
@@ -159,7 +160,7 @@ export function fakeProposal(r: Rng, input: Input): Proposal {
   const tableRow = (label: string, a: string, b: string) => `${label} | $ | ${a} | $ | ${b}`;
   return {
     key: input.key,
-    company: input.company,
+    company: input.name,
     periodEnd: iso(end),
     periodLabel: `Q${q} FY${fy}`,
     revenue,
@@ -172,7 +173,7 @@ export function fakeProposal(r: Rng, input: Input): Proposal {
       periodEnd: `today announced financial results for its fiscal ${fy} ${["first", "second", "third", "fourth"][q - 1]} quarter ended ${end.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "UTC" })}`,
       revenue:
         style === "narrative"
-          ? `${input.company} posted quarterly revenue of $${(revenue / 1e9).toFixed(1)} billion, ${pct >= 0 ? "up" : "down"} ${Math.abs(pct)} percent year over year`
+          ? `${input.name} posted quarterly revenue of $${(revenue / 1e9).toFixed(1)} billion, ${pct >= 0 ? "up" : "down"} ${Math.abs(pct)} percent year over year`
           : tableRow("Total revenue", rev, pri),
       netIncome: style === "table" ? tableRow("Net income", ni, fmtMillions(netIncome * 0.9)) : `Net income was $${(Math.abs(netIncome) / 1e9).toFixed(1)} billion`,
       dilutedEps: style === "table" ? tableRow("Diluted earnings per share", eps.toFixed(2), (eps * 0.9).toFixed(2)) : `Diluted earnings per share was $${eps.toFixed(2)}`,

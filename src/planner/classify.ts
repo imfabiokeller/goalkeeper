@@ -27,7 +27,7 @@ export type ClassifyResult = {
 export function buildPrompt(
   goal: Goal,
   requestText: string,
-  unscheduled: { key: string; company: string }[],
+  unscheduled: { key: string; name: string }[],
   stateKeys: string[],
 ): string {
   const lines: string[] = [];
@@ -45,7 +45,7 @@ export function buildPrompt(
   lines.push(requestText.slice(0, 4000));
   lines.push("");
   lines.push(`UNSCHEDULED INPUT KEYS (${unscheduled.length}, work not yet queued; a "task" outcome must name one of these):`);
-  for (const u of unscheduled) lines.push(`- ${u.key}: ${u.company}`);
+  for (const u of unscheduled) lines.push(`- ${u.key}: ${u.name}`);
   lines.push("");
   lines.push(`MERGED STATE KEYS (${stateKeys.length}, work already done; a "recheck" outcome must name one of these):`);
   for (const k of stateKeys) lines.push(`- ${k}`);
@@ -73,8 +73,8 @@ export async function classify(
   if (!claimed) return null;
 
   const unscheduled = await c.inputs
-    .find({ scheduled: false }, { projection: { key: 1, company: 1 }, sort: { key: 1 }, limit: LIST_CAP })
-    .map((i) => ({ key: i.key, company: i.company }))
+    .find({ scheduled: false }, { projection: { key: 1, name: 1 }, sort: { key: 1 }, limit: LIST_CAP })
+    .map((i) => ({ key: i.key, name: i.name }))
     .toArray();
   const stateKeys = await c.state
     .find({}, { projection: { key: 1 }, sort: { key: 1 }, limit: LIST_CAP })

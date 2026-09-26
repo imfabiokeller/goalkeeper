@@ -55,7 +55,8 @@ export function inputFixture(key: string, over: Partial<Input> = {}): Input {
   return {
     _id: key,
     key,
-    company: key.toUpperCase(),
+    name: key.toUpperCase(),
+    meta: {},
     text: `press release for ${key}`,
     chars: 20,
     scheduled: true,

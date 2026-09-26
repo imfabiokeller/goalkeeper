@@ -27,7 +27,7 @@ export const MAX_SYSTEM_CHARS = 64_000;
 export type AssembleArgs = {
   goal: Goal;
   task: Pick<Task, "key" | "criteria" | "attempt" | "hint">;
-  input: Pick<Input, "key" | "company" | "text"> & Partial<Pick<Input, "ticker" | "filedAt" | "chars">>;
+  input: Pick<Input, "key" | "name" | "text"> & Partial<Pick<Input, "chars">>;
   state: Pick<State, "data" | "stateVersion" | "version"> | null;
   failures: Array<Pick<Source, "raw" | "createdAt">>;
   passages: Passage[]; // the retrieved, expanded hits
@@ -92,7 +92,7 @@ export function assemble(args: AssembleArgs): Assembled {
     .map((id) => goal.criteria.find((c) => c.id === id))
     .map((c, i) => (c ? `${c.id}: ${clip(c.text, MAX_GOAL_LINE_CHARS)}` : `${task.criteria[i]}: (not in this goal version)`));
   parts.push(
-    `# Task\nkey: ${task.key}\nunit: ${input.company}${input.ticker ? ` (${input.ticker})` : ""}${input.filedAt ? `, filed ${input.filedAt}` : ""}\nattempt: ${task.attempt}\ncriteria:\n` +
+    `# Task\nkey: ${task.key}\nunit: ${input.name}\nattempt: ${task.attempt}\ncriteria:\n` +
       taskCriteria.map((t) => `- ${t}`).join("\n") +
       (task.hint ? `\nhint (a previous proposal or a doubt about the merged one):\n${clip(task.hint, 4000)}` : ""),
   );
@@ -163,7 +163,7 @@ export function assemble(args: AssembleArgs): Assembled {
   const messages: ModelMessage[] = [
     {
       role: "user",
-      content: `Work on ${task.key} (${input.company}). Read what you need, then call submit or block.`,
+      content: `Work on ${task.key} (${input.name}). Read what you need, then call submit or block.`,
     },
   ];
 

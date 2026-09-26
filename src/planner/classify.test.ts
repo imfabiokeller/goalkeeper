@@ -13,7 +13,7 @@ describe("classify", () => {
     const goal = goalFixture();
     await c.goal.insertOne(goal);
     await c.inputs.insertMany([
-      inputFixture("nvda", { scheduled: false, scheduledBy: null, company: "NVIDIA" }),
+      inputFixture("nvda", { scheduled: false, scheduledBy: null, name: "NVIDIA" }),
       inputFixture("aapl"),
     ]);
     await c.state.insertOne(stateFixture("aapl"));

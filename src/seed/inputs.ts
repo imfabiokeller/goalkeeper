@@ -11,17 +11,29 @@ export const SCHEDULED_COUNT = 200;
 
 export const USECASE_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "../../usecase");
 
-const IndexEntry = z.object({
-  key: z.string().min(1),
-  company: z.string().min(1),
-  ticker: z.string().optional(),
-  sector: z.string().optional(),
-  filedAt: z.string().optional(),
-  source: z.string().optional(),
-  file: z.string().min(1),
-  chars: z.number().int().optional(),
-});
+// Only the fields the harness reads are named; everything else in an
+// entry is domain data and lands in `meta` untouched.
+const IndexEntry = z
+  .object({
+    key: z.string().min(1),
+    name: z.string().min(1).optional(),
+    company: z.string().min(1).optional(), // display name fallback when name is absent
+    file: z.string().min(1),
+    source: z.string().optional(),
+    chars: z.number().int().optional(),
+  })
+  .passthrough();
 export type IndexEntry = z.infer<typeof IndexEntry>;
+
+const HARNESS_FIELDS = new Set(["key", "name", "file", "source", "chars", "text"]);
+
+export function entryName(e: IndexEntry): string {
+  return e.name ?? e.company ?? e.key;
+}
+
+export function entryMeta(e: IndexEntry): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(e).filter(([k]) => !HARNESS_FIELDS.has(k)));
+}
 
 export async function readIndex(usecaseDir: string = USECASE_DIR): Promise<IndexEntry[]> {
   const raw = JSON.parse(await readFile(join(usecaseDir, "inputs.json"), "utf8"));
@@ -43,10 +55,8 @@ export async function loadInputs(usecaseDir: string = USECASE_DIR, now: Date = n
       Input.parse({
         _id: e.key,
         key: e.key,
-        company: e.company,
-        ticker: e.ticker,
-        sector: e.sector,
-        filedAt: e.filedAt,
+        name: entryName(e),
+        meta: entryMeta(e),
         source: e.source,
         text,
         chars: text.length,

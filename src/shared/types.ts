@@ -54,10 +54,8 @@ export const Goal = z.object({
 export const Input = z.object({
   _id: z.string(), // equals key
   key: z.string(),
-  company: z.string(), // display name of the unit, domain-agnostic despite the name
-  ticker: z.string().optional(),
-  sector: z.string().optional(),
-  filedAt: isoDate.optional(),
+  name: z.string(), // display name of the unit
+  meta: z.record(z.string(), z.unknown()), // extra fields from inputs.json, passed to the checks as-is
   source: z.string().optional(), // URL of the original
   text: z.string(),
   chars: z.number().int(),
@@ -233,9 +231,12 @@ export type Lock = z.infer<typeof Lock>;
 export type Metrics = z.infer<typeof Metrics>;
 export type CrowdOutcome = z.infer<typeof CrowdOutcome>;
 
-// The check function contract, as implemented in usecase/checks.ts.
+// The check function contract, as implemented in usecase/checks.ts. The
+// harness is domain-agnostic: a check reads whatever it needs from `meta`.
 // `state.merged` is the map of merged proposals by key, built by the gate
-// caller from the `state` collection (today: only the task's own key).
-export type CheckInput = { key: string; company: string; ticker: string; filedAt: string; text: string };
+// caller from the `state` collection. The task's own key is never in it:
+// a recheck replaces that key's state, so the old record is not a
+// duplicate.
+export type CheckInput = { key: string; name: string; text: string; meta: Record<string, unknown> };
 export type CheckState = { merged: Record<string, unknown> };
 export type CheckFn = (proposal: unknown, input: CheckInput, state: CheckState) => { pass: boolean; reasons: string[] };

@@ -19,6 +19,8 @@ export function gate(
   state: CheckState,
 ): GateResult {
   const results: GateResult["checks"] = {};
+  // The harness is domain-agnostic; the use case's checks read their own meta fields, so meta is spread flat.
+  const checkArg = { ...input.meta, key: input.key, name: input.name, text: input.text } as CheckInput;
 
   if (input.key !== task.key) {
     results.input = { pass: false, reasons: [`input key ${input.key} does not match task key ${task.key}`] };
@@ -38,7 +40,7 @@ export function gate(
     }
     if (results[kind]) continue; // two criteria naming the same kind run it once
     try {
-      const r = fn(proposal, input, state);
+      const r = fn(proposal, checkArg, state);
       results[kind] = { pass: r.pass, reasons: [...r.reasons] };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);

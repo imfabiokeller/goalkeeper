@@ -56,11 +56,16 @@ function claimed(task: Task, workerId: string) {
 }
 
 export function checkInput(input: Input): CheckInput {
-  return { key: input.key, company: input.company, ticker: input.ticker ?? "", filedAt: input.filedAt ?? "", text: input.text };
+  return { key: input.key, name: input.name, text: input.text, meta: input.meta };
 }
 
-export function checkState(task: Pick<Task, "key">, state: State | null): CheckState {
-  return { merged: state ? { [task.key]: state.data } : {} };
+// The task's own key is never in `merged`: a recheck replaces the state
+// for that key, so the old record must not count as a duplicate. Other
+// keys pass through as given.
+export function checkState(task: Pick<Task, "key">, merged: Record<string, unknown> = {}): CheckState {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(merged)) if (k !== task.key) out[k] = v;
+  return { merged: out };
 }
 
 async function tryPlan(c: Collections, workerId: string, opts: IterationOptions): Promise<void> {
@@ -149,7 +154,7 @@ async function work(c: Collections, workerId: string, task: Task, opts: Iteratio
 
   if (run.outcome.type === "submit") {
     const proposal = run.outcome.proposal;
-    gateResult = gateFn(goal, task, proposal, checkInput(input), checkState(task, state));
+    gateResult = gateFn(goal, task, proposal, checkInput(input), checkState(task));
     if (gateResult.pass) {
       const merged = await mergeState(c, task, proposal, state, goal.version);
       if (!merged) {

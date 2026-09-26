@@ -13,7 +13,7 @@ type Sample = {
   expect: Record<string, boolean>;
   proposal: unknown;
 };
-type IndexEntry = { key: string; company: string; ticker: string; filedAt: string; file: string };
+type IndexEntry = { key: string; file: string; [extra: string]: unknown };
 
 const usecase = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "usecase");
 const read = (...p: string[]) => readFileSync(join(usecase, ...p), "utf8");
@@ -23,7 +23,8 @@ const index = new Map((JSON.parse(read("inputs.json")) as IndexEntry[]).map((e) 
 function loadInput(key: string): CheckInput {
   const e = index.get(key);
   if (!e) throw new Error(`no input with key ${key}`);
-  return { key, company: e.company, ticker: e.ticker, filedAt: e.filedAt, text: read(e.file) };
+  const { key: _key, file, source: _source, chars: _chars, ...meta } = e;
+  return { key, name: typeof meta.company === "string" ? meta.company : key, text: read(file), meta };
 }
 
 function stateFor(sample: Sample): CheckState {

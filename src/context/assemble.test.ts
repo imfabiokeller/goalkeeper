@@ -21,7 +21,7 @@ function longPassage(i: number): Passage {
 }
 
 const baseTask = { key: "aapl-2026-07-30", criteria: ["c1", "c2", "c3"], attempt: 1, hint: null };
-const baseInput = { key: "aapl-2026-07-30", company: "Apple Inc.", ticker: "AAPL", filedAt: "2026-07-30", text: "Apple reports third quarter results. Revenue $109.4 billion." };
+const baseInput = { key: "aapl-2026-07-30", name: "Apple Inc.", text: "Apple reports third quarter results. Revenue $109.4 billion." };
 
 describe("assemble", () => {
   const heavy = {

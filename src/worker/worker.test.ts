@@ -8,7 +8,7 @@ import type { LanguageModelV3CallOptions, LanguageModelV3GenerateResult } from "
 import { collections, ensureIndexes, type Collections } from "../shared/db.ts";
 import { goalFromLens } from "../shared/goal.ts";
 import type { Goal, Task } from "../shared/types.ts";
-import { iteration, type IterationOptions } from "./loop.ts";
+import { checkInput, checkState, iteration, type IterationOptions } from "./loop.ts";
 import { claim, heartbeat } from "./claim.ts";
 import { retrieve } from "../context/retrieve.ts";
 
@@ -50,10 +50,8 @@ async function seedInput(key: string) {
   await c.inputs.insertOne({
     _id: key,
     key,
-    company: "Apple Inc.",
-    ticker: "AAPL",
-    sector: "Information Technology",
-    filedAt: "2026-07-30",
+    name: "Apple Inc.",
+    meta: { ticker: "AAPL", sector: "Information Technology", filedAt: "2026-07-30" },
     source: "https://www.sec.gov/",
     text: appleText,
     chars: appleText.length,
@@ -114,6 +112,25 @@ const submitModel = (patch: Record<string, unknown> = {}) =>
   mockModel((o) => toolCallResult("submit", { proposal: { ...appleSample.proposal, key: keyOf(o), ...patch } }));
 
 // -------------------------------------------------------------- tests
+
+describe("check input and state", () => {
+  it("passes name, text and the meta bag, never the task's own merged state", () => {
+    const input = {
+      _id: "k",
+      key: "k",
+      name: "Unit K",
+      meta: { ticker: "K", filedAt: "2026-07-30" },
+      text: "t",
+      chars: 1,
+      scheduled: true,
+      scheduledBy: "seed",
+      createdAt: new Date(),
+    };
+    expect(checkInput(input)).toEqual({ key: "k", name: "Unit K", text: "t", meta: { ticker: "K", filedAt: "2026-07-30" } });
+    expect(checkState({ key: "k" })).toEqual({ merged: {} });
+    expect(checkState({ key: "k" }, { k: { old: true }, other: { x: 1 } })).toEqual({ merged: { other: { x: 1 } } });
+  });
+});
 
 describe("worker iteration", () => {
   it("merges one task: state doc, merged task, one worker-run source with tokens", async () => {

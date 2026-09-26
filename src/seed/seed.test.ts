@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { goalFromLens } from "../shared/goal.ts";
 import { Goal, Input, Lock, Metrics, Question, Source, SourceKind, State, Task, TaskStatus } from "../shared/types.ts";
 import { makeDevData, WORKERS } from "./fakes.ts";
-import { loadInputs, readIndex, readLens, SCHEDULED_COUNT, USECASE_DIR } from "./inputs.ts";
+import { entryMeta, entryName, loadInputs, readIndex, readLens, SCHEDULED_COUNT, USECASE_DIR } from "./inputs.ts";
 
 const NOW = new Date("2026-09-26T15:00:00Z");
 
@@ -54,6 +54,11 @@ describe("live input loader", () => {
       expect(doc.scheduled).toBe(i < SCHEDULED_COUNT);
       expect(doc.scheduledBy).toBe(i < SCHEDULED_COUNT ? "seed" : null);
       expect(doc.createdAt).toEqual(NOW);
+      // the harness names the unit; every other index field lands in meta untouched
+      const { key: _key, file: _file, source: _source, chars: _chars, ...rest } = index[i]!;
+      expect(doc.name).toBe(entryName(index[i]!));
+      expect(doc.meta).toEqual(rest);
+      expect(doc).not.toHaveProperty("company");
     }
     expect(inputs.filter((d) => d.scheduled)).toHaveLength(SCHEDULED_COUNT);
   }, 60_000);
@@ -68,12 +73,10 @@ describe("dev fakes", () => {
       Input.parse({
         _id: e.key,
         key: e.key,
-        company: e.company,
-        ticker: e.ticker,
-        sector: e.sector,
-        filedAt: e.filedAt,
+        name: entryName(e),
+        meta: entryMeta(e),
         source: e.source,
-        text: `${e.company} reports quarterly results.`,
+        text: `${entryName(e)} reports quarterly results.`,
         chars: 40,
         scheduled: i < SCHEDULED_COUNT,
         scheduledBy: i < SCHEDULED_COUNT ? "seed" : null,
