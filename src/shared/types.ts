@@ -78,6 +78,21 @@ export const GateResult = z.object({
   checks: z.record(z.string(), z.object({ pass: z.boolean(), reasons: z.array(z.string()) })),
 });
 
+// One line of live progress on a claimed task: which tool the step called
+// and, for a draft or a submit, what the gate said. Small on purpose: no
+// proposal, no program text, reasons clipped. The screen reads it live.
+export const ProgressEntry = z.object({
+  at: z.date(),
+  step: z.number().int().min(0),
+  tool: z.string(), // tool name, "text" for a step without a call, "reaper" for a requeue
+  ok: z.boolean().optional(), // try_submit and submit only: the gate verdict
+  reasons: z.array(z.string()).optional(), // first PROGRESS_REASONS, each clipped to PROGRESS_REASON_CHARS
+  rule: z.string().optional(), // the draft's rule sentence, if the proposal has one
+});
+export const PROGRESS_ENTRIES = 25; // the task keeps the last this many
+export const PROGRESS_REASONS = 3;
+export const PROGRESS_REASON_CHARS = 160;
+
 export const Task = z.object({
   _id: objectId,
   key: z.string(),
@@ -95,7 +110,15 @@ export const Task = z.object({
   createdBy: z.string(), // "planner" | "crowd:<sourceId>"
   createdAt: z.date(),
   updatedAt: z.date(),
+  // Live progress, written by the worker per step (the claim resets both).
+  step: z.number().int().min(0).nullable().optional(), // tool steps completed in the current attempt
+  progress: z.array(ProgressEntry).optional(), // last PROGRESS_ENTRIES, oldest first
+  // Dead worker memory, written by the reaper on a requeue and left as is by the next claim.
+  lastWorker: z.string().nullable().optional(),
+  diedAt: z.date().nullable().optional(),
 });
+
+export type ProgressEntry = z.infer<typeof ProgressEntry>;
 
 // --------------------------------------------------------------- state
 

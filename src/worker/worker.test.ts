@@ -10,6 +10,8 @@ import { goalFromLens } from "../shared/goal.ts";
 import type { Goal, Task } from "../shared/types.ts";
 import { checkInput, checkState, iteration, MAX_ATTEMPTS, type IterationOptions } from "./loop.ts";
 import { claim, heartbeat } from "./claim.ts";
+import { gate } from "../gate/gate.ts";
+import { MAX_NUDGES, NUDGE, runTask, type RunCtx } from "./run.ts";
 import { retrieve } from "../context/retrieve.ts";
 import { flattenRun, proposalLines } from "./write.ts";
 
@@ -110,8 +112,37 @@ function toolCallResult(toolName: string, input: unknown): LanguageModelV3Genera
   };
 }
 
+// A step that ends on plain text, no tool call: "length" when the output ceiling cut it off.
+function textResult(text: string, finishReason: "stop" | "length" = "length"): LanguageModelV3GenerateResult {
+  return {
+    content: [{ type: "text", text }],
+    finishReason: { unified: finishReason, raw: finishReason },
+    usage: {
+      inputTokens: { total: 1000, noCache: 1000, cacheRead: undefined, cacheWrite: undefined },
+      outputTokens: { total: 4000, text: 4000, reasoning: undefined },
+    },
+    warnings: [],
+  };
+}
+
 function mockModel(decide: (options: LanguageModelV3CallOptions) => Promise<LanguageModelV3GenerateResult> | LanguageModelV3GenerateResult) {
   return new MockLanguageModelV3({ doGenerate: async (options) => decide(options) });
+}
+
+// runTask against the mock with the real gate on the apple puzzle, no database.
+function runCtx(model: ReturnType<typeof mockModel>, extra: Partial<RunCtx> = {}): RunCtx {
+  const task = { key: "60c09cac", criteria: ["c1", "c2", "c3"] };
+  const input = { key: "60c09cac", name: "60c09cac", text: appleText, meta: puzzleMeta };
+  return {
+    system: "key: 60c09cac",
+    messages: [{ role: "user", content: "solve it" }],
+    inputText: appleText,
+    readState: async () => null,
+    search: async () => [],
+    dryRun: (proposal) => gate(goal, task, proposal, input, { merged: {} }),
+    model,
+    ...extra,
+  };
 }
 
 const submitModel = (patch: Record<string, unknown> = {}) =>
@@ -135,6 +166,51 @@ describe("check input and state", () => {
     expect(checkInput(input)).toEqual({ key: "k", name: "Unit K", text: "t", meta: { ticker: "K", filedAt: "2026-07-30" } });
     expect(checkState({ key: "k" })).toEqual({ merged: {} });
     expect(checkState({ key: "k" }, { k: { old: true }, other: { x: 1 } })).toEqual({ merged: { other: { x: 1 } } });
+  });
+});
+
+describe("run nudges", () => {
+  it("a text-only step that hit the output ceiling gets a nudge, and the next call submits", async () => {
+    let calls = 0;
+    const prompts: LanguageModelV3CallOptions["prompt"][] = [];
+    const model = mockModel((o) => {
+      calls += 1;
+      prompts.push(o.prompt);
+      if (calls === 1) return textResult("Let me analyze the pairs at length...");
+      return toolCallResult("submit", { proposal: { ...appleSample.proposal, key: "60c09cac" } });
+    });
+    const r = await runTask(runCtx(model));
+    expect(r.outcome.type).toBe("submit");
+    expect(calls).toBe(2);
+    expect(r.steps).toHaveLength(2);
+    expect(r.steps[0].finishReason).toBe("length");
+    expect(r.steps[0].toolCalls).toEqual([]);
+    expect(r.steps[1].toolCalls[0]?.name).toBe("submit");
+    expect(r.usage).toEqual({ in: 2200, out: 4080 });
+    // The second call carries the first answer and the nudge line.
+    const second = prompts[1];
+    expect(second.at(-1)).toMatchObject({ role: "user", content: [{ type: "text", text: NUDGE }] });
+    expect(second.some((m) => m.role === "assistant")).toBe(true);
+    // The run record has the assistant text, the nudge and the submit call, in order.
+    expect(r.messages.map((m) => m.role)).toEqual(["assistant", "user", "assistant", "tool"]);
+  });
+
+  it("nudges stop at MAX_NUDGES and within the step budget", async () => {
+    let calls = 0;
+    const model = mockModel(() => {
+      calls += 1;
+      return textResult("still thinking", "stop");
+    });
+    const r = await runTask(runCtx(model));
+    expect(r.outcome).toEqual({ type: "fail", reason: "no submit or block within the step budget" });
+    expect(calls).toBe(MAX_NUDGES + 1);
+    expect(r.steps).toHaveLength(MAX_NUDGES + 1);
+
+    calls = 0;
+    const tight = await runTask(runCtx(model, { maxSteps: 2 }));
+    expect(tight.outcome.type).toBe("fail");
+    expect(calls).toBe(2);
+    expect(tight.steps).toHaveLength(2);
   });
 });
 

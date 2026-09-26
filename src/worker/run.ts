@@ -11,6 +11,9 @@ import { workerModel, workerProviderOptions } from "../shared/llm.ts";
 import { BlockArgs, SubmitArgs, type GateResult } from "../shared/types.ts";
 
 export const MAX_STEPS = 20;
+// How many times a run that ended on plain text (no tool call) is asked again for a tool call.
+export const MAX_NUDGES = 3;
+export const NUDGE = "Stop analyzing. Call try_submit now with your best draft, or block.";
 
 export type RunOutcome =
   | { type: "submit"; proposal: Record<string, unknown> }
@@ -119,6 +122,7 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
     }),
   };
 
+<<<<<<< Updated upstream
   const result = await generateText({
     model: ctx.model ?? workerModel(),
     system: ctx.system,
@@ -129,13 +133,51 @@ export async function runTask(ctx: RunCtx): Promise<RunResult> {
     providerOptions: workerProviderOptions(),
     abortSignal: ctx.abortSignal,
   });
+=======
+  const maxSteps = ctx.maxSteps ?? MAX_STEPS;
+  const steps: StepRecord[] = [];
+  const responseMessages: ModelMessage[] = [];
+  const usage = { in: 0, out: 0 };
+  let finishReason = "";
+  let nudges = 0;
 
-  const steps = result.steps.map((s) => recordStep(s as unknown as StepResult<never, never>));
+  // A text-only step ends generateText (no tool call, so nothing to loop
+  // on). With reasoning off the model may write its whole analysis as
+  // text and run out of output tokens ("length") before calling a tool.
+  // Each such ending gets a nudge: the same conversation plus one user
+  // line asking for a tool call, within the remaining step budget.
+  for (;;) {
+    const result = await generateText({
+      model: ctx.model ?? workerModel(),
+      system: ctx.system,
+      messages: [...ctx.messages, ...responseMessages],
+      tools,
+      stopWhen: [stepCountIs(maxSteps - steps.length), hasToolCall("submit"), hasToolCall("block")],
+      maxOutputTokens: 4000, // a proposal plus its working, never the model's default ceiling
+      providerOptions: workerProviderOptions(),
+      abortSignal: ctx.abortSignal,
+    });
+
+    steps.push(...result.steps.map((s) => recordStep(s as unknown as StepResult<never, never>)));
+    responseMessages.push(...result.response.messages);
+    usage.in += result.totalUsage.inputTokens ?? 0;
+    usage.out += result.totalUsage.outputTokens ?? 0;
+    finishReason = result.finishReason;
+
+    if (outcome) break;
+    const last = result.steps.at(-1);
+    const textOnly = last !== undefined && last.toolCalls.length === 0 && (last.finishReason === "length" || last.finishReason === "stop");
+    if (!textOnly || steps.length >= maxSteps || nudges >= MAX_NUDGES) break;
+    nudges += 1;
+    responseMessages.push({ role: "user", content: NUDGE });
+  }
+>>>>>>> Stashed changes
+
   return {
     outcome: outcome ?? { type: "fail", reason: "no submit or block within the step budget" },
     steps,
-    messages: result.response.messages,
-    usage: { in: result.totalUsage.inputTokens ?? 0, out: result.totalUsage.outputTokens ?? 0 },
-    finishReason: result.finishReason,
+    messages: responseMessages,
+    usage,
+    finishReason,
   };
 }
