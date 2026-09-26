@@ -33,6 +33,17 @@ Chin, 2026); Greenblatt's GPT-4o pipeline was 42% with thousands of
 samples per task (2024). The public eval set is likely in training data,
 so any public-eval number is best case; ARC Prize scores semi-private.
 
+**Is the comparison with the control fair?**
+Same model, no thinking, same puzzle text, same gate, and at most two
+shots at the hidden test on both sides (ARC's rule). Not the same: the
+harness runs its program on the example pairs and reads the diff, the
+control writes blind; and a harness attempt costs about ten times the
+control's tokens. So the honest claim is "same model, one shot 12%,
+with the harness about 50%", not "same budget". Whether the library, and
+not just feedback plus retries, is the cause needs an ablation with
+retrieval off; we did not run it today. The curve of solve rate against
+library size over the day is the evidence we have.
+
 **Two workers, same puzzle?**
 Cannot happen: the claim is one atomic update, the planner never emits a
 task for a busy key, and the state write has a version precondition. A
